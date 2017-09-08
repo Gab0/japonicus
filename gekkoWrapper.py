@@ -22,6 +22,7 @@ def getAvailableDataset():
     REQ = requests.post(URL)
 
     RESP = REQ.json()
+
     DS = RESP['datasets']
     
     for EXCHANGE in DS:
@@ -35,7 +36,7 @@ def getAvailableDataset():
     best_exchange = exchange_longest_spans.index(max(exchange_longest_spans))
 
     LongestDataset = DS[best_exchange]['ranges'][DS[best_exchange]['max_span_index']]
-            
+
     return LongestDataset
 
 def runBacktest(TradeSetting, DateRange):

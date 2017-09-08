@@ -69,7 +69,6 @@ def getDateRange(Limits, deltaDAYS=3):
         "from": "%s" % epochToString(Starting),
         "to": "%s" % epochToString(Starting+deltams)
     }
-
     return DateRange
 
 def Evaluate(DateRange, Individual, Strategy):
@@ -83,12 +82,11 @@ def initInd(Criterion):
     return w
 
 def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
-    
     Strategy= "DEMA" # Strategy to be used;
     DRP = 10 # Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
     _lambda  = 5 # size of offspring generated per epoch;
-    cxpb, mutpb = 0.3, 0.5 # Probabilty of crossover and mutation respectively;
+    cxpb, mutpb = 0.3, 0.6 # Probabilty of crossover and mutation respectively;
     deltaDays=3 # time window of dataset for evaluation
     n_ParallelBacktests = 5
 
@@ -129,9 +127,12 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
     while W < NBEPOCH: 
         HallOfFame = tools.HallOfFame(30)
         bestScore = 0
-        if (not W % DRP and bestScore > 0.3 and not Deviation)\
-           or not W % (DRP*3): # SELECT NEW DATERANGE;
-            if W:
+        Deviation = 0
+        
+        Z = not W % DRP and bestScore > 0.3 and not Deviation
+        K = not W % (DRP*3)
+        if Z or K: # SELECT NEW DATERANGE;
+            if W:# SEND BEST IND TO HoF;
                 BestSetting = tools.selBest(POP, 1)[0]
                 HallOfFame.insert(BestSetting)
                 #print(InfoData)
