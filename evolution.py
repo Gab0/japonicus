@@ -156,7 +156,7 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
         # sort some information to show;
         medScore = sum([I.fitness.values[0] for I in POP])/len(POP)
         bestScore = tools.selBest(POP,1)[0].fitness.values[0]
-        print("Scores for epoch:  Medium profit %.3f%%     Best profit %.3f%%" % (medScore, bestScore))
+        print("EPOCH %i:  Medium profit %.3f%%     Best profit %.3f%%" % (W, medScore, bestScore))
         
         InfoData[W] = {
             'best': bestScore,
@@ -170,7 +170,7 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
         W+=1
         
     FinalIndividue = tools.selBest(POP, 1)[0]
-    print(reconstructTradeSettings(FinalIndividue))
+    print(reconstructTradeSettings(FinalIndividue, FinalIndividue.Settings))
 
 if __name__ == '__main__':
     MODES = ['MACD', 'DEMA', 'RSI', 'PPO']
