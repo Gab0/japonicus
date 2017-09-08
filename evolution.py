@@ -129,7 +129,8 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
     while W < NBEPOCH: 
         HallOfFame = tools.HallOfFame(30)
         bestScore = 0
-        if (not W % DRP and bestScore > 0.3) or not W % (DRP*3): # SELECT NEW DATERANGE;
+        if (not W % DRP and bestScore > 0.3 and not Deviation)\
+           or not W % (DRP*3): # SELECT NEW DATERANGE;
             if W:
                 BestSetting = tools.selBest(POP, 1)[0]
                 HallOfFame.insert(BestSetting)
@@ -170,7 +171,7 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
 
         # show information;
         print("EPOCH %i" % W) 
-        print("Average profit %.3f%%\tVariation %.3f" % (Stats['avg'],Stats['std']))
+        print("Average profit %.3f%%\tDeviation %.3f" % (Stats['avg'],Stats['std']))
         print("Maximum profit %.3f%%\tMinimum profit %.3f%%" % (Stats['max'],Stats['min']))
         print("")
 
@@ -178,7 +179,7 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
         InfoData[W] = Stats
         
         bestScore=Stats['max']
-        
+        Deviation = Stats['std']
         # generate and append offspring in population;
         offspring = algorithms.varOr(POP, toolbox, _lambda, cxpb, mutpb)
         POP += offspring
