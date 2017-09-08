@@ -12,7 +12,6 @@ import requests
 gekkoURL = 'http://localhost:3000'
 gekkoDIR = 'TBD'
 
-
 def initializeGekko(): # not used yet.
     CMD = ['node', GekkoDir + '/gekko', '--ui']
     D = Popen(CMD, stdin=PIPE, stdout=PIPE, stderr=PIPE)
@@ -92,32 +91,3 @@ def runBacktest(TradeSetting, DateRange):
     rP = RESULT['report']['relativeProfit']
     return rP
 
-'''    
-def runStandaloneBacktest(TradeSetting, DateRange):
-    # needs modified gekko -> to accept trade config from the command line.
-    # DEPRECATED; ugly stuff.
-    
-    CMD = ['node', GekkoDir + '/gekko',
-           '--config', 'config.js',
-           '--backtest',
-           '--daterange', DateRange,
-           '--trade', TradeSetting]
-
-    D = Popen(CMD, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    Result = D.communicate()[0].decode('utf-8').split('\n')
-    for line in Result:
-        if 'simulated profit' in line:
-            print('*'+line)
-            RES = float(line.split(' ')[-1][1:-2])
-            print("* %.3f *" % RES)
-
-        
-    return RES
-    #print(Result)
-'''
-'''
-def getFromDict(DataDict, Indexes):
-    return reduce(operator.getitem, Indexes, DataDict)
-def writeToDict(DataDict, Indexes, Value):
-    getFromDict(DataDict, Indexes[:-1])[Indexes[-1]] = Value
-'''

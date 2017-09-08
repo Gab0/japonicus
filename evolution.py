@@ -11,6 +11,8 @@ from deap import creator
 from deap import tools
 from deap import algorithms
 
+import numpy as np
+
 from multiprocessing import Pool
 
 from gekkoWrapper import *
@@ -111,6 +113,12 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
     print("using candlestick dataset %s" % chosenRange)
 
     InfoData={}
+    
+    stats = tools.Statistics(lambda ind: ind.fitness.values)
+    stats.register("avg", np.mean)
+    stats.register("std", np.std)
+    stats.register("min", np.min)
+    stats.register("max", np.max)
 
     settings_debug_min = reconstructTradeSettings([0 for x in range(10)], 'MIN_ VALUES')
     settings_debug_max = reconstructTradeSettings([100 for x in range(10)], 'MAX_ VALUES')
@@ -120,9 +128,8 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
           
     while W < NBEPOCH: 
         HallOfFame = tools.HallOfFame(30)
-
-
-        if not W % DRP: # SELECT NEW DATERANGE;
+        bestScore = 0
+        if (not W % DRP and bestScore > 0.3) or not W % (DRP*3): # SELECT NEW DATERANGE;
             if W:
                 BestSetting = tools.selBest(POP, 1)[0]
                 HallOfFame.insert(BestSetting)
@@ -145,26 +152,32 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
         for ind, fit in zip(individues_to_simulate, fitnesses):
             ind.fitness.values = fit
 
+        # get proper evolution statistics; #TBD
+        Stats=stats.compile(POP)
+
         hof=0
         if HallOfFame.items:
             # casually insert individuals from HallOfFame on population;
             for Q in range(1):
                 CHP = deepcopy(choice(HallOfFame))
+                del CHP.fitness.values
                 POP += [CHP]
+                
                 hof+=1
             
         # remove worst individuals from population;
         POP = tools.selBest(POP, len(POP)-_lambda-hof)
 
-        # sort some information to show;
-        medScore = sum([I.fitness.values[0] for I in POP])/len(POP)
-        bestScore = tools.selBest(POP, 1)[0].fitness.values[0]
-        print("EPOCH %i -- Medium profit %.3f%%     Best profit %.3f%%" % (W, medScore, bestScore))
+        # show information;
+        print("EPOCH %i" % W) 
+        print("Average profit %.3f%%\tVariation %.3f" % (Stats['avg'],Stats['std']))
+        print("Maximum profit %.3f%%\tMinimum profit %.3f%%" % (Stats['max'],Stats['min']))
+        print("")
+
+        # log statistcs;
+        InfoData[W] = Stats
         
-        InfoData[W] = {
-            'best': bestScore,
-            'med': medScore
-        }
+        bestScore=Stats['max']
         
         # generate and append offspring in population;
         offspring = algorithms.varOr(POP, toolbox, _lambda, cxpb, mutpb)
@@ -173,7 +186,10 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
         W+=1
         
     FinalIndividue = tools.selBest(POP, 1)[0]
-    print(reconstructTradeSettings(FinalIndividue, FinalIndividue.Strategy))
+    FinalIndividueSettings = reconstructTradeSettings(FinalIndividue,
+                                                      FinalIndividue.Strategy)
+    Show = json.dumps(FinalIndividueSettings, indent=2)
+    print("Result Config: %s" % Show)
 
 if __name__ == '__main__':
     MODES = ['MACD', 'DEMA', 'RSI', 'PPO']
