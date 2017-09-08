@@ -10,6 +10,8 @@ from deap import creator
 from deap import tools
 from deap import algorithms
 
+from multiprocessing import Pool
+
 from gekkoWrapper import *
 #from plotInfo import plotEvolutionSummary
 
@@ -24,70 +26,31 @@ def progrBarMap(funct, array):
     return result
 
 def getRandomTradeSettings():
-
-    sC = '''
-{"%s":{
-    "short": %i,
-    "long": %i,
-    "signal": %i,
-    "interval": %i,
-    "thresholds": {
-    "down": %.3f,
-    "up": %.3f,
-    "low": %i,
-    "high": %i,
-    "persistence": %i,
-    "fibonacci": %.1f
-    }
-    }
-    }
-''' % (choice(MODES),
-       randrange(2,20),
-       randrange(14,44),
-       randrange(5,15),
-       randrange(4,28),
-       randrange(-50, 5)/40,
-       randrange(-5, 50)/40,
-       randrange(10,50),
-       randrange(45,95),
-       randrange(1,4),
-       randrange(1,6)/10)
-    
-    return eval(sC)
+    pass
 
 def createRandomVarList(SZ=10):
     VAR_LIST = [random.randrange(0,100) for x in range(SZ)]
     return VAR_LIST
 
-def reconstructTradeSettings(IND):
-    sC =\
- '''{"%s":{
-    "short": %i,
-    "long": %i,
-    "signal": %i,
-    "interval": %i,
-    "thresholds": {
-    "down": %.3f,
-    "up": %.3f,
-    "low": %i,
-    "high": %i,
-    "persistence": %i,
-    "fibonacci": %.1f
-    }
-    }
-    }''' % (IND.Strategy,
-            IND[0]//5,
-            IND[1]//3+10,
-            IND[2]//10+5,
-            IND[3]//3,
-            (IND[4]//1.5-50)/40,
-            (IND[5]//1.5-5)/40,
-            IND[6]//2+10,
-            IND[7]//2+45,
-            IND[8]//25+1,
-            (IND[9]//11+1)/10)
+def reconstructTradeSettings(IND, Strategy):
+    Settings = {
+        Strategy:{
+            "short": IND[0]//5,
+            "long": IND[1]//3+10,
+            "signal": IND[2]//10+5,
+            "interval": IND[3]//3,
+            "thresholds": {
+                "down": (IND[4]//1.5-50)/40,
+                "up": (IND[5]//1.5-5)/40,
+                "low": IND[6]//2+10,
+                "high": IND[7]//2+45,
+                "persistence": IND[8]//25+1,
+                "fibonacci": (IND[9]//11+1)/10
+            }
+        }
+    } 
         
-    return eval(sC)
+    return Settings
 
 def getDateRange(Limits, deltaDAYS=3):
     DateFormat="%Y-%m-%d %H:%M:%S"
@@ -106,8 +69,8 @@ def getDateRange(Limits, deltaDAYS=3):
 
     return DateRange
 
-def Evaluate(DateRange, Individual):
-    Settings = reconstructTradeSettings(Individual)
+def Evaluate(DateRange, Individual, Strategy):
+    Settings = reconstructTradeSettings(Individual, Strategy)
     Score = runBacktest(Settings, DateRange)
     return Score,
 
@@ -124,7 +87,9 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
     _lambda  = 5 # size of offspring generated per epoch;
     cxpb, mutpb = 0.3, 0.5 # Probabilty of crossover and mutation respectively;
     deltaDays=3 # time window of dataset for evaluation
+    n_ParallellBacktests = 5
 
+    parallel = Pool(n_ParallelBacktests)
     
     toolbox = base.Toolbox()
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -153,7 +118,7 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
             if W:
                 BestSetting = tools.selBest(POP, 1)[0]
                 HallOfFame.insert(BestSetting)
-                print(InfoData)
+                #print(InfoData)
                 #plotEvolutionSummary(InfoData,
                 #                     "evolution_%s"% (Strategy))
             DateRange = getDateRange(chosenRange, deltaDAYS=deltaDays)
@@ -164,7 +129,11 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
             toolbox.register("evaluate", Evaluate, DateRange)
         
         individues_to_simulate = [ind for ind in POP if not ind.fitness.valid]
-        fitnesses = toolbox.map(toolbox.evaluate, individues_to_simulate)
+        
+        #fitnesses = toolbox.map(toolbox.evaluate, individues_to_simulate)
+        to_simulation = [(x[:], x.Strategy) for x in individues_to_simulate]
+        fitnesses = parallel.starmap(toolbox.evaluate, to_simulation)
+        
         for ind, fit in zip(individues_to_simulate, fitnesses):
             ind.fitness.values = fit
 

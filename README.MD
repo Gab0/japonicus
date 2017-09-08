@@ -6,13 +6,13 @@ Recommended usage:
 ```
 Open two terminals:
 
-1st$ cd [gekko dir] && node gekko --ui
+first, run Gekko on ui mode.
 
-2nd$ cd [japonicus dir] && python evolution.py
+second, $cd [japonicus dir] && python evolution.py
 ```
 If you use a UI port which is not :3000, adjust accordingly on gekkoWrapper.py.
 
-The backtesting is serial (one at a time). I'm not aware of node.js multicore capabilities, if it is possible to increase speed by running multiple parallel backtestings, would be not hard to just open multiple Gekkos on diverse ports and develop this script to follow. So fork it or let me know..
+Backtesting is parallel. It runs five at a time, or adjust it on evolution.py:90
 
 This is written on python because of the nice DEAP module for genetic algorithm. It's worth it.. available on PIP.
 
