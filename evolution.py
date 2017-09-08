@@ -2,6 +2,7 @@
 import random
 import datetime
 import calendar
+import json
 
 from copy import deepcopy
 
@@ -82,7 +83,7 @@ def initInd(Criterion):
 def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
     
     Strategy= "DEMA" # Strategy to be used;
-    DRP = 20 # Date range persistence; Number of subsequent rounds
+    DRP = 10 # Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
     _lambda  = 5 # size of offspring generated per epoch;
     cxpb, mutpb = 0.3, 0.5 # Probabilty of crossover and mutation respectively;
@@ -111,9 +112,11 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
 
     InfoData={}
 
-
-    print("DEBUG %s" % reconstructTradeSettings([0 for x in range(10)], 'MIN_ VALUES'))
-    print("DEBUG %s" % reconstructTradeSettings([100 for x in range(10)], 'MAX_ VALUES'))
+    settings_debug_min = reconstructTradeSettings([0 for x in range(10)], 'MIN_ VALUES')
+    settings_debug_max = reconstructTradeSettings([100 for x in range(10)], 'MAX_ VALUES')
+    
+    print("DEBUG %s" % json.dumps(settings_debug_min, indent=2))
+    print("DEBUG %s" % json.dumps(settings_debug_max, indent=2))
           
     while W < NBEPOCH: 
         HallOfFame = tools.HallOfFame(30)
@@ -128,9 +131,9 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
                 #                     "evolution_%s"% (Strategy))
             DateRange = getDateRange(chosenRange, deltaDAYS=deltaDays)
             print("Loading new date range;")
-            print("\t%s" % DateRange)
-            for I in POP:
-                del I.fitness.values
+            print("\t%s to %s" % (DateRange['from'], DateRange['to']))
+            for I in range(len(POP)):
+                del POP[I].fitness.values
             toolbox.register("evaluate", Evaluate, DateRange)
         
         individues_to_simulate = [ind for ind in POP if not ind.fitness.valid]
@@ -155,8 +158,8 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
 
         # sort some information to show;
         medScore = sum([I.fitness.values[0] for I in POP])/len(POP)
-        bestScore = tools.selBest(POP,1)[0].fitness.values[0]
-        print("EPOCH %i:  Medium profit %.3f%%     Best profit %.3f%%" % (W, medScore, bestScore))
+        bestScore = tools.selBest(POP, 1)[0].fitness.values[0]
+        print("EPOCH %i -- Medium profit %.3f%%     Best profit %.3f%%" % (W, medScore, bestScore))
         
         InfoData[W] = {
             'best': bestScore,
@@ -170,7 +173,7 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
         W+=1
         
     FinalIndividue = tools.selBest(POP, 1)[0]
-    print(reconstructTradeSettings(FinalIndividue, FinalIndividue.Settings))
+    print(reconstructTradeSettings(FinalIndividue, FinalIndividue.Strategy))
 
 if __name__ == '__main__':
     MODES = ['MACD', 'DEMA', 'RSI', 'PPO']
