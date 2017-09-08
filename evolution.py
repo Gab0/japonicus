@@ -35,7 +35,7 @@ def createRandomVarList(SZ=10):
 def reconstructTradeSettings(IND, Strategy):
     Settings = {
         Strategy:{
-            "short": IND[0]//5,
+            "short": IND[0]//5+1,
             "long": IND[1]//3+10,
             "signal": IND[2]//10+5,
             "interval": IND[3]//3,
