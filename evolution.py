@@ -11,7 +11,7 @@ from deap import tools
 from deap import algorithms
 
 from gekkoWrapper import *
-from plotInfo import plotEvolutionSummary
+#from plotInfo import plotEvolutionSummary
 
 def progrBarMap(funct, array):
     l = len(array)
@@ -59,7 +59,7 @@ def createRandomVarList(SZ=10):
     VAR_LIST = [random.randrange(0,100) for x in range(SZ)]
     return VAR_LIST
 
-def reconstructTradeSettings(VAR_LIST):
+def reconstructTradeSettings(IND):
     sC =\
  '''{"%s":{
     "short": %i,
@@ -75,23 +75,23 @@ def reconstructTradeSettings(VAR_LIST):
     "fibonacci": %.1f
     }
     }
-    }''' % ("DEMA",
-            VAR_LIST[0]//5,
-            VAR_LIST[1]//3+10,
-            VAR_LIST[2]//10+5,
-            VAR_LIST[3]//3,
-            (VAR_LIST[4]//1.5-50)/40,
-            (VAR_LIST[5]//1.5-5)/40,
-            VAR_LIST[6]//2+10,
-            VAR_LIST[7]//2+45,
-            VAR_LIST[8]//25+1,
-            (VAR_LIST[9]//11+1)/10)
+    }''' % (IND.Strategy,
+            IND[0]//5,
+            IND[1]//3+10,
+            IND[2]//10+5,
+            IND[3]//3,
+            (IND[4]//1.5-50)/40,
+            (IND[5]//1.5-5)/40,
+            IND[6]//2+10,
+            IND[7]//2+45,
+            IND[8]//25+1,
+            (IND[9]//11+1)/10)
         
     return eval(sC)
 
 def getDateRange(Limits, deltaDAYS=3):
     DateFormat="%Y-%m-%d %H:%M:%S"
-    print(Limits)
+
     epochToString = lambda D: datetime.datetime.utcfromtimestamp(D).strftime(DateFormat)
     FLms = Limits['from']
     TLms = Limits['to']
@@ -116,10 +116,20 @@ def initInd(Criterion):
     w[:] = createRandomVarList()
     return w
 
-def gekkoGA(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
+def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
+    
+    Strategy= "DEMA" # Strategy to be used;
+    DRP = 20 # Date range persistence; Number of subsequent rounds
+             # until another time range in dataset is selected;
+    _lambda  = 5 # size of offspring generated per epoch;
+    cxpb, mutpb = 0.3, 0.5 # Probabilty of crossover and mutation respectively;
+    deltaDays=3 # time window of dataset for evaluation
+
+    
     toolbox = base.Toolbox()
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
-    creator.create("Criterion", list, fitness=creator.FitnessMax)
+    creator.create("Criterion", list,
+                   fitness=creator.FitnessMax, Strategy=Strategy)
     toolbox.register("newCriterion", initInd, creator.Criterion)
     
     toolbox.register("population", tools.initRepeat, list,  toolbox.newCriterion)
@@ -132,12 +142,7 @@ def gekkoGA(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
     POP = toolbox.population(n=POP_SIZE)
     W=0
     chosenRange = getAvailableDataset()
-    print(chosenRange)
-
-    DRP = 20 # Date range persistence; Number of subsequent rounds
-             # until another time range in dataset is selected;
-    _lambda  = 5, 0.3, 0.5 # N of offspring generated per epoch;
-    cxpb, mutpb = 0.3, 0.5 # Probabilty of crossover and mutation respectively;
+    print("using candlestick dataset %s" % chosenRange)
 
     InfoData={}
     while W < NBEPOCH:
@@ -148,9 +153,10 @@ def gekkoGA(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
             if W:
                 BestSetting = tools.selBest(POP, 1)[0]
                 HallOfFame.insert(BestSetting)
-                InfoData.update({W:BestSetting.fitness.values[0]})
-                plotEvolutionSummary(InfoData, "evolution_%s"% (W,Strategy))
-            DateRange = getDateRange(chosenRange)
+                print(InfoData)
+                #plotEvolutionSummary(InfoData,
+                #                     "evolution_%s"% (Strategy))
+            DateRange = getDateRange(chosenRange, deltaDAYS=deltaDays)
             print("Loading new date range;")
             print("\t%s" % DateRange)
             for I in POP:
@@ -177,22 +183,25 @@ def gekkoGA(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
         medScore = sum([I.fitness.values[0] for I in POP])/len(POP)
         bestScore = tools.selBest(POP,1)[0].fitness.values[0]
         print("Scores for epoch:  Medium profit %.3f%%     Best profit %.3f%%" % (medScore, bestScore))
-
+        
+        InfoData[W] = {
+            'best': bestScore,
+            'med': medScore
+        }
+        
         # generate and append offspring in population;
         offspring = algorithms.varOr(POP, toolbox, _lambda, cxpb, mutpb)
         POP += offspring
-        print("POPSIZE %i" % len(POP))
-        
+        #print("POPSIZE %i" % len(POP))
         W+=1
-    
+        
     FinalIndividue = tools.selBest(POP, 1)[0]
     print(reconstructTradeSettings(FinalIndividue))
-
 
 if __name__ == '__main__':
     MODES = ['MACD', 'DEMA', 'RSI', 'PPO']
 
     for W in range(10):
-        GA = gekkoGA()
+        GA = gekko_generations()
 
 

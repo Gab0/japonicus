@@ -10,7 +10,7 @@ from urllib import request, parse
 import requests
 
 gekkoURL = 'http://localhost:3000'
-gekkoDIR = 'not needed'
+gekkoDIR = 'TBD'
 
 
 def initializeGekko(): # not used yet.
@@ -23,7 +23,6 @@ def getAvailableDataset():
     REQ = requests.post(URL)
 
     RESP = REQ.json()
-    print(RESP)
     DS = RESP['datasets']
     
     for EXCHANGE in DS:
