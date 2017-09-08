@@ -87,7 +87,7 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
     _lambda  = 5 # size of offspring generated per epoch;
     cxpb, mutpb = 0.3, 0.5 # Probabilty of crossover and mutation respectively;
     deltaDays=3 # time window of dataset for evaluation
-    n_ParallellBacktests = 5
+    n_ParallelBacktests = 5
 
     parallel = Pool(n_ParallelBacktests)
     
@@ -110,7 +110,12 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
     print("using candlestick dataset %s" % chosenRange)
 
     InfoData={}
-    while W < NBEPOCH:
+
+
+    print("DEBUG %s" % reconstructTradeSettings([0 for x in range(10)], 'MIN_ VALUES'))
+    print("DEBUG %s" % reconstructTradeSettings([100 for x in range(10)], 'MAX_ VALUES'))
+          
+    while W < NBEPOCH: 
         HallOfFame = tools.HallOfFame(30)
 
 
