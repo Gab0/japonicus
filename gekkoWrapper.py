@@ -56,7 +56,9 @@ def runBacktest(TradeSetting, DateRange):
                 "asset": "BTC"
             },
             "paperTrader": {
-                "fee":0.25,
+                "feeMaker": 0.15,
+                "feeTaker": 0.25,
+                "feeUsing": 'maker',
                 "slippage":0.05,
                 "simulationBalance": {
                     "asset":1,
