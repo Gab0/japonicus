@@ -56,6 +56,7 @@ def runBacktest(TradeSetting, DateRange):
                 "asset": "BTC"
             },
             "paperTrader": {
+                "fee": 0.25, # declare deprecated 'fee' so keeps working w/ old gekko;
                 "feeMaker": 0.15,
                 "feeTaker": 0.25,
                 "feeUsing": 'maker',
