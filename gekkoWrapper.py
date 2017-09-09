@@ -6,7 +6,7 @@ from copy import deepcopy
 import operator
 from functools import reduce
 from urllib import request, parse
-
+import json
 import requests
 
 gekkoURL = 'http://localhost:3000'
@@ -16,12 +16,16 @@ def initializeGekko(): # not used yet.
     CMD = ['node', GekkoDir + '/gekko', '--ui']
     D = Popen(CMD, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
+def httpPost(URL, data={}):
+    Request = requests.post(URL, json=data)
+    Response = json.loads(Request.text)
+
+    return Response
+    
 def getAvailableDataset():
     URL = gekkoURL + '/api/scansets'
 
-    REQ = requests.post(URL)
-
-    RESP = REQ.json()
+    RESP = httpPost(URL)
 
     DS = RESP['datasets']
     
@@ -86,9 +90,7 @@ def runBacktest(TradeSetting, DateRange):
             }
     }
 
-    REQ = requests.post(URL, json=CONFIG)
-
-    RESULT = REQ.json()
+    RESULT = httpPost(URL, CONFIG)
     rP = RESULT['report']['relativeProfit']
     return rP
 
