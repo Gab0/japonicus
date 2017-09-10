@@ -1,7 +1,7 @@
 #!/bin/python
 from subprocess import run
 from subprocess import Popen, PIPE
-from random import randrange, choice
+import random
 from copy import deepcopy
 import operator
 from functools import reduce
@@ -9,7 +9,7 @@ from urllib import request, parse
 import json
 import requests
 
-gekkoURL = 'http://localhost:3000'
+gekkoURLs = ['http://localhost:3000']
 gekkoDIR = 'TBD'
 
 def initializeGekko(): # not used yet.
@@ -23,7 +23,7 @@ def httpPost(URL, data={}):
     return Response
     
 def getAvailableDataset():
-    URL = gekkoURL + '/api/scansets'
+    URL = gekkoURLs[0] + '/api/scansets'
 
     RESP = httpPost(URL)
 
@@ -43,8 +43,11 @@ def getAvailableDataset():
 
     return LongestDataset
 
+def loadHostsFile():
+    pass
+
 def runBacktest(TradeSetting, DateRange):
-    URL = 'http://localhost:3000/api/backtest'
+    URL = random.choice(gekkoURLs)+'/api/backtest'
     TradeMethod = list(TradeSetting.keys())[0]
     true = True
     false= False

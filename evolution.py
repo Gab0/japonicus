@@ -4,6 +4,7 @@ import datetime
 import calendar
 import json
 
+
 from copy import deepcopy
 
 from deap import base
@@ -18,6 +19,12 @@ from multiprocessing import Pool
 from gekkoWrapper import *
 #from plotInfo import plotEvolutionSummary
 
+def logInfo(message, filename="evolution.log"):
+    F=open(filename, 'w+')
+    F.write(message)
+    print(message)
+    F.close()
+    
 def progrBarMap(funct, array):
     l = len(array)
     result = []
@@ -38,13 +45,13 @@ def createRandomVarList(SZ=10):
 def reconstructTradeSettings(IND, Strategy):
     Settings = {
         Strategy:{
-            "short": IND[0]//5+1,
+            "ssuhort": IND[0]//5+1,
             "long": IND[1]//3+10,
             "signal": IND[2]//10+5,
             "interval": IND[3]//3,
             "thresholds": {
-                "down": (IND[4]//1.5-50)/40,
-                "up": (IND[5]//1.5-5)/40,
+                "down": (IND[4]//1.5-50)/60,
+                "up": (IND[5]//1.5-5)/60,
                 "low": IND[6]//2+10,
                 "high": IND[7]//2+45,
                 "persistence": IND[8]//25+1,
@@ -55,7 +62,7 @@ def reconstructTradeSettings(IND, Strategy):
         
     return Settings
 
-def getDateRange(Limits, deltaDAYS=3):
+def getDateRange(Limits, deltaDAYS):
     DateFormat="%Y-%m-%d %H:%M:%S"
 
     epochToString = lambda D: datetime.datetime.utcfromtimestamp(D).strftime(DateFormat)
@@ -81,15 +88,16 @@ def initInd(Criterion):
     w[:] = createRandomVarList()
     return w
 
-def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
-    Strategy= "DEMA" # Strategy to be used;
+def gekko_generations(NBEPOCH=300, POP_SIZE=30):
+    # SETTINGS;############################
+    Strategy= "MACD" # Strategy to be used;
     DRP = 10 # Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
     _lambda  = 5 # size of offspring generated per epoch;
-    cxpb, mutpb = 0.3, 0.6 # Probabilty of crossover and mutation respectively;
-    deltaDays=3 # time window of dataset for evaluation
+    cxpb, mutpb = 0.2, 0.8 # Probabilty of crossover and mutation respectively;
+    deltaDays=21 # time window of dataset for evaluation
     n_ParallelBacktests = 5
-
+    #######################################
     parallel = Pool(n_ParallelBacktests)
     
     toolbox = base.Toolbox()
@@ -118,6 +126,9 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
     stats.register("min", np.min)
     stats.register("max", np.max)
 
+    InitialBestScores, FinalBestScores = [], []
+    FirstEpochOfDataset = False
+    Stats = None
     settings_debug_min = reconstructTradeSettings([0 for x in range(10)], 'MIN_ VALUES')
     settings_debug_max = reconstructTradeSettings([100 for x in range(10)], 'MAX_ VALUES')
     
@@ -138,17 +149,19 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
                 #print(InfoData)
                 #plotEvolutionSummary(InfoData,
                 #                     "evolution_%s"% (Strategy))
+                FinalBestScores.append(Stats['max'])
             DateRange = getDateRange(chosenRange, deltaDAYS=deltaDays)
             print("Loading new date range;")
             print("\t%s to %s" % (DateRange['from'], DateRange['to']))
             for I in range(len(POP)):
                 del POP[I].fitness.values
             toolbox.register("evaluate", Evaluate, DateRange)
+            FirstEpochOfDataset = True
         
         individues_to_simulate = [ind for ind in POP if not ind.fitness.valid]
         
         #fitnesses = toolbox.map(toolbox.evaluate, individues_to_simulate)
-        to_simulation = [(x[:], x.Strategy) for x in individues_to_simulate]
+        to_simulation = [ (x[:], x.Strategy) for x in individues_to_simulate ]
         fitnesses = parallel.starmap(toolbox.evaluate, to_simulation)
         
         for ind, fit in zip(individues_to_simulate, fitnesses):
@@ -158,14 +171,15 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
         Stats=stats.compile(POP)
 
         hof=0
-        if HallOfFame.items:
-            # casually insert individuals from HallOfFame on population;
-            for Q in range(1):
-                CHP = deepcopy(choice(HallOfFame))
-                del CHP.fitness.values
-                POP += [CHP]
-                
-                hof+=1
+        if random.random() < 0.2:
+            if HallOfFame.items:
+                # casually insert individuals from HallOfFame on population;
+                for Q in range(1):
+                    CHP = deepcopy(random.choice(HallOfFame))
+                    del CHP.fitness.values
+                    POP += [CHP]
+
+                    hof+=1
             
         # remove worst individuals from population;
         POP = tools.selBest(POP, len(POP)-_lambda-hof)
@@ -178,7 +192,10 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
 
         # log statistcs;
         InfoData[W] = Stats
-        
+        if FirstEpochOfDataset:
+            InitialBestScores.append(Stats['max'])
+            FirstEpochOfDataset = False
+            
         bestScore=Stats['max']
         Deviation = Stats['std']
         # generate and append offspring in population;
@@ -191,12 +208,20 @@ def gekko_generations(NBEPOCH=150, POP_SIZE=30, DDAYS=3):
     FinalIndividueSettings = reconstructTradeSettings(FinalIndividue,
                                                       FinalIndividue.Strategy)
     Show = json.dumps(FinalIndividueSettings, indent=2)
-    print("Result Config: %s" % Show)
+
+    print("%i    XXX     %i" % (len(InitialBestScores), len(FinalBestScores)))
+    assert(len(InitialBestScores)-1 == len(FinalBestScores)) #remove this xd
+    logInfo("~" * 18)
+    for S in range(len(FinalBestScores)):
+        logInfo("Candlestick Set %i: \n\n" % (S+1)+\
+                "EPOCH ONE BEST PROFIT: %.3f\n" % InitialBestScores[S] +\
+                "LAST EPOCH BEST PROFIT: %.3f\n" % FinalBestScores[S])
+
+    logInfo("Result Config: %s" % Show)
 
 if __name__ == '__main__':
     MODES = ['MACD', 'DEMA', 'RSI', 'PPO']
 
-    for W in range(10):
+    for W in range(int(1e10)): # runs indefinitely;
         GA = gekko_generations()
-
 
