@@ -154,8 +154,8 @@ def Evaluate(DateRange, Individual, Strategy):
     return Score
 
 def gekko_search(**args):
-    print(args)
-    print(params)
+    #print(args)
+    #print(params)
     params.update(args.copy())
     #print(params)
     scores = np.zeros((num_rounds))
@@ -222,7 +222,7 @@ def flatten_dict(d):
 
 if __name__ == '__main__':
     MODES = ['MACD', 'DEMA', 'RSI', 'PPO']
-    Strategy = MODES[1]
+    Strategy = MODES[2]
     filename = "example-config.js"
     with open(filename, "r") as f:
         text = f.read()
@@ -240,8 +240,9 @@ if __name__ == '__main__':
     stats = []
 
     params = flatten_dict(config[Strategy])
+    print("")
     print("Starting search %s parameters" % Strategy)
-    print(params)
+    #print(params)
 
     from bayes_opt import BayesianOptimization
     bo = BayesianOptimization(gekko_search, {
