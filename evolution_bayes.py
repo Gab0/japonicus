@@ -12,6 +12,10 @@ from matplotlib import ticker
 import matplotlib.dates as mdates
 from gekkoWrapper import getAvailableDataset, runBacktest, getCandles
 #from plotInfo import plotEvolutionSummary
+import js2py
+from bayes_opt import BayesianOptimization
+from multiprocessing import Pool
+import multiprocessing as mp
 
 
 def moving_average(x, n, type='simple'):
@@ -95,10 +99,12 @@ def reconstructTradeSettingsDict(IND, Strategy):
     Settings[Strategy]["thresholds"] = {}
     for key in "short long signal interval".split(" "):
         if key in IND:
-            Settings[Strategy][key] = f[key](IND[key])
+            #Settings[Strategy][key] = f[key](IND[key])
+            Settings[Strategy][key] = IND[key]
     for key in "down up low high persistence fibonacci".split(" "):
         if key in IND:
-            Settings[Strategy]["thresholds"][key] = f[key](IND[key])
+            #Settings[Strategy]["thresholds"][key] = f[key](IND[key])
+            Settings[Strategy]["thresholds"][key] = IND[key]
     return Settings
 
 def reconstructTradeSettings(IND, Strategy):
@@ -148,28 +154,33 @@ def getDateRange(Limits, deltaDays=3):
     }
     return DateRange
 
+def evaluate_random(i):
+    chosenRange = getAvailableDataset()
+    DateRange = getRandomDateRange(chosenRange, deltaDays=deltaDays)
+    return Evaluate(DateRange, params, Strategy)
+
 def Evaluate(DateRange, Individual, Strategy):
     Settings = reconstructTradeSettingsDict(Individual, Strategy)
+    #print(Settings)
     Score = runBacktest(Settings, DateRange)
     return Score
 
 def gekko_search(**args):
-    #print(args)
-    #print(params)
     params.update(args.copy())
-    #print(params)
-    scores = np.zeros((num_rounds))
-    for i in range(num_rounds):
-        chosenRange = getAvailableDataset()
-        DateRange = getRandomDateRange(chosenRange, deltaDays=deltaDays)
-        scores[i] = Evaluate(DateRange, params, Strategy)
-    smean = np.mean(scores)
-    sstd = np.std(scores)
-    smax = np.max(scores)
-    smin = np.min(scores)
-    stats.append([smean, sstd, smax, smin])
-    all_val.append(smean)
-    return smean
+    if parallel:
+        p = Pool(mp.cpu_count())
+        scores = p.imap_unordered(evaluate_random, list(range(num_rounds)), 5)
+        p.close()
+    else:
+        scores = [evaluate_random(n) for n in range(num_rounds)]
+    series = pd.Series(scores)
+    mean = series.mean()
+    stats.append([series.count(), mean, series.std(), series.min()] +
+         [series.quantile(x) for x in percentiles] + [series.max()])
+    #for i in range(len(stats[-1])):
+    #    print('// %s: %.3f' % (stats_index[i], stats[-1][i]))
+    all_val.append(mean)
+    return mean
 
 def candlechart(ohlc, width=0.8):
     fig, ax = plt.subplots()
@@ -222,20 +233,26 @@ def flatten_dict(d):
 
 if __name__ == '__main__':
     MODES = ['MACD', 'DEMA', 'RSI', 'PPO']
-    Strategy = MODES[2]
+    Strategy = MODES[0]
+    percentiles = np.array([0.25, 0.5, 0.75])
+    formatted_percentiles = [str(int(round(x*100)))+"%" for x in percentiles]
+    stats_index = (['count', 'mean', 'std', 'min'] +
+              formatted_percentiles + ['max'])
+
     filename = "example-config.js"
     with open(filename, "r") as f:
         text = f.read()
     text = text.replace("module.exports = config;","config;")
-    import js2py
     config = js2py.eval_js(text).to_dict()
     #print(config)
+
     deltaDays = 3
     testDays = 3
-    num_rounds = 30
-    random_state = 2016
-    num_iter = 25
-    init_points = 5
+    num_rounds = 10
+    random_state = 2017
+    num_iter = 45
+    init_points = 9
+    parallel = False
     all_val = []
     stats = []
 
@@ -244,7 +261,6 @@ if __name__ == '__main__':
     print("Starting search %s parameters" % Strategy)
     #print(params)
 
-    from bayes_opt import BayesianOptimization
     bo = BayesianOptimization(gekko_search, {
             "short": (1,30),
             "long": (1,30),
@@ -257,31 +273,43 @@ if __name__ == '__main__':
             "fibonacci": (0.1, 0.2)
         })
 
+    # 1st Evaluate
     bo.maximize(init_points=init_points, n_iter=num_iter)
 
-    print('='*50)
-    print('Final Results')
     max_val = bo.res['max']['max_val']
     index = all_val.index(max_val)
-    s = stats[index]
-    print('='*50)
-    print(json.dumps(bo.res, indent=2))
-    print('-'*53)
-    print('Avg: %f' % s[0])
-    print('Std: %f' % s[1])
-    print('Max: %f' % s[2])
-    print('Min: %f' % s[3])
-    print('-'*50)
-    max_params = bo.res['max']['max_params'].copy()
-    max_params["persistence"] = 1
-    resultjson = json.dumps(reconstructTradeSettingsDict(max_params, Strategy), indent=2)
-    print("Result Config: %s" % resultjson)
-    print('-'*50)
+    s1 = stats[index]
+    # 2nd Evaluate
     chosenRange = getAvailableDataset()
     DateRange = getDateRange(chosenRange, deltaDays=testDays)
-    print("Evaluate nearest date: %s to %s" % (DateRange['from'], DateRange['to']))
-    scores = Evaluate(DateRange, max_params, Strategy)
-    print("Evaluted Score: %f" % scores)
+    max_params = bo.res['max']['max_params'].copy()
+    max_params["persistence"] = 1
+    gekko_search(**max_params)
+    s2 = stats[-1]
+    # 3rd Evaluate
+    score = Evaluate(DateRange, max_params, Strategy)
+    resultjson = reconstructTradeSettingsDict(max_params, Strategy)[Strategy]
+
+    # config.js like output
+    print("")
+    print("// "+'-'*50)
+    print("// "+Strategy + ' Settings')
+    #print("// "+'-'*50)
+    #print(json.dumps(bo.res, indent=2))
+    print("// "+'-'*50)
+    print("// 1st Evaluate:")
+    for i in range(len(s1)):
+        print('// %s: %.3f' % (stats_index[i], s1[i]))
+    print("// "+'-'*50)
+    print("// 2nd Evaluate:")
+    for i in range(len(s2)):
+        print('// %s: %.3f' % (stats_index[i], s2[i]))
+    print("// "+'-'*50)
+    print("// 3rd Evaluate nearest date: %s to %s" % (DateRange['from'], DateRange['to']))
+    print("// Evaluted Score: %f" % score)
+    print("// "+'-'*50)
+    print("config.%s = {%s}" % (Strategy, json.dumps(resultjson, indent=2)[1:-1]))
+    print("// "+'-'*50)
 
 
 
