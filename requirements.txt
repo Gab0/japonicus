@@ -2,3 +2,5 @@ deap==1.0.2
 requests==2.14.2
 numpy=1.12.1
 js2py=0.50
+bayesian-optimization==0.4.0
+matplotlib==1.5.3
