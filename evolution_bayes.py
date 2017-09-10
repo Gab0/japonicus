@@ -96,7 +96,7 @@ def reconstructTradeSettingsDict(IND, Strategy):
     for key in "short long signal interval".split(" "):
         if key in IND:
             Settings[Strategy][key] = f[key](IND[key])
-    for key in "donw up low high persistence fibonacci".split(" "):
+    for key in "down up low high persistence fibonacci".split(" "):
         if key in IND:
             Settings[Strategy]["thresholds"][key] = f[key](IND[key])
     return Settings
