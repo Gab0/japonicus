@@ -1,4 +1,5 @@
 #!/bin/python
+
 from subprocess import run
 from subprocess import Popen, PIPE
 from random import randrange, choice
@@ -13,7 +14,7 @@ gekkoURL = 'http://localhost:3000'
 gekkoDIR = 'TBD'
 
 def initializeGekko(): # not used yet.
-    CMD = ['node', GekkoDir + '/gekko', '--ui']
+    CMD = ['node', gekkoDIR + '/gekko', '--ui']
     D = Popen(CMD, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
 def httpPost(URL, data={}):
@@ -94,6 +95,43 @@ def runBacktest(TradeSetting, DateRange):
     }
 
     RESULT = httpPost(URL, CONFIG)
+    # sometime report is False(not dict)
+    if type(RESULT['report']) is bool:
+        print("Warning: report not found")
+        print(DateRange)
+        #print(TradeSetting)
+        #print(RESULT)
+        #print(URL)
+        #print(CONFIG)
+        return 0.
     rP = RESULT['report']['relativeProfit']
     return rP
+
+def getCandles(DateRange, size=100):
+    URL = 'http://localhost:3000/api/getCandles'
+    CONFIG = {
+        "watch": {
+            "exchange": 'poloniex',
+            "currency": 'USDT',
+            "asset": 'BTC'
+            },
+        "daterange": DateRange,
+        "adapter": 'sqlite',
+        "sqlite": {
+            "path": 'plugins/sqlite',
+
+            "dataDirectory": 'history',
+            "version": 0.1,
+
+            "dependencies": [{
+                "module": 'sqlite3',
+                "version": '3.1.4'
+                }]
+            },
+        "candleSize": size
+    }
+
+    RESULT = httpPost(URL, CONFIG)
+    return RESULT
+
 
