@@ -17,10 +17,12 @@ import numpy as np
 from multiprocessing import Pool
 
 from gekkoWrapper import *
+from coreFunctions import Evaluate, getRandomDateRange
+from Settings import getSettings
 #from plotInfo import plotEvolutionSummary
 
 def logInfo(message, filename="evolution.log"):
-    F=open(filename, 'w+')
+    F=open(filename, 'a+')
     F.write(message)
     print(message)
     F.close()
@@ -45,7 +47,7 @@ def createRandomVarList(SZ=10):
 def reconstructTradeSettings(IND, Strategy):
     Settings = {
         Strategy:{
-            "ssuhort": IND[0]//5+1,
+            "short": IND[0]//5+1,
             "long": IND[1]//3+10,
             "signal": IND[2]//10+5,
             "interval": IND[3]//3,
@@ -62,27 +64,6 @@ def reconstructTradeSettings(IND, Strategy):
         
     return Settings
 
-def getDateRange(Limits, deltaDAYS):
-    DateFormat="%Y-%m-%d %H:%M:%S"
-
-    epochToString = lambda D: datetime.datetime.utcfromtimestamp(D).strftime(DateFormat)
-    FLms = Limits['from']
-    TLms = Limits['to']
-    delta=datetime.timedelta(days=deltaDAYS)
-    deltams=deltaDAYS * 24 * 60 * 60
-
-    Starting= random.randint(FLms,TLms-deltams)
-    DateRange = {
-        "from": "%s" % epochToString(Starting),
-        "to": "%s" % epochToString(Starting+deltams)
-    }
-    return DateRange
-
-def Evaluate(DateRange, Individual, Strategy):
-    Settings = reconstructTradeSettings(Individual, Strategy)
-    Score = runBacktest(Settings, DateRange)
-    return Score,
-
 def initInd(Criterion):
     w = Criterion()
     w[:] = createRandomVarList()
@@ -90,7 +71,8 @@ def initInd(Criterion):
 
 def gekko_generations(NBEPOCH=300, POP_SIZE=30):
     # SETTINGS;############################
-    Strategy= "MACD" # Strategy to be used;
+    settings=getSettings()['generations']
+    Strategy= "DEMA" # Strategy to be used;
     DRP = 10 # Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
     _lambda  = 5 # size of offspring generated per epoch;
@@ -150,16 +132,27 @@ def gekko_generations(NBEPOCH=300, POP_SIZE=30):
                 #plotEvolutionSummary(InfoData,
                 #                     "evolution_%s"% (Strategy))
                 FinalBestScores.append(Stats['max'])
-            DateRange = getDateRange(chosenRange, deltaDAYS=deltaDays)
+            DateRange = getRandomDateRange(chosenRange, deltaDays)
             print("Loading new date range;")
             print("\t%s to %s" % (DateRange['from'], DateRange['to']))
             for I in range(len(POP)):
                 del POP[I].fitness.values
             toolbox.register("evaluate", Evaluate, DateRange)
             FirstEpochOfDataset = True
-        
+            
+        if random.random() < 0.2 and HallOfFame.items:
+            # casually insert individuals from HallOfFame on population;
+            for Q in range(1):
+                CHP = deepcopy(random.choice(HallOfFame))
+                del CHP.fitness.values
+                POP += [CHP]
+
+        if random.random() < 0.5:
+            # should have built the wall;
+            nb = random.randint(1,9)
+            POP += toolbox.population(nb)
+            
         individues_to_simulate = [ind for ind in POP if not ind.fitness.valid]
-        
         #fitnesses = toolbox.map(toolbox.evaluate, individues_to_simulate)
         to_simulation = [ (x[:], x.Strategy) for x in individues_to_simulate ]
         fitnesses = parallel.starmap(toolbox.evaluate, to_simulation)
@@ -170,22 +163,11 @@ def gekko_generations(NBEPOCH=300, POP_SIZE=30):
         # get proper evolution statistics; #TBD
         Stats=stats.compile(POP)
 
-        hof=0
-        if random.random() < 0.2:
-            if HallOfFame.items:
-                # casually insert individuals from HallOfFame on population;
-                for Q in range(1):
-                    CHP = deepcopy(random.choice(HallOfFame))
-                    del CHP.fitness.values
-                    POP += [CHP]
 
-                    hof+=1
             
-        # remove worst individuals from population;
-        POP = tools.selBest(POP, len(POP)-_lambda-hof)
 
         # show information;
-        print("EPOCH %i" % W) 
+        print("EPOCH %i/%i" % (W, NBEPOCH)) 
         print("Average profit %.3f%%\tDeviation %.3f" % (Stats['avg'],Stats['std']))
         print("Maximum profit %.3f%%\tMinimum profit %.3f%%" % (Stats['max'],Stats['min']))
         print("")
@@ -199,29 +181,28 @@ def gekko_generations(NBEPOCH=300, POP_SIZE=30):
         bestScore=Stats['max']
         Deviation = Stats['std']
         # generate and append offspring in population;
-        offspring = algorithms.varOr(POP, toolbox, _lambda, cxpb, mutpb)
-        POP += offspring
+        offspring = algorithms.varOr(POP, toolbox, settings['_lambda'],
+                                     settings['cxpb'], settings['mutpb'])
+
+        POP[:] = tools.selBest(POP+offspring, POP_SIZE)
+
         #print("POPSIZE %i" % len(POP))
         W+=1
-        
+
+    FinalBestScores.append(Stats['max'])
     FinalIndividue = tools.selBest(POP, 1)[0]
     FinalIndividueSettings = reconstructTradeSettings(FinalIndividue,
                                                       FinalIndividue.Strategy)
     Show = json.dumps(FinalIndividueSettings, indent=2)
 
-    print("%i    XXX     %i" % (len(InitialBestScores), len(FinalBestScores)))
-    assert(len(InitialBestScores)-1 == len(FinalBestScores)) #remove this xd
     logInfo("~" * 18)
     for S in range(len(FinalBestScores)):
         logInfo("Candlestick Set %i: \n\n" % (S+1)+\
                 "EPOCH ONE BEST PROFIT: %.3f\n" % InitialBestScores[S] +\
-                "LAST EPOCH BEST PROFIT: %.3f\n" % FinalBestScores[S])
+                "FINAL EPOCH BEST PROFIT: %.3f\n" % FinalBestScores[S])
 
+    print("Remember to check MAX and MIN values for each parameter.")
+    print("\tresults may improve with extended ranges.")
     logInfo("Result Config: %s" % Show)
-
-if __name__ == '__main__':
-    MODES = ['MACD', 'DEMA', 'RSI', 'PPO']
-
-    for W in range(int(1e10)): # runs indefinitely;
-        GA = gekko_generations()
-
+    print("\t\t.RUN ENDS.")
+    
