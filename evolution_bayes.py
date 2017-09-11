@@ -17,7 +17,7 @@ from bayes_opt import BayesianOptimization
 from multiprocessing import Pool
 import multiprocessing as mp
 
-from coreFunctions import getRandomDateRange
+from coreFunctions import getRandomDateRange, getDateRange
 from Settings import getSettings
 def moving_average(x, n, type='simple'):
     """

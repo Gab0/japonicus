@@ -17,7 +17,7 @@ import numpy as np
 from multiprocessing import Pool
 
 from gekkoWrapper import *
-from coreFunctions import Evaluate, getRandomDateRange
+from coreFunctions import Evaluate, getRandomDateRange, stratSettingsProofOfViability
 from Settings import getSettings
 #from plotInfo import plotEvolutionSummary
 
@@ -97,8 +97,8 @@ def gekko_generations(NBEPOCH=300, POP_SIZE=30):
     
     POP = toolbox.population(n=POP_SIZE)
     W=0
-    chosenRange = getAvailableDataset()
-    print("using candlestick dataset %s" % chosenRange)
+    availableDataRange = getAvailableDataset()
+    print("using candlestick dataset %s" % availableDataRange)
 
     InfoData={}
     
@@ -132,7 +132,7 @@ def gekko_generations(NBEPOCH=300, POP_SIZE=30):
                 #plotEvolutionSummary(InfoData,
                 #                     "evolution_%s"% (Strategy))
                 FinalBestScores.append(Stats['max'])
-            DateRange = getRandomDateRange(chosenRange, deltaDays)
+            DateRange = getRandomDateRange(availableDataRange, deltaDays)
             print("Loading new date range;")
             print("\t%s to %s" % (DateRange['from'], DateRange['to']))
             for I in range(len(POP)):
@@ -178,7 +178,7 @@ def gekko_generations(NBEPOCH=300, POP_SIZE=30):
             InitialBestScores.append(Stats['max'])
             FirstEpochOfDataset = False
             
-        bestScore=Stats['max']
+        bestScore = Stats['max']
         Deviation = Stats['std']
         # generate and append offspring in population;
         offspring = algorithms.varOr(POP, toolbox, settings['_lambda'],
@@ -204,5 +204,7 @@ def gekko_generations(NBEPOCH=300, POP_SIZE=30):
     print("Remember to check MAX and MIN values for each parameter.")
     print("\tresults may improve with extended ranges.")
     logInfo("Result Config: %s" % Show)
+
+    stratSettingsProofOfViability(FinalIndividueSettings, availableDataRange)
     print("\t\t.RUN ENDS.")
     

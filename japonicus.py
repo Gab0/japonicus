@@ -8,6 +8,9 @@ from subprocess import Popen, PIPE
 from Settings import getSettings
 from evolution_generations import gekko_generations
 
+from os import chdir, path
+chdir(path.dirname(path.realpath(__file__)))
+
 #from evolution_bayes import gekko_bayesian
 parser = optparse.OptionParser()
 

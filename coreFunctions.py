@@ -23,6 +23,7 @@ def reconstructTradeSettings(IND, Strategy):
     } 
         
     return Settings
+
 def Evaluate(DateRange, Individual, Strategy):
     Settings = reconstructTradeSettings(Individual, Strategy)
     #print(Settings)
@@ -56,3 +57,13 @@ def getRandomDateRange(Limits, deltaDays, testDays=0):
         "to": "%s" % epochToString(Starting+deltams)
     }
     return DateRange
+
+def stratSettingsProofOfViability(Settings, DatasetLimits):
+    AllProofs = []
+    for W in range(10):
+        DateRange = getRandomDateRange(DatasetLimits, 30)
+        q=runBacktest(Settings, DateRange)
+        AllProofs.append(q)
+        print('Month PoV %.3f' % q)
+
+    print(AllProofs)
