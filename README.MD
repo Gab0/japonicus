@@ -9,7 +9,7 @@ Open two terminals:
 T.1 -> run Gekko on ui mode.
 
 T.2 -> $cd [japonicus dir]
-       $python evolution.py [-g|-b] [-k] [--repeat <X>]
+       $python japonicus.py [-g|-b] [-k] [--repeat <X>]
        
     -g for genetic algorithm;
     -b for bayesian optimization;
