@@ -19,6 +19,7 @@ import multiprocessing as mp
 
 from coreFunctions import getRandomDateRange, getDateRange
 from Settings import getSettings
+
 def moving_average(x, n, type='simple'):
     """
     compute an n period moving average.
@@ -203,7 +204,7 @@ def gekko_bayesian():
     
     # 1st Evaluate
     bo.maximize(init_points=settings['init_points'], n_iter=settings['num_iter'])
-
+    print(all_val)
     max_val = bo.res['max']['max_val']
     index = all_val.index(max_val)
     s1 = stats[index]
@@ -213,6 +214,7 @@ def gekko_bayesian():
     DateRange = getDateRange(chosenRange, deltaDays=settings['testDays'])
     max_params = bo.res['max']['max_params'].copy()
     #max_params["persistence"] = 1
+    print("Starting Second Evaluation")
     gekko_search(**max_params)
     s2 = stats[-1]
     

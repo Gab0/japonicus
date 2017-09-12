@@ -27,9 +27,14 @@ options, args = parser.parse_args()
 
 settings = getSettings()['global']
 G=None
-if options.SpawnGekko and (options.GeneticAlgorithm or options.BayesianOptimization):
-    G = Popen(['node', settings['gekkoPath']+'/web/server.js'], stdin=PIPE, stdout=PIPE)
-    sleep(2)
+if options.SpawnGekko:
+   if options.GeneticAlgorithm or options.BayesianOptimization:
+        GekkoArgs = ['node',
+                     '--max-old-space-size=8192',
+                     settings['gekkoPath']+'/web/server.js']
+
+        G = Popen(GekkoArgs, stdin=PIPE, stdout=PIPE)
+        sleep(2)
 if options.GeneticAlgorithm:
     for S in range(options.Repeater):
         gekko_generations()
