@@ -17,7 +17,8 @@ import numpy as np
 from multiprocessing import Pool
 
 from gekkoWrapper import *
-from coreFunctions import Evaluate, getRandomDateRange, stratSettingsProofOfViability
+from coreFunctions import Evaluate, getRandomDateRange,\
+    stratSettingsProofOfViability, pasteSettingsToUI
 from Settings import getSettings
 #from plotInfo import plotEvolutionSummary
 
@@ -69,10 +70,10 @@ def initInd(Criterion):
     w[:] = createRandomVarList()
     return w
 
-def gekko_generations(NBEPOCH=300, POP_SIZE=30):
+def gekko_generations(Strategy, NBEPOCH=300, POP_SIZE=30):
     # SETTINGS;############################
     settings=getSettings()['generations']
-    Strategy= "DEMA" # Strategy to be used;
+
     DRP = 10 # Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
     _lambda  = 5 # size of offspring generated per epoch;
@@ -99,7 +100,8 @@ def gekko_generations(NBEPOCH=300, POP_SIZE=30):
     W=0
     availableDataRange = getAvailableDataset()
     print("using candlestick dataset %s" % availableDataRange)
-
+    print("%s strategy;" % Strategy)
+    
     InfoData={}
     
     stats = tools.Statistics(lambda ind: ind.fitness.values)
@@ -189,22 +191,28 @@ def gekko_generations(NBEPOCH=300, POP_SIZE=30):
         #print("POPSIZE %i" % len(POP))
         W+=1
 
+    # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
     FinalBestScores.append(Stats['max'])
     FinalIndividue = tools.selBest(POP, 1)[0]
     FinalIndividueSettings = reconstructTradeSettings(FinalIndividue,
                                                       FinalIndividue.Strategy)
     Show = json.dumps(FinalIndividueSettings, indent=2)
-
     logInfo("~" * 18)
     for S in range(len(FinalBestScores)):
         logInfo("Candlestick Set %i: \n\n" % (S+1)+\
                 "EPOCH ONE BEST PROFIT: %.3f\n" % InitialBestScores[S] +\
                 "FINAL EPOCH BEST PROFIT: %.3f\n" % FinalBestScores[S])
 
+        
+    print("Settings for Gekko config.js:")
+    print(Show)
+    print("Settings for Gekko --ui webpage")
+    logInfo(pasteSettingsToUI(FinalIndividueSettings))
+
     print("Remember to check MAX and MIN values for each parameter.")
     print("\tresults may improve with extended ranges.")
-    logInfo("Result Config: %s" % Show)
-
+    
+    print("Testing Strategy:\n\n")
     stratSettingsProofOfViability(FinalIndividueSettings, availableDataRange)
     print("\t\t.RUN ENDS.")
     

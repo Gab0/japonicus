@@ -67,3 +67,20 @@ def stratSettingsProofOfViability(Settings, DatasetLimits):
         print('Month PoV %.3f' % q)
 
     print(AllProofs)
+
+def pasteSettingsToUI(Settings):
+    text = []
+    toParameter = lambda name, value: "%s = %f" % (name,value)
+    Strat = list(Settings.keys())[0]
+    text.append('{ %s }' % Strat)
+    #rint("{{ %s }}" % Settings[Strat])
+    Settings = Settings[Strat]
+    for W in Settings.keys():
+        Q = Settings[W]
+        if type(Q) == dict:
+            text.append('\n[%s]' % W)
+            for Z in Q.keys():
+                text.append(toParameter(Z, Q[Z]))
+        else:
+            text.append(toParameter(W, Q))
+    return '\n'.join(text)

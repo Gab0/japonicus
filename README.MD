@@ -9,13 +9,13 @@ Open two terminals:
 T.1 -> run Gekko on ui mode.
 
 T.2 -> $cd [japonicus dir]
-       $python japonicus.py [-g|-b] [-k] [--repeat <X>]
+       $python japonicus.py [-g|-b] [-k] [--repeat <X>] [--strat <Strategy>]
        
     -g for genetic algorithm;
     -b for bayesian optimization;
 
     -k launches a child gekko instance, so no need for the first terminal;
-    
+    --strat choose one strat to run;
     --repeat to run genetic algorithm X times; then just check evolution.log;
 ```
 If you use a UI port which is not :3000, adjust accordingly on gekkoWrapper.py.

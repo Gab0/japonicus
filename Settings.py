@@ -9,7 +9,7 @@ def getSettings():
             'cxpb': 0.2,
             'mutpb': 0.8,
             '_lambda': 5,
-            'Strategy': "MACD",
+            'Strategy': "StochRSI",
             'DRP': 10,
             'ParallelBacktests': 5
         },
