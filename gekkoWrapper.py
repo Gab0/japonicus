@@ -13,24 +13,44 @@ import requests
 gekkoURLs = ['http://localhost:3000']
 gekkoDIR = 'TBD'
 
+def getURL(path):
+    return random.choice(gekkoURLs)+path
+
 def initializeGekko(): # not used yet.
     CMD = ['node', gekkoDIR + '/gekko', '--ui']
     D = Popen(CMD, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
 def httpPost(URL, data={}):
     Request = requests.post(URL, json=data)
-    Response = json.loads(Request.text)
+    try:
+        Response = json.loads(Request.text)
+    except Exception as e:
+        print("Error: setting wrong")
+        print(URL)
+        print(data)
+        raise e
 
     return Response
     
-def getAvailableDataset():
-    URL = gekkoURLs[0] + '/api/scansets'
+def getAllScanset():
+    URL = getURL('/api/scansets')
 
     RESP = httpPost(URL)
 
-    DS = RESP['datasets']
+    return RESP['datasets']
+
+def getAvailableDataset(watch={"exchange": "poloniex","currency": 'USDT',"asset": 'BTC'}):
+    DS = getAllScanset()
     
-    for EXCHANGE in DS:
+    scanset = []
+    for s in DS:
+        for k in "exchange currency asset".split(" "):
+            if s[k] != watch[k]:
+                continue
+            scanset.append(s)
+    if len(scanset) == 0:
+        raise "scanset not available: {}".format(watch)
+    for EXCHANGE in scanset:
         ranges = EXCHANGE['ranges']
         range_spans = [x['to']-x['from'] for x in ranges]
         LONGEST = range_spans.index(max(range_spans))
@@ -47,18 +67,38 @@ def getAvailableDataset():
 def loadHostsFile():
     pass
 
-def runBacktest(TradeSetting, DateRange):
-    URL = random.choice(gekkoURLs)+'/api/backtest'
-    TradeMethod = list(TradeSetting.keys())[0]
-    true = True
-    false= False
-    CONFIG = {
-        "gekkoConfig": {
-            "watch": {
+def runBacktest(TradeSetting, DateRange, gekko_config=None):
+    gekko_config = createConfig(TradeSetting, DateRange, gekko_config)
+    url = getURL('/api/backtest')
+    result = httpPost(url, gekko_config)
+    # sometime report is False(not dict)
+    if type(result['report']) is bool:
+        print("Warning: report not found")
+        print(DateRange)
+        #print(TradeSetting)
+        #print(result)
+        #print(URL)
+        #print(CONFIG)
+        return 0.
+    return result['report']['relativeProfit']
+
+def createConfig(TradeSetting, DateRange, gekko_config=None):
+    if "watch" in TradeSetting:
+        watch = TradeSetting["watch"]
+        del TradeSetting["watch"]
+    else:
+        watch = {
                 "exchange": "poloniex",
                 "currency": "USDT",
                 "asset": "BTC"
-            },
+        }
+    TradeMethod = list(TradeSetting.keys())[0]
+    true = True
+    false= False
+
+    CONFIG = {
+        "gekkoConfig": {
+            "watch": watch,
             "paperTrader": {
                 "fee": 0.25, # declare deprecated 'fee' so keeps working w/ old gekko;
                 "feeMaker": 0.15,
@@ -89,46 +129,37 @@ def runBacktest(TradeSetting, DateRange):
             "valid":true
         },
             "data": {
-                "candleProps": ["close", "start"],
+                "candleProps": ["id", "start", "open", "high", "low", "close", "vwp", "volume", "trades"],
                 "indicatorResults":true,
                 "report":true,
                 "roundtrips":false,
-                "trades":false
+                "trades":true
             }
     }
+    if gekko_config == None:
+        gekko_config = CONFIG
+    return gekko_config
 
-    RESULT = httpPost(URL, CONFIG)
-    # sometime report is False(not dict)
-    if type(RESULT['report']) is bool:
-        print("Warning: report not found")
-        print(DateRange)
-        #print(TradeSetting)
-        #print(RESULT)
-        #print(URL)
-        #print(CONFIG)
-        return 0.
-    rP = RESULT['report']['relativeProfit']
-    return rP
 
 def getCandles(DateRange, size=100):
-    URL = 'http://localhost:3000/api/getCandles'
+    URL = "http://localhost:3000/api/getCandles"
     CONFIG = {
         "watch": {
-            "exchange": 'poloniex',
-            "currency": 'USDT',
-            "asset": 'BTC'
+            "exchange": "poloniex",
+            "currency": "BTC",
+            "asset": "ETH"
             },
         "daterange": DateRange,
-        "adapter": 'sqlite',
+        "adapter": "sqlite",
         "sqlite": {
-            "path": 'plugins/sqlite',
+            "path": "plugins/sqlite",
 
-            "dataDirectory": 'history',
+            "dataDirectory": "history",
             "version": 0.1,
 
             "dependencies": [{
-                "module": 'sqlite3',
-                "version": '3.1.4'
+                "module": "sqlite3",
+                "version": "3.1.4"
                 }]
             },
         "candleSize": size
