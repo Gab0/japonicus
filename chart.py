@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -131,6 +130,7 @@ def ppo(fig, ax, axis, price, params):
     PPOsignal = 100 * (emadiff / emaslow)
     PPOsignal = moving_average(PPOsignal, params["signal"], weight_type='exponential')
     signal = emadiff - signal
+
     # divide graph
     divider = make_axes_locatable(ax)
     #ax_bot = divider.append_axes("bottom", size="25%", pad=0., sharex=ax)
@@ -151,10 +151,22 @@ def trade(ax, trades, candles, params):
     buys = candles.merge(buys, on="start", how="left")
     sells = trades.loc[trades.action.str.match("sell"), :]
     sells = candles.merge(sells, on="start", how="left")
+
     ax.plot(buys.index, buys['price'], '^', markersize=8, color='g', label="buy")
     ax.plot(sells.index, sells['price'], 'v', markersize=8, color='g', label="sell")
 
-def show_candles(res, params=None):
+def ohlcsum(df):
+    return {
+       'open': df['open'][0],
+       'high': df['high'].max(),
+       'low': df['low'].min(),
+       'close': df['close'][-1],
+       'volume': df['volume'].sum()
+      }
+def groupby_ohlc(candles, freq):
+    return candles.groupby(pd.Grouper(freq=freq)).agg(ohlcsum)
+
+def show_candles(res, params=None, candle_freq=None):
     strategy = settings["Strategy"]
     report = res["report"]
     score = res['report']['relativeProfit']
@@ -162,10 +174,20 @@ def show_candles(res, params=None):
     candles = pd.DataFrame.from_dict(res['candles'])
     candles["start"] = pd.to_datetime(candles["start"])
     candles.index = candles["start"]
+
     # candle
     fig = plt.figure(1)
     ax = plt.subplot(1, 1, 1)
-    candlechart(fig, ax, candles)
+    if candle_freq:
+        candlechart(fig, ax, candles)
+        ohlc = groupby_ohlc(candles, freq=candle_freq)
+        ax2 = ax.twiny()
+        candlechart(fig, ax2, ohlc)
+        ax2.autoscale()
+        ax.autoscale()
+    else:
+        candlechart(fig, ax, candles)
+        #ax.autoscale()
 
     # trade
     trades = pd.DataFrame.from_dict(res['trades'])
@@ -190,7 +212,6 @@ def show_candles(res, params=None):
     # show
     ax.grid()
     fig.autofmt_xdate()
-    fig.tight_layout()
     try:
         while True:
             plt.pause(.01)
