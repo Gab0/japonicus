@@ -2,7 +2,7 @@
 
 import optparse
 from time import sleep
-
+from random import choice
 from subprocess import Popen, PIPE
 
 from Settings import getSettings
@@ -39,7 +39,10 @@ if options.SpawnGekko:
         sleep(2)
 if options.GeneticAlgorithm:
     for S in range(options.Repeater):
-        gekko_generations(options.Strategy)
+        Strat = choice(settings['global']['Strategies'])\
+                if options.Strategy == 'all'\
+                else options.Strategy
+        gekko_generations(Strat)
 elif options.BayesianOptimization:
     import evolution_bayes
     evolution_bayes.gekko_bayesian()

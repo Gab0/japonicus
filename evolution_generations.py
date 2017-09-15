@@ -46,19 +46,20 @@ def createRandomVarList(SZ=10):
     return VAR_LIST
 
 def reconstructTradeSettings(IND, Strategy):
+    R = lambda V, lim: ((lim[1]-lim[0])/100) * V + lim[0]
     Settings = {
         Strategy:{
-            "short": IND[0]//5+1,
-            "long": IND[1]//3+10,
-            "signal": IND[2]//10+5,
-            "interval": IND[3]//3,
+            "short": R( IND[0], (1, 20) ),
+            "long": R( IND[1], (10, 43) ),
+            "signal": R( IND[2], (5, 15) ),
+            "interval": R( IND[3], (1, 26) ),
             "thresholds": {
-                "down": (IND[4]//1.5-50)/60,
-                "up": (IND[5]//1.5-5)/60,
-                "low": IND[6]//2+10,
-                "high": IND[7]//2+45,
-                "persistence": IND[8]//25+1,
-                "fibonacci": (IND[9]//11+1)/10
+                "down": R( IND[4], (-0.85, 0.25) ),
+                "up": R( IND[5], (-0.85, 1.02) ),
+                "low": R( IND[6], (10, 60) ),
+                "high": R( IND[7], (45, 95) ),
+                "persistence": R( IND[8], (1, 15)),
+                "fibonacci": R( IND[9], (0.1, 1))
             }
         }
     } 
@@ -104,6 +105,8 @@ def gekko_generations(Strategy, NBEPOCH=300, POP_SIZE=30):
     
     InfoData={}
     
+    #firePaperTrader(reconstructTradeSettings(POP[0], POP[0].Strategy), "poloniex",
+    #                "USDT", "BTC")
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", np.mean)
     stats.register("std", np.std)
@@ -209,10 +212,12 @@ def gekko_generations(Strategy, NBEPOCH=300, POP_SIZE=30):
     print("Settings for Gekko --ui webpage")
     logInfo(pasteSettingsToUI(FinalIndividueSettings))
 
-    print("Remember to check MAX and MIN values for each parameter.")
+    print("\nRemember to check MAX and MIN values for each parameter.")
     print("\tresults may improve with extended ranges.")
     
-    print("Testing Strategy:\n\n")
-    stratSettingsProofOfViability(FinalIndividueSettings, availableDataRange)
+    print("Testing Strategy:\n")
+    Vv=stratSettingsProofOfViability(FinalIndividueSettings, availableDataRange)
+    Vv = "GOOD STRAT" if Vv else "SEEMS BAD"
+    logInfo(Vv)
     print("\t\t.RUN ENDS.")
     

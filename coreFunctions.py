@@ -20,7 +20,8 @@ def reconstructTradeSettings(IND, Strategy):
                 "fibonacci": (IND[9]//11+1)/10
             }
         }
-    } 
+    }
+    
         
     return Settings
 
@@ -56,7 +57,9 @@ def getRandomDateRange(Limits, deltaDays, testDays=0):
         "from": "%s" % epochToString(Starting),
         "to": "%s" % epochToString(Starting+deltams)
     }
+
     return DateRange
+
 
 def stratSettingsProofOfViability(Settings, DatasetLimits):
     AllProofs = []
@@ -65,9 +68,11 @@ def stratSettingsProofOfViability(Settings, DatasetLimits):
         q=runBacktest(Settings, DateRange)
         AllProofs.append(q)
         print('Month PoV %.3f' % q)
-
-    print(AllProofs)
-
+        
+    check = [x for x in AllProofs if x > 0]
+    Valid = len(check) == len(AllProofs)
+    return Valid   
+ 
 def pasteSettingsToUI(Settings):
     text = []
     toParameter = lambda name, value: "%s = %f" % (name,value)
@@ -84,3 +89,6 @@ def pasteSettingsToUI(Settings):
         else:
             text.append(toParameter(W, Q))
     return '\n'.join(text)
+
+def loadGekkoConfig():
+    pass
