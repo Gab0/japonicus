@@ -83,17 +83,6 @@ def runBacktest(TradeSetting, DateRange, gekko_config=None):
         return 0.
     return result['report']['relativeProfit']
 
-def createConfig(TradeSetting, DateRange, gekko_config=None):
-    if "watch" in TradeSetting:
-        watch = TradeSetting["watch"]
-        del TradeSetting["watch"]
-    else:
-        watch = {
-                "exchange": "poloniex",
-                "currency": "USDT",
-                "asset": "BTC"
-        }
-
 def firePaperTrader(TradeSetting, Exchange, Currency, Asset):
     
     TradeMethod = list(TradeSetting.keys())[0]
@@ -143,9 +132,16 @@ def firePaperTrader(TradeSetting, Exchange, Currency, Asset):
     RESULT = httpPost(URL,CONFIG)
     print(RESULT)
     
-def _runBacktest(TradeSetting, DateRange):
-    URL = random.choice(gekkoURLs)+'/api/backtest'
-
+def createConfig(TradeSetting, DateRange, gekko_config=None):
+    if "watch" in TradeSetting:
+        watch = TradeSetting["watch"]
+        del TradeSetting["watch"]
+    else:
+        watch = {
+                "exchange": "poloniex",
+                "currency": "USDT",
+                "asset": "BTC"
+        }
     TradeMethod = list(TradeSetting.keys())[0]
     true = True
     false= False
