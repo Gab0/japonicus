@@ -50,6 +50,7 @@ def getAvailableDataset(watch={"exchange": "poloniex","currency": 'USDT',"asset"
             scanset.append(s)
     if len(scanset) == 0:
         raise "scanset not available: {}".format(watch)
+    print(scanset)
     for EXCHANGE in scanset:
         ranges = EXCHANGE['ranges']
         range_spans = [x['to']-x['from'] for x in ranges]
@@ -57,7 +58,7 @@ def getAvailableDataset(watch={"exchange": "poloniex","currency": 'USDT',"asset"
         EXCHANGE['max_span'] = range_spans[LONGEST]
         EXCHANGE['max_span_index'] = LONGEST
 
-    exchange_longest_spans = [x['max_span'] for x in DS]
+    exchange_longest_spans = [x['max_span'] for x in scanset]
     best_exchange = exchange_longest_spans.index(max(exchange_longest_spans))
 
     LongestDataset = DS[best_exchange]['ranges'][DS[best_exchange]['max_span_index']]
