@@ -3,7 +3,8 @@ import js2py
 
 def getSettings():
     s = {'global':{
-        'gekkoPath': os.getenv("HOME")+'/gekko1'
+        'gekkoPath': os.getenv("HOME")+'/gekko1',
+        'Strategies': ['DEMA', 'MACD', 'PPO', 'RSI', 'StochRSI', 'TSI']
         },
          
         'generations': {
