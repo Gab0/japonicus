@@ -61,7 +61,7 @@ def getAvailableDataset(watch={"exchange": "poloniex","currency": 'USDT',"asset"
     exchange_longest_spans = [x['max_span'] for x in scanset]
     best_exchange = exchange_longest_spans.index(max(exchange_longest_spans))
 
-    LongestDataset = DS[best_exchange]['ranges'][DS[best_exchange]['max_span_index']]
+    LongestDataset = scanset[best_exchange]['ranges'][scanset[best_exchange]['max_span_index']]
 
     return LongestDataset
 
@@ -166,7 +166,7 @@ def createConfig(TradeSetting, DateRange, gekko_config=None):
             "tradingAdvisor": {
                 "enabled":true,
                 "method": TradeMethod,
-                "candleSize":60,
+                "candleSize":10, # candleSize: smaller = heavier computation + better possible results;
                 "historySize":10
             },
             TradeMethod: TradeSetting[TradeMethod],
