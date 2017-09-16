@@ -171,17 +171,26 @@ def gekko_bayesian():
         paramsdf["target"] = valuesdf
         watch = settings["watch"]
         filename = "_".join([watch["exchange"], watch["currency"], watch["asset"], Strategy, datetime.datetime.now().strftime('%Y%m%d_%H%M%S'), str(max_val)])
-        csv_filename = os.path.join(settings["save_dir"], filename) + ".csv"
-        json_filename = os.path.join(settings["save_dir"], filename) + ".json"
+        save_dir = settings["save_dir"]
+        csv_filename = os.path.join(save_dir, filename) + "_bayes.csv"
+        json_filename = os.path.join(save_dir, filename) + "_config.json"
+        json2_filename = os.path.join(save_dir, filename) + "_response.json"
         config = compressing_flatten_dict(max_params, Strategy)
         config["watch"] = watch
         gekko_config = gekkoWrapper.createConfig(config, DateRange)
+
+        if not os.path.exists(save_dir):
+            os.mkdir(save_dir)
         paramsdf.to_csv(csv_filename, index=False)
         print("Saved: " + csv_filename)
         f = open(json_filename, "w")
         f.write(json.dumps(gekko_config, indent=2))
         f.close()
         print("Saved: " + json_filename)
+        f = open(json2_filename, "w")
+        f.write(json.dumps(result, indent=2))
+        f.close()
+        print("Saved: " + json2_filename)
     if settings["show_chart"]:
         chart.show_candles(result, max_params)
     return max_params
