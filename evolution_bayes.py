@@ -11,6 +11,7 @@ from gekkoWrapper import getAvailableDataset, runBacktest
 from bayes_opt import BayesianOptimization
 from multiprocessing import Pool
 import multiprocessing as mp
+from itertools import repeat
 
 from coreFunctions import getRandomDateRange, getDateRange
 from Settings import getSettings
@@ -20,7 +21,6 @@ import chart
 dict_merge = lambda a,b: a.update(b) or a
 settings = getSettings()['bayesian']
 Strategy = settings["Strategy"]
-params = settings[Strategy]
 percentiles = np.array([0.25, 0.5, 0.75])
 all_val = []
 stats = []
@@ -62,18 +62,18 @@ def compressing_flatten_dict(IND, Strategy):
 
     return config
 
-def evaluate_random(i):
-    global params
+def evaluate_random(Strategy, params):
     watch = settings["watch"]
     chosenRange = getAvailableDataset(watch)
     DateRange = getRandomDateRange(chosenRange, deltaDays=settings['deltaDays'])
     if "candleSize" in settings[Strategy]:
-        return EvaluateRaw(watch, DateRange, params, settings['Strategy'])["report"]["trades"]
+        # parameter search trade count
+        return EvaluateRaw(watch, DateRange, params, Strategy)["report"]["trades"]
     else:
-        return Evaluate(watch, DateRange, params, settings['Strategy'])
+        return Evaluate(watch, DateRange, params, Strategy)
 
 def gekko_search(**args):
-    global params
+    params = {}
     dict_merge(params, args.copy())
     parallel = settings['parallel']
     num_rounds = settings['num_rounds']
@@ -87,10 +87,12 @@ def gekko_search(**args):
         del params["historySize"]
     if parallel:
         p = Pool(mp.cpu_count())
-        scores = p.imap_unordered(evaluate_random, list(range(num_rounds)), 5)
+        param_list = list([(Strategy, params),] * num_rounds)
+        scores = p.starmap(evaluate_random, param_list)
         p.close()
+        p.join()
     else:
-        scores = [evaluate_random(n) for n in range(num_rounds)]
+        scores = [evaluate_random(Strategy, params) for n in range(num_rounds)]
     series = pd.Series(scores)
     mean = series.mean()
     stats.append([series.count(), mean, series.std(), series.min()] +
@@ -109,10 +111,13 @@ def flatten_dict(d):
 
     return dict(items())
 
-def gekko_bayesian():
+def gekko_bayesian(indicator=None):
     print("")
-    Strategy = settings['Strategy']
-    print("Starting search %s parameters" % settings['Strategy'])
+    global Strategy
+    Strategy = indicator
+    if indicator == None:
+        Strategy = settings['Strategy']
+    print("Starting search %s parameters" % Strategy)
     bo = BayesianOptimization(gekko_search, settings[Strategy])
     
     # 1st Evaluate

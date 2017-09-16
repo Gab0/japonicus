@@ -23,9 +23,8 @@ parser.add_option('-k', '--gekko', dest='SpawnGekko',
                   action='store_true', default=False)
 parser.add_option('--repeat <X>', dest='Repeater',
                   type=int, default=1)
-parser.add_option('--strat <strat>', dest='Strategy',
-                  default=settings['generations']['Strategy'])
-                  
+parser.add_option('--strat <strat>', dest='Strategy')
+
 options, args = parser.parse_args()
 
 G=None
@@ -37,15 +36,15 @@ if options.SpawnGekko:
 
         G = Popen(GekkoArgs, stdin=PIPE, stdout=PIPE)
         sleep(2)
+strat = choice(settings['global']['Strategies'])\
+        if options.Strategy == 'all'\
+        else options.Strategy
 if options.GeneticAlgorithm:
     for S in range(options.Repeater):
-        Strat = choice(settings['global']['Strategies'])\
-                if options.Strategy == 'all'\
-                else options.Strategy
-        gekko_generations(Strat)
+        gekko_generations(strat)
 elif options.BayesianOptimization:
     import evolution_bayes
-    evolution_bayes.gekko_bayesian()
+    evolution_bayes.gekko_bayesian(strat)
 
 if G:
     G.kill()
