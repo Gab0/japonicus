@@ -67,7 +67,7 @@ def stratSettingsProofOfViability(Settings, DatasetLimits):
         DateRange = getRandomDateRange(DatasetLimits, 30)
         q=runBacktest(Settings, DateRange)
         AllProofs.append(q)
-        print('Month PoV %.3f' % q)
+        print('Random month profit~ %.3f' % q)
         
     check = [x for x in AllProofs if x > 0]
     Valid = len(check) == len(AllProofs)

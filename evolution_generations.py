@@ -103,7 +103,7 @@ def gekko_generations(Strategy, NBEPOCH=300, POP_SIZE=30):
     print("using candlestick dataset %s" % availableDataRange)
     print("%s strategy;" % Strategy)
     
-    InfoData={}
+    EvolutionStatistics={}
     
     #firePaperTrader(reconstructTradeSettings(POP[0], POP[0].Strategy), "poloniex",
     #                "USDT", "BTC")
@@ -133,8 +133,8 @@ def gekko_generations(Strategy, NBEPOCH=300, POP_SIZE=30):
             if W:# SEND BEST IND TO HoF;
                 BestSetting = tools.selBest(POP, 1)[0]
                 HallOfFame.insert(BestSetting)
-                #print(InfoData)
-                #plotEvolutionSummary(InfoData,
+                #print(EvolutionStatistics)
+                #plotEvolutionSummary(EvolutionStatistics,
                 #                     "evolution_%s"% (Strategy))
                 FinalBestScores.append(Stats['max'])
             DateRange = getRandomDateRange(availableDataRange, deltaDays)
@@ -178,7 +178,8 @@ def gekko_generations(Strategy, NBEPOCH=300, POP_SIZE=30):
         print("")
 
         # log statistcs;
-        InfoData[W] = Stats
+        EvolutionStatistics[W] = Stats
+
         if FirstEpochOfDataset:
             InitialBestScores.append(Stats['max'])
             FirstEpochOfDataset = False
@@ -220,4 +221,5 @@ def gekko_generations(Strategy, NBEPOCH=300, POP_SIZE=30):
     Vv = "GOOD STRAT" if Vv else "SEEMS BAD"
     logInfo(Vv)
     print("\t\t.RUN ENDS.")
-    
+
+    return FinalIndividueSettings, EvolutionStatistics
