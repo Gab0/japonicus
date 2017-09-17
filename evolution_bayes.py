@@ -11,14 +11,14 @@ from gekkoWrapper import getAvailableDataset, runBacktest
 from bayes_opt import BayesianOptimization
 from multiprocessing import Pool
 import multiprocessing as mp
-from itertools import repeat
 
-from coreFunctions import getRandomDateRange, getDateRange
+from coreFunctions import getRandomDateRange, getDateRange, write_evolution_logs
 from Settings import getSettings
 import gekkoWrapper
 import chart
 
 dict_merge = lambda a,b: a.update(b) or a
+gsettings = getSettings()['global']
 settings = getSettings()['bayesian']
 Strategy = settings["Strategy"]
 percentiles = np.array([0.25, 0.5, 0.75])
@@ -98,6 +98,7 @@ def gekko_search(**args):
     stats.append([series.count(), mean, series.std(), series.min()] +
          [series.quantile(x) for x in percentiles] + [series.max()])
     all_val.append(mean)
+    write_evolution_logs(len(all_val), stats[-1])
     return mean
 
 def flatten_dict(d):
@@ -144,7 +145,10 @@ def gekko_bayesian(indicator=None):
     print("Step 3: testing searched parameters on recent date")
     watch = settings["watch"]
     result = EvaluateRaw(watch, DateRange, max_params, Strategy)
-    s3 = result['report']['relativeProfit']
+    if type(result['report']) == bool:
+        s3 = 0.
+    else:
+        s3 = result['report']['relativeProfit']
     resultjson = compressing_flatten_dict(max_params, Strategy)[Strategy]
 
     # config.js like output
@@ -176,7 +180,7 @@ def gekko_bayesian(indicator=None):
         paramsdf["target"] = valuesdf
         watch = settings["watch"]
         filename = "_".join([watch["exchange"], watch["currency"], watch["asset"], Strategy, datetime.datetime.now().strftime('%Y%m%d_%H%M%S'), str(max_val)])
-        save_dir = settings["save_dir"]
+        save_dir = gsettings["save_dir"]
         csv_filename = os.path.join(save_dir, filename) + "_bayes.csv"
         json_filename = os.path.join(save_dir, filename) + "_config.json"
         json2_filename = os.path.join(save_dir, filename) + "_response.json"
