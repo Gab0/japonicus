@@ -24,6 +24,7 @@ import Settings
 import coreFunctions
 import evolution_bayes
 
+gsettings = Settings.getSettings()['global']
 settings = Settings.getSettings()['bayesian']
 
 MA_SMA, MA_EMA, MA_WMA, MA_DEMA, MA_TEMA, MA_TRIMA, MA_KAMA, MA_MAMA, MA_T3 = range(9)
@@ -88,7 +89,7 @@ def run_server():
         else:
             res = load_json(responses[-1])
             gekko_config = load_json(configs[-1])
-        filename = settings['configFilename']
+        filename = gsettings['configFilename']
         configjs = Settings.get_configjs(filename)
         config = {k:v for k,v in configjs.items() if k in indicators}
         config2 = {k:v for k,v in gekko_config["gekkoConfig"].items() if k in indicators}
@@ -161,43 +162,37 @@ def run_server():
                     'gekkoJaponicus Web Chart',
                     style={'padding-top': '20', 'text-align': 'center'}
                 ),
-                html.Div(
-                    [
+                html.Div([
                         html.Label('Select log:'),
                         dcc.Dropdown(
                             id='dropdown',
                             options=logs,
                             value=str(responses[0]),
-                        ),
-                    ],
+                        )],
                     style={
                         'width': '510', 'display': 'inline-block',
                         'padding-left': '40', 'margin-bottom': '20'}
                 ),
-                html.Div(
-                    [
+                html.Div([
                         html.Label('Select technical indicators:'),
                         dcc.Dropdown(
                             id='multi',
                             options=functions,
                             multi=True,
                             value=["add_"+strategy.upper()],
-                        ),
-                    ],
+                        )],
                     style={
                         'width': '510', 'display': 'inline-block',
                         'padding-right': '40', 'margin-bottom': '20'}
                 ),
             ]),
-            html.Div(
-                [
+            html.Div([
                     html.Label('Specify parameters of technical indicators:'),
                     dcc.Input(
                         id='arglist',
                         style={'height': '32', 'width': '1020'},
                         value=json.dumps(config),
-                    )
-                ],
+                    )],
                 id='arg-controls',
                 style={'display': 'none'}
             ),
@@ -211,6 +206,7 @@ def run_server():
             'background-color': '#F3F3F3'
         }
     )
+
 
     @app.callback(Output('arg-controls', 'style'), [Input('multi', 'value')])
     def display_control(multi):
@@ -277,18 +273,14 @@ def run_server():
     for css in external_css:
         app.css.append_css({"external_url": css})
 
-    if 'DYNO' in os.environ:
-        app.scripts.append_script({
-            'external_url': 'https://cdn.rawgit.com/chriddyp/ca0d8f02a1659981a0ea7f013a378bbd/raw/e79f3f789517deec58f41251f7dbb6bee72c44ab/plotly_ga.js'
-        })
-
     # Run the Dash app
     if __name__ == '__main__':
         app.server.run(debug=True)
+        #app.server.run()
 
 def get_json():
-    files1 = os.path.join(settings["save_dir"], '*_response.json')
-    files2 = os.path.join(settings["save_dir"], '*_config.json')
+    files1 = os.path.join(gsettings["save_dir"], '*_response.json')
+    files2 = os.path.join(gsettings["save_dir"], '*_config.json')
     response_files = list(filter(os.path.isfile, glob.glob(files1)))
     response_files.sort(key=lambda x: -os.path.getmtime(x))
     config_file = list(filter(os.path.isfile, glob.glob(files2)))
@@ -305,7 +297,7 @@ def create_first_chart():
     print("log file not found: try to fetch")
     strategy = settings["Strategy"]
     deltaDays = settings['deltaDays']
-    filename = settings['configFilename']
+    filename = gsettings['configFilename']
     configjs = Settings.get_configjs(filename)
     watch = settings["watch"]
     dateset = gekkoWrapper.getAvailableDataset(watch)
@@ -317,7 +309,7 @@ def create_first_chart():
     score = res['report']['relativeProfit']
 
     filename = "_".join([watch["exchange"], watch["currency"], watch["asset"], strategy, datetime.datetime.now().strftime('%Y%m%d_%H%M%S'), str(score)])
-    save_dir = settings["save_dir"]
+    save_dir = gsettings["save_dir"]
     json_filename = os.path.join(save_dir, filename) + "_config.json"
     json2_filename = os.path.join(save_dir, filename) + "_response.json"
     if not os.path.exists(save_dir):

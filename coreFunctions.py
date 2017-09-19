@@ -1,8 +1,12 @@
 #!/bin/python
 
-from gekkoWrapper import runBacktest
+import os
 import datetime
 import random
+import pandas as pd
+
+from gekkoWrapper import runBacktest
+from Settings import getSettings
 
 def reconstructTradeSettings(IND, Strategy):
     Settings = {
@@ -67,7 +71,7 @@ def stratSettingsProofOfViability(Settings, DatasetLimits):
         DateRange = getRandomDateRange(DatasetLimits, 30)
         q=runBacktest(Settings, DateRange)
         AllProofs.append(q)
-        print('Random month profit~ %.3f' % q)
+        print('Month PoV %.3f' % q)
         
     check = [x for x in AllProofs if x > 0]
     Valid = len(check) == len(AllProofs)
@@ -92,3 +96,29 @@ def pasteSettingsToUI(Settings):
 
 def loadGekkoConfig():
     pass
+
+def logInfo(message, filename="evolution_gen.log"):
+    gsettings = getSettings()['global']
+    filename = os.path.join(gsettings['save_dir'], filename)
+    F=open(filename, 'a+')
+    F.write(message)
+    print(message)
+    F.close()
+
+def write_evolution_logs(i, stats, filename="evolution_gen.csv"):
+    print(i, stats)
+    if type(stats) == dict:
+        message = ','.join([str(x) for x in [i,stats['avg'],stats['std'],stats['min'],stats['max']]])
+    elif type(stats) == list:
+        message = ','.join([str(x) for x in [i,stats[1],stats[2],stats[3],stats[-1]]])
+    else:
+        raise
+    print(message)
+    gsettings = getSettings()['global']
+    filename = os.path.join(gsettings['save_dir'], filename)
+    if i == 0:
+        os.remove(filename)
+    f=open(filename, 'a+')
+    f.write(message+"\n")
+    print(message)
+    f.close()

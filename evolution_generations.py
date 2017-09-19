@@ -1,9 +1,7 @@
 #!/bin/python
 import random
-import datetime
-import calendar
 import json
-
+import os
 
 from copy import deepcopy
 
@@ -18,22 +16,18 @@ from multiprocessing import Pool
 
 from gekkoWrapper import *
 from coreFunctions import Evaluate, getRandomDateRange,\
-    stratSettingsProofOfViability, pasteSettingsToUI
+    stratSettingsProofOfViability, pasteSettingsToUI,\
+    logInfo, write_evolution_logs
 from Settings import getSettings
 #from plotInfo import plotEvolutionSummary
 
-def logInfo(message, filename="evolution.log"):
-    F=open(filename, 'a+')
-    F.write(message)
-    print(message)
-    F.close()
-    
+
 def progrBarMap(funct, array):
     l = len(array)
     result = []
     for w in range(len(array)):
         result.append(funct(array[w]))
-        print("\r\tevaluating %i:\t%.2f%%" % (l, ((w+1)/l*100)), end='')
+        print("\r\tevaluating %i:\t%.2f%%" % (l, (w+1)/l*100), end='')
     print('\r\n')
 
     return result
@@ -180,6 +174,7 @@ def gekko_generations(Strategy, NBEPOCH=300, POP_SIZE=30):
         # log statistcs;
         EvolutionStatistics[W] = Stats
 
+        write_evolution_logs(W, Stats)
         if FirstEpochOfDataset:
             InitialBestScores.append(Stats['max'])
             FirstEpochOfDataset = False

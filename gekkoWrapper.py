@@ -50,7 +50,7 @@ def getAvailableDataset(watch={"exchange": "poloniex","currency": 'USDT',"asset"
             scanset.append(s)
     if len(scanset) == 0:
         raise "scanset not available: {}".format(watch)
-    print(scanset)
+
     for EXCHANGE in scanset:
         ranges = EXCHANGE['ranges']
         range_spans = [x['to']-x['from'] for x in ranges]

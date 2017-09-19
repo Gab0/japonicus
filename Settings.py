@@ -4,9 +4,11 @@ import js2py
 def getSettings():
     s = {'global':{
         'gekkoPath': os.getenv("HOME")+'/gekko1',
-        'Strategies': ['DEMA', 'MACD', 'PPO', 'RSI', 'StochRSI', 'TSI']
+        'Strategies': ['DEMA', 'MACD', 'PPO', 'RSI', 'StochRSI', 'TSI'],
+        'configFilename': 'example-config.js',
+        'save_dir': "output",
         },
-         
+
         'generations': {
             'deltaDays': 21,
             'cxpb': 0.2,
@@ -24,10 +26,8 @@ def getSettings():
                     'init_points': 9,
                     'parallel': False,
                     'Strategy': 'PPO',
-                    'configFilename': 'example-config.js',
-                    'show_chart': True,
+                    'show_chart': False,
                     'save': True,
-                    'save_dir': "output",
                     'watch':{
                             "exchange": "poloniex",
                             "currency": 'USDT',
