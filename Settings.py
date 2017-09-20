@@ -1,68 +1,80 @@
 import os
 import js2py
 
-def getSettings():
-    s = {'global':{
-        'gekkoPath': os.getenv("HOME")+'/gekko1',
-        'Strategies': ['DEMA', 'MACD', 'PPO', 'RSI', 'StochRSI', 'TSI'],
-        'configFilename': 'example-config.js',
-        'save_dir': "output",
-        },
+class _settings:
+    def __init__(self, **entries):
+        self.__dict__.update(entries)
 
+def getSettings(specific=None):
+    s = {
+        'global': {
+            'gekkoPath': os.getenv("HOME")+'/gekko1',
+            'Strategies': ['DEMA', 'MACD', 'PPO', 'RSI', 'StochRSI', 'TSI'],
+            'configFilename': 'example-config.js',
+            'save_dir': "output",
+        },
+        
         'generations': {
+            'POP_SIZE': 30,
+            'NBEPOCH': 300,
             'deltaDays': 21,
             'cxpb': 0.2,
             'mutpb': 0.8,
             '_lambda': 5,
-            'Strategy': "StochRSI",
+            'Strategy': "DEMA",
             'DRP': 10,
             'ParallelBacktests': 5
         },
-        'bayesian': {'deltaDays': 21,
-                    'testDays': 21,
-                    'num_rounds': 10,
-                    'random_state': 2017,
-                    'num_iter': 50,
-                    'init_points': 9,
-                    'parallel': False,
-                    'Strategy': 'PPO',
-                    'show_chart': False,
-                    'save': True,
-                    'watch':{
-                            "exchange": "poloniex",
-                            "currency": 'USDT',
-                            "asset": 'BTC'
-                    },
-                    "DEMA":{
-                           #"candleSize":(1,60), # tick per day
-                           #"historySize":(1,60),
-                           "short": (1,10), # short EMA
-                           "long": (20,50), # long EMA
-                           "thresholds.down": (-0.5,0.), # trend thresholds
-                           "thresholds.up": (0.,0.5), # trend thresholds
-                    },
-                    "MACD":{
-                           #"candleSize":(1,60), # tick per day
-                           #"historySize":(1,60), # required history
-                           "short": (1,10), # short EMA
-                           "long": (20,50), # long EMA
-                           "signal": (1,18), # shortEMA - longEMA diff
-                           "thresholds.down": (-0.5,0.), # trend thresholds
-                           "thresholds.up": (0.,0.5), # trend thresholds
-                           "thresholds.persistence": (0,2), # trend duration(count up by tick) thresholds
-                    },
-                    "PPO":{
-                           #"candleSize":(1,60), # tick per day
-                           #"historySize":(1,60), # required history
-                           "short": (6,18), # short EMA
-                           "long": (13,39), # long EMA
-                           "signal": (1,18), # 100 * (shortEMA - longEMA / longEMA)
-                           "thresholds.down": (-0.5,0.), # trend thresholds
-                           "thresholds.up": (0.,0.5), # trend thresholds
-                           "thresholds.persistence": (0,4), # trend duration(count up by tick) thresholds
-                    },
-                    # Uses one of the momentum indicators but adjusts the thresholds when PPO is bullish or bearish
-                    # Uses settings from the ppo and momentum indicator config block
+        'bayesian': {
+            'deltaDays': 21,
+            'testDays': 21,
+            'num_rounds': 10,
+            'random_state': 2017,
+            'num_iter': 50,
+            'init_points': 9,
+            'parallel': False,
+            'Strategy': 'PPO',
+            'show_chart': False,
+            'save': True,
+            'watch':{
+                "exchange": "poloniex",
+                "currency": 'USDT',
+                "asset": 'BTC'
+            }
+        },
+        'strategies': {
+            # Define range of values for strat settings;
+            #for all evolution methods;
+            "DEMA":{
+                #"candleSize":(1,60), # tick per day
+                #"historySize":(1,60),
+                "short": (1,10), # short EMA
+                "long": (20,50), # long EMA
+                "thresholds.down": (-0.5,0.1), # trend thresholds
+                "thresholds.up": (-0.1,0.5), # trend thresholds
+            },
+            "MACD":{
+                #"candleSize":(1,60), # tick per day
+                #"historySize":(1,60), # required history
+                "short": (1,10), # short EMA
+                "long": (20,50), # long EMA
+                "signal": (1,18), # shortEMA - longEMA diff
+                "thresholds.down": (-0.5,0.), # trend thresholds
+                "thresholds.up": (0.,0.5), # trend thresholds
+                "thresholds.persistence": (0,2), # trend duration(count up by tick) thresholds
+            },
+            "PPO":{
+                #"candleSize":(1,60), # tick per day
+                #"historySize":(1,60), # required history
+                "short": (6,18), # short EMA
+                "long": (13,39), # long EMA
+                "signal": (1,18), # 100 * (shortEMA - longEMA / longEMA)
+                "thresholds.down": (-0.5,0.), # trend thresholds
+                "thresholds.up": (0.,0.5), # trend thresholds
+                "thresholds.persistence": (0,4), # trend duration(count up by tick) thresholds
+            },
+            # Uses one of the momentum indicators but adjusts the thresholds when PPO is bullish or bearish
+            # Uses settings from the ppo and momentum indicator config block
                     "varPPO":{ # TODO: merge PPO config
                            #"candleSize":(1,60), # tick per day
                            #"historySize":(1,60), # required history
@@ -117,7 +129,10 @@ def getSettings():
                      },
         }
     }
-    
+
+    if specific:
+        return _settings(**s[specific])
+
     return s
 
 def get_configjs(filename="example-config.js"):

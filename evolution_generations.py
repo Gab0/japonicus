@@ -17,9 +17,11 @@ from multiprocessing import Pool
 from gekkoWrapper import *
 from coreFunctions import Evaluate, getRandomDateRange,\
     stratSettingsProofOfViability, pasteSettingsToUI,\
+    reconstructTradeSettings,\
     logInfo, write_evolution_logs
 from Settings import getSettings
 #from plotInfo import plotEvolutionSummary
+
 
 
 def progrBarMap(funct, array):
@@ -39,35 +41,16 @@ def createRandomVarList(SZ=10):
     VAR_LIST = [random.randrange(0,100) for x in range(SZ)]
     return VAR_LIST
 
-def reconstructTradeSettings(IND, Strategy):
-    R = lambda V, lim: ((lim[1]-lim[0])/100) * V + lim[0]
-    Settings = {
-        Strategy:{
-            "short": R( IND[0], (1, 20) ),
-            "long": R( IND[1], (10, 43) ),
-            "signal": R( IND[2], (5, 15) ),
-            "interval": R( IND[3], (1, 26) ),
-            "thresholds": {
-                "down": R( IND[4], (-0.85, 0.25) ),
-                "up": R( IND[5], (-0.85, 1.02) ),
-                "low": R( IND[6], (10, 60) ),
-                "high": R( IND[7], (45, 95) ),
-                "persistence": R( IND[8], (1, 15)),
-                "fibonacci": R( IND[9], (0.1, 1))
-            }
-        }
-    } 
-        
-    return Settings
+
 
 def initInd(Criterion):
     w = Criterion()
     w[:] = createRandomVarList()
     return w
 
-def gekko_generations(Strategy, NBEPOCH=300, POP_SIZE=30):
+def gekko_generations(Strategy):
     # SETTINGS;############################
-    settings=getSettings()['generations']
+    genconf=getSettings('generations')
 
     DRP = 10 # Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
@@ -91,7 +74,7 @@ def gekko_generations(Strategy, NBEPOCH=300, POP_SIZE=30):
     toolbox.register("mate", tools.cxTwoPoint)
     toolbox.register("mutate", tools.mutUniformInt, low=10, up=10, indpb=0.2)
     
-    POP = toolbox.population(n=POP_SIZE)
+    POP = toolbox.population(n=genconf.POP_SIZE)
     W=0
     availableDataRange = getAvailableDataset()
     print("using candlestick dataset %s" % availableDataRange)
@@ -110,13 +93,13 @@ def gekko_generations(Strategy, NBEPOCH=300, POP_SIZE=30):
     InitialBestScores, FinalBestScores = [], []
     FirstEpochOfDataset = False
     Stats = None
-    settings_debug_min = reconstructTradeSettings([0 for x in range(10)], 'MIN_ VALUES')
-    settings_debug_max = reconstructTradeSettings([100 for x in range(10)], 'MAX_ VALUES')
+    settings_debug_min = reconstructTradeSettings([0 for x in range(10)], Strategy)
+    settings_debug_max = reconstructTradeSettings([100 for x in range(10)], Strategy)
     
     print("DEBUG %s" % json.dumps(settings_debug_min, indent=2))
     print("DEBUG %s" % json.dumps(settings_debug_max, indent=2))
           
-    while W < NBEPOCH: 
+    while W < genconf.NBEPOCH: 
         HallOfFame = tools.HallOfFame(30)
         bestScore = 0
         Deviation = 0
@@ -166,7 +149,7 @@ def gekko_generations(Strategy, NBEPOCH=300, POP_SIZE=30):
             
 
         # show information;
-        print("EPOCH %i/%i" % (W, NBEPOCH)) 
+        print("EPOCH %i/%i" % (W, genconf.NBEPOCH)) 
         print("Average profit %.3f%%\tDeviation %.3f" % (Stats['avg'],Stats['std']))
         print("Maximum profit %.3f%%\tMinimum profit %.3f%%" % (Stats['max'],Stats['min']))
         print("")
@@ -182,10 +165,10 @@ def gekko_generations(Strategy, NBEPOCH=300, POP_SIZE=30):
         bestScore = Stats['max']
         Deviation = Stats['std']
         # generate and append offspring in population;
-        offspring = algorithms.varOr(POP, toolbox, settings['_lambda'],
-                                     settings['cxpb'], settings['mutpb'])
+        offspring = algorithms.varOr(POP, toolbox, genconf._lambda,
+                                     genconf.cxpb, genconf.mutpb)
 
-        POP[:] = tools.selBest(POP+offspring, POP_SIZE)
+        POP[:] = tools.selBest(POP+offspring, genconf.POP_SIZE)
 
         #print("POPSIZE %i" % len(POP))
         W+=1

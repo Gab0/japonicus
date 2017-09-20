@@ -159,7 +159,7 @@ def run_server():
         [
             html.Div([
                 html.H2(
-                    'gekkoJaponicus Web Chart',
+                    'gekkoJaponicus Charts',
                     style={'padding-top': '20', 'text-align': 'center'}
                 ),
                 html.Div([

@@ -44,7 +44,7 @@ def run_server():
         [
             html.Div([
                 html.H2(
-                    'gekkoJaponicus Web Chart',
+                    'gekkoJaponicus Evolution Statistics Over Time',
                     style={'padding-top': '20', 'text-align': 'center'}
                 ),
                 html.Div([
@@ -91,7 +91,7 @@ def run_server():
         df = load_evolution_logs()
         fig = {
             'data': [
-                {'x': df["id"], 'y': df["avg"], 'type': 'line', 'name': 'Average profit'},
+                {'x': df["id"], 'y': df["avg"], 'type': 'line', 'name': 'Average profit', 'color':'rgb(22, 96, 167)'},
                 {'x': df["id"], 'y': df["std"], 'type': 'line', 'name': 'Deviation'},
                 {'x': df["id"], 'y': df["min"], 'type': 'line', 'name': 'Minimum profit'},
                 {'x': df["id"], 'y': df["max"], 'type': 'line', 'name': 'Maximum profit'},

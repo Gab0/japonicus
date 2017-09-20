@@ -20,7 +20,10 @@ import chart
 dict_merge = lambda a,b: a.update(b) or a
 gsettings = getSettings()['global']
 settings = getSettings()['bayesian']
+
 Strategy = settings["Strategy"]
+StratConfig = getSettings()["strategies"][Strategy]
+
 percentiles = np.array([0.25, 0.5, 0.75])
 all_val = []
 stats = []
@@ -66,7 +69,7 @@ def evaluate_random(Strategy, params):
     watch = settings["watch"]
     chosenRange = getAvailableDataset(watch)
     DateRange = getRandomDateRange(chosenRange, deltaDays=settings['deltaDays'])
-    if "candleSize" in settings[Strategy]:
+    if "candleSize" in StratConfig:
         # parameter search trade count
         return EvaluateRaw(watch, DateRange, params, Strategy)["report"]["trades"]
     else:
@@ -119,7 +122,7 @@ def gekko_bayesian(indicator=None):
     if indicator == None:
         Strategy = settings['Strategy']
     print("Starting search %s parameters" % Strategy)
-    bo = BayesianOptimization(gekko_search, settings[Strategy])
+    bo = BayesianOptimization(gekko_search, StratConfig)
     
     # 1st Evaluate
     print("")

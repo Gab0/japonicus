@@ -9,24 +9,25 @@ from gekkoWrapper import runBacktest
 from Settings import getSettings
 
 def reconstructTradeSettings(IND, Strategy):
+    # THIS FUNCTION IS UGLYLY WRITTEN; USE WITH CAUTION;
+    # (still works :})
+    R = lambda V, lim: ((lim[1]-lim[0])/100) * V + lim[0]
+    stratSettings = getSettings()['strategies'][Strategy]
     Settings = {
-        Strategy:{
-            "short": IND[0]//5+1,
-            "long": IND[1]//3+10,
-            "signal": IND[2]//10+5,
-            "interval": IND[3]//3,
-            "thresholds": {
-                "down": (IND[4]//1.5-50)/60,
-                "up": (IND[5]//1.5-5)/60,
-                "low": IND[6]//2+10,
-                "high": IND[7]//2+45,
-                "persistence": IND[8]//25+1,
-                "fibonacci": (IND[9]//11+1)/10
-            }
+        Strategy:{}
         }
-    }
-    
-        
+    i=0
+    for K in stratSettings.keys():
+        Value = R(IND[i], stratSettings[K])
+        if '.' in K:
+            K=K.split('.')
+            if not K[0] in list(Settings[Strategy].keys()):
+                Settings[Strategy][K[0]] = {}
+            Settings[Strategy][K[0]][K[1]] = Value
+        else:
+            Settings[Strategy][K] = Value
+        i+=1
+
     return Settings
 
 def Evaluate(DateRange, Individual, Strategy):
