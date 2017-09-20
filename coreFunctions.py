@@ -4,34 +4,25 @@ import os
 import datetime
 import random
 import pandas as pd
+from deap import tools
+import numpy as np
 
 from gekkoWrapper import runBacktest
 from Settings import getSettings
 
-def reconstructTradeSettings(IND, Strategy):
-    # THIS FUNCTION IS UGLYLY WRITTEN; USE WITH CAUTION;
-    # (still works :})
-    R = lambda V, lim: ((lim[1]-lim[0])/100) * V + lim[0]
-    stratSettings = getSettings()['strategies'][Strategy]
-    Settings = {
-        Strategy:{}
-        }
-    i=0
-    for K in stratSettings.keys():
-        Value = R(IND[i], stratSettings[K])
-        if '.' in K:
-            K=K.split('.')
-            if not K[0] in list(Settings[Strategy].keys()):
-                Settings[Strategy][K[0]] = {}
-            Settings[Strategy][K[0]][K[1]] = Value
-        else:
-            Settings[Strategy][K] = Value
-        i+=1
+def getStatistcsMeter():
+    stats = tools.Statistics(lambda ind: ind.fitness.values)
+    stats.register("avg", np.mean)
+    stats.register("std", np.std)
+    stats.register("min", np.min)
+    stats.register("max", np.max)
 
-    return Settings
+    return stats
 
-def Evaluate(DateRange, Individual, Strategy):
-    Settings = reconstructTradeSettings(Individual, Strategy)
+def Evaluate(IndividualToSettings, DateRange, Individual, Strategy):
+    # IndividualToSettings(IND, STRAT) is a function that depends on GA algorithm,
+    # so should be provided;
+    Settings = IndividualToSettings(Individual, Strategy)
     #print(Settings)
     Profit = runBacktest(Settings, DateRange)
     return Profit,

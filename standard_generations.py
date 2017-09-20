@@ -17,11 +17,33 @@ from multiprocessing import Pool
 from gekkoWrapper import *
 from coreFunctions import Evaluate, getRandomDateRange,\
     stratSettingsProofOfViability, pasteSettingsToUI,\
-    reconstructTradeSettings,\
+    getStatisticsMeter,\
     logInfo, write_evolution_logs
+
 from Settings import getSettings
 #from plotInfo import plotEvolutionSummary
 
+def reconstructTradeSettings(IND, Strategy):
+    # THIS FUNCTION IS UGLYLY WRITTEN; USE WITH CAUTION;
+    # (still works :})
+    R = lambda V, lim: ((lim[1]-lim[0])/100) * V + lim[0]
+    stratSettings = getSettings()['strategies'][Strategy]
+    Settings = {
+        Strategy:{}
+        }
+    i=0
+    for K in stratSettings.keys():
+        Value = R(IND[i], stratSettings[K])
+        if '.' in K:
+            K=K.split('.')
+            if not K[0] in list(Settings[Strategy].keys()):
+                Settings[Strategy][K[0]] = {}
+            Settings[Strategy][K[0]][K[1]] = Value
+        else:
+            Settings[Strategy][K] = Value
+        i+=1
+
+    return Settings
 
 
 def progrBarMap(funct, array):
@@ -84,11 +106,7 @@ def gekko_generations(Strategy):
     
     #firePaperTrader(reconstructTradeSettings(POP[0], POP[0].Strategy), "poloniex",
     #                "USDT", "BTC")
-    stats = tools.Statistics(lambda ind: ind.fitness.values)
-    stats.register("avg", np.mean)
-    stats.register("std", np.std)
-    stats.register("min", np.min)
-    stats.register("max", np.max)
+    stats = getStatisticsMeter()
 
     InitialBestScores, FinalBestScores = [], []
     FirstEpochOfDataset = False
@@ -119,7 +137,7 @@ def gekko_generations(Strategy):
             print("\t%s to %s" % (DateRange['from'], DateRange['to']))
             for I in range(len(POP)):
                 del POP[I].fitness.values
-            toolbox.register("evaluate", Evaluate, DateRange)
+            toolbox.register("evaluate", Evaluate, reconstructTradeSettings, DateRange)
             FirstEpochOfDataset = True
             
         if random.random() < 0.2 and HallOfFame.items:
