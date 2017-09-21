@@ -105,12 +105,12 @@ def write_evolution_logs(i, stats, filename="evolution_gen.csv"):
         message = ','.join([str(x) for x in [i,stats[1],stats[2],stats[3],stats[-1]]])
     else:
         raise
-    print(message)
+    #print(message)
     gsettings = getSettings()['global']
     filename = os.path.join(gsettings['save_dir'], filename)
     if i == 0:
         os.remove(filename)
     f=open(filename, 'a+')
     f.write(message+"\n")
-    print(message)
+    #print(message)
     f.close()
