@@ -10,7 +10,7 @@ import numpy as np
 from gekkoWrapper import runBacktest
 from Settings import getSettings
 
-def getStatistcsMeter():
+def getStatisticsMeter():
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", np.mean)
     stats.register("std", np.std)
@@ -19,10 +19,10 @@ def getStatistcsMeter():
 
     return stats
 
-def Evaluate(IndividualToSettings, DateRange, Individual, Strategy):
+def Evaluate(IndividualToSettings, DateRange, Individual):
     # IndividualToSettings(IND, STRAT) is a function that depends on GA algorithm,
     # so should be provided;
-    Settings = IndividualToSettings(Individual, Strategy)
+    Settings = IndividualToSettings(Individual)
     #print(Settings)
     Profit = runBacktest(Settings, DateRange)
     return Profit,

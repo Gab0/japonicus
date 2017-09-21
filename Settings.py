@@ -17,12 +17,13 @@ def getSettings(specific=None):
         'generations': {
             'POP_SIZE': 30,
             'NBEPOCH': 300,
-            'deltaDays': 21,
-            'cxpb': 0.2,
-            'mutpb': 0.8,
-            '_lambda': 5,
+            'deltaDays': 21, # time window of dataset for evaluation
+            'cxpb': 0.2, # Probabilty of crossover 
+            'mutpb': 0.8,# Probability of mutation;
+            '_lambda': 5,# size of offspring generated per epoch;
             'Strategy': "DEMA",
-            'DRP': 10,
+            'DRP': 10,# Date range persistence; Number of subsequent rounds
+             # until another time range in dataset is selected;
             'ParallelBacktests': 5
         },
         'bayesian': {

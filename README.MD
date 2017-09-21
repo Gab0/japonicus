@@ -18,7 +18,8 @@ T.2 -> $cd [japonicus dir]
     --strat choose one strat to run;
     --repeat to run genetic algorithm X times; then just check evolution.log;
     
-    -w launches a neat dash/flask web server @ your local machine, which can be accessed via  webbrowser. Address is shown on the first line of console output. (likely http://localhost:5000)
+    -w launches a neat dash/flask web server @ your local machine, which can be accessed via  webbrowser. 
+           Address is shown on the first line of console output. (likely http://localhost:5000)
 ```
 If you use a Gekko UI port which is not :3000, adjust accordingly on gekkoWrapper.py.
 

@@ -17,6 +17,8 @@ parser = optparse.OptionParser()
 
 parser.add_option('-g', '--genetic', dest='genetic_algorithm',
                   action='store_true', default=False)
+parser.add_option('-c', '--chromosome', dest='chromosome_mode',
+                  action='store_true', default=False)
 parser.add_option('-b', '--bayesian', dest='bayesian_optimization',
                   action='store_true', default=False)
 parser.add_option('-k', '--gekko', dest='spawn_gekko',
@@ -48,10 +50,11 @@ if options.spawn_web:
     web_server = Popen(web_args, stdin=PIPE, stdout=PIPE)
     sleep(5)
 if options.genetic_algorithm:
-    for s in range(options.repeater):
-        if strat == None:
-            strat = settings['generations']['Strategy']
-        gekko_generations(strat)
+   GenerationMethod = 'chromossome' if options.chromosome_mode else 'standard'
+   for s in range(options.repeater):
+      if strat == None:
+         strat = settings['generations']['Strategy']
+         gekko_generations(strat, GenerationMethod)
 elif options.bayesian_optimization:
     import evolution_bayes
     if strat == None:

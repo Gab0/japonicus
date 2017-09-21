@@ -1,38 +1,35 @@
 #!/bin/python
 
-import promoterz
+from promoterz import *
 
 from coreFunctions import Evaluate
 
-def reconstructTradeSettings(Individue, PromoterMap):
+def reconstructTradeSettings(Individue):
     Settings = {}
 
-    Promoters = list(PromoterMap.keys())
+    PromotersPath = {v: k for k, v in Individue.PromoterMap.items()}
+    #print(PromotersPath)
+    #print(Individue[:])
+    Promoters = list(PromotersPath.keys())
     for C in Individue:
         for BP in range(len(C)):
             if C[BP] in Promoters:
                 read_window = C[BP+1:BP+3]
-                read_window = [V for V in read_window if V < 33]
+                read_window = [V for V in read_window if type(V) == int and V < 33]
                 Value = sum(read_window)
-                Settings[PromoterMap[C[BP]]] = Value
+                Settings[PromotersPath[C[BP]]] = Value
 
+    _Settings = {}
+
+    for K in Settings.keys():
+        if '.' in K:
+            Q = K.split('.')
+            if not Q[0] in _Settings.keys():
+                _Settings[Q[0]] = {}
+            _Settings[Q[0]][Q[1]] = Settings[K]
+        else:
+            _Settings[K] = Settings[K]
+
+    Settings = {Individue.Strategy: _Settings}
     return Settings
 
-def gekko_chromosomes(Strategy):
-    chrconf = getSettings('chromosome')
-    Settings = None
-    population = promoters.populate(chrconf.POP_SIZE, Settings)
-    StrategySettings = getSettings['strategies']['Strategy']
-    PromoterMap = promoterz.initPromoterMap(StrategySettings)
-
-    toolbox = promoterz.getToolbox()
-    toolbox.register("Evaluate", reconstructTradeSettings)
-    W = 0
-    while W < chrconf.NBEPOCH:
-
-        invalid_ind = [ x for x in population if not x.fitness.valid]
-        to_simulation = [ (x[:], x.Strategy) for x in invalid_ind ]
-        fitnesses = parallel.starmap(toolbox.evaluate, to_simulation)
-
-        for ind, fit in zip(individues_to_simulate, fitnesses):
-            ind.fitness.values = fit
