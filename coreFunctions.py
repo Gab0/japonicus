@@ -98,7 +98,7 @@ def logInfo(message, filename="evolution_gen.log"):
     F.close()
 
 def write_evolution_logs(i, stats, filename="evolution_gen.csv"):
-    print(i, stats)
+    #print(i, stats)
     if type(stats) == dict:
         message = ','.join([str(x) for x in [i,stats['avg'],stats['std'],stats['min'],stats['max']]])
     elif type(stats) == list:
