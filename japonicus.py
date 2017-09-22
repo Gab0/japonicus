@@ -4,13 +4,14 @@ import optparse
 from time import sleep
 from random import choice
 from subprocess import Popen, PIPE
-
+from threading import Thread
 from Settings import getSettings
 from evolution_generations import gekko_generations
 
 from os import chdir, path
 chdir(path.dirname(path.realpath(__file__)))
 
+import web
 settings = getSettings()
 #from evolution_bayes import gekko_bayesian
 parser = optparse.OptionParser()
@@ -46,9 +47,14 @@ if options.spawn_gekko:
         gekko_server = Popen(gekko_args, stdin=PIPE, stdout=PIPE)
         sleep(2)
 if options.spawn_web:
-    web_args = ['python', 'web.py']
-    web_server = Popen(web_args, stdin=PIPE, stdout=PIPE)
-    sleep(5)
+   #web_args = ['python', 'web.py']
+   #web_server = Popen(web_args, stdin=PIPE, stdout=PIPE)
+   print("WEBSERVER MODE")
+   APP = web.run_server()
+   P = Thread(target=APP.server.run)
+   P.start()
+
+   sleep(2)
 if options.genetic_algorithm:
    GenerationMethod = 'chromossome' if options.chromosome_mode else 'standard'
    for s in range(options.repeater):

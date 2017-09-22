@@ -107,7 +107,7 @@ def mutate(ind, mutpb=0.0001, mutagg=20):
         for BP in range(len(ind[C])):
             if BP < 100: # case BP is common base value;
                 if random.random() < mutpb:
-                    ind[C][BP]+=random.choice(range(-S,S))
+                    ind[C][BP]+=random.choice(range(-mutagg, mutagg))
             else: # case BP is in fact a promoter;
                 pass
 

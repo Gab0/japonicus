@@ -24,7 +24,6 @@ def load_evolution_logs(filename="evolution_gen.csv"):
     return df
 
 def run_server():
-
     # Setup the app
     server = flask.Flask(__name__)
     #server.secret_key = os.environ.get('secret_key', 'secret')
@@ -115,7 +114,9 @@ def run_server():
     if __name__ == '__main__':
         app.server.run(debug=True)
         #app.server.run()
-
+    else: # this way it integrates with main interface without child procs across pipes,
+        return app
 
 if __name__ == '__main__':
     run_server()
+
