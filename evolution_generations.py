@@ -59,32 +59,39 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     
     #print("DEBUG %s" % json.dumps(settings_debug_min, indent=2))
     #print("DEBUG %s" % json.dumps(settings_debug_max, indent=2))
-          
+    HallOfFame = tools.HallOfFame(30)
+    bestScore = 0
+    Deviation = 0
     while W < genconf.NBEPOCH:
-        newDateRangeLoadedOnEpoch = False
-        HallOfFame = tools.HallOfFame(30)
-        bestScore = 0
-        Deviation = 0
-        
+
+        FirstEpochOfDataset = False
+
+        # --change environment
         Z = not W % genconf.DRP and bestScore > 0.3 and not Deviation
         K = not W % (genconf.DRP*3)
         if Z or K: # SELECT NEW DATERANGE;
+
             if W:# SEND BEST IND TO HoF;
                 BestSetting = tools.selBest(POP, 1)[0]
                 HallOfFame.insert(BestSetting)
                 #print(EvolutionStatistics)
-                #plotEvolutionSummary(EvolutionStatistics,
-                #                     "evolution_%s"% (Strategy))
+
                 FinalBestScores.append(Stats['max'])
+
             DateRange = getRandomDateRange(availableDataRange, genconf.deltaDays)
             print("Loading new date range;")
-            newDateRangeLoadedOnEpoch = True
+
             print("\t%s to %s" % (DateRange['from'], DateRange['to']))
             for I in range(len(POP)):
                 del POP[I].fitness.values
-            toolbox.register("evaluate", Evaluate, GenerationMethod.reconstructTradeSettings, DateRange)
+            toolbox.register("evaluate", Evaluate,
+                             GenerationMethod.reconstructTradeSettings, DateRange)
             FirstEpochOfDataset = True
-            
+            bestScore = 0
+
+
+
+        # --hall of fame immigration;
         if random.random() < 0.2 and HallOfFame.items:
             # casually insert individuals from HallOfFame on population;
             for Q in range(1):
@@ -92,20 +99,22 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
                 del CHP.fitness.values
                 POP += [CHP]
 
+        # --randomic immigration;
         if random.random() < 0.5:
             # should have built the wall;
-            nb = random.randint(1,9)
+            nb = random.randint(1, 9)
             POP += toolbox.population(nb)
-            
+
+        # --evaluate individuals;
         individues_to_simulate = [ind for ind in POP if not ind.fitness.valid]
 
         #fitnesses = toolbox.map(toolbox.evaluate, individues_to_simulate)
         fitnesses = parallel.starmap(toolbox.evaluate, zip(individues_to_simulate))
-        
+
         for ind, fit in zip(individues_to_simulate, fitnesses):
             ind.fitness.values = fit
 
-        # get proper evolution statistics; #TBD
+        # --get proper evolution statistics;
         Stats=stats.compile(POP)
 
         # show information;
@@ -114,26 +123,27 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
         print("Maximum profit %.3f%%\tMinimum profit %.3f%%" % (Stats['max'],Stats['min']))
         print("")
 
-        # log statistcs;
-        EvolutionStatistics[W] = Stats
-        if newDateRangeLoadedOnEpoch:
-            EvolutionStatistics[W]['dateRange'] = "%s ~ %s" % (DateRange['from'],
-                                                               DateRange['to'])
-        else:
-            EvolutionStatistics[W]['dateRange'] = None
 
-        write_evolution_logs(W, Stats)
         if FirstEpochOfDataset:
             InitialBestScores.append(Stats['max'])
-            FirstEpochOfDataset = False
+            Stats['dateRange'] = "%s ~ %s" % (DateRange['from'], DateRange['to'])
+        else:
+            Stats['dateRange'] = None
+
+        # --log statistcs;
+        EvolutionStatistics[W] = Stats
+        write_evolution_logs(W, Stats)
 
         bestScore = Stats['max']
         Deviation = Stats['std']
-        # generate and append offspring in population;
+
+        # --generate and integrate offspring;
         offspring = algorithms.varOr(POP, toolbox, genconf._lambda,
                                      genconf.cxpb, genconf.mutpb)
+        POP += offspring
 
-        POP[:] = tools.selBest(POP+offspring, genconf.POP_SIZE)
+        # --filter best inds;
+        POP[:] = tools.selBest(POP, genconf.POP_SIZE)
 
         #print("POPSIZE %i" % len(POP))
         W+=1
@@ -141,7 +151,7 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
     FinalBestScores.append(Stats['max'])
     FinalIndividue = tools.selBest(POP, 1)[0]
-    FinalIndividueSettings = reconstructTradeSettings(FinalIndividue)
+    FinalIndividueSettings = GenerationMethod.reconstructTradeSettings(FinalIndividue)
 
     Show = json.dumps(FinalIndividueSettings, indent=2)
     logInfo("~" * 18)

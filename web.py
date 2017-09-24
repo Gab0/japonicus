@@ -26,7 +26,7 @@ def load_evolution_logs(filename="evolution_gen.csv"):
 def run_server():
     # Setup the app
     server = flask.Flask(__name__)
-    #server.secret_key = os.environ.get('secret_key', 'secret')
+    #server.secret_key = os.environ.get('secret_http://localhost:500/key', 'secret')
     app = dash.Dash(__name__, server=server, csrf_protect=False)
 
     app.scripts.config.serve_locally = False
@@ -99,11 +99,11 @@ def run_server():
                     'yanchor': 'bottom',
                     'font': {
                         'family': 'Arial',
-                        'size': 16,
+                        'size': 12,
                         'color': 'rgb(37,37,37)'
                     },
                     'x': W,
-                    'y': -1,
+                    'y': 1 if not len(annotations) % 2 else 0.93, # avoid label overlap;
                     'text': DR
                 })
 

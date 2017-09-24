@@ -63,7 +63,7 @@ def stratSettingsProofOfViability(Settings, DatasetLimits):
         DateRange = getRandomDateRange(DatasetLimits, 30)
         q=runBacktest(Settings, DateRange)
         AllProofs.append(q)
-        print('Month PoV %.3f' % q)
+        print('Testing monthly profit %.3f' % q)
         
     check = [x for x in AllProofs if x > 0]
     Valid = len(check) == len(AllProofs)
@@ -108,7 +108,7 @@ def write_evolution_logs(i, stats, filename="evolution_gen.csv"):
     #print(message)
     gsettings = getSettings()['global']
     filename = os.path.join(gsettings['save_dir'], filename)
-    if i == 0:
+    if i == 0 and os.path.isfile(filename):
         os.remove(filename)
     f=open(filename, 'a+')
     f.write(message+"\n")
