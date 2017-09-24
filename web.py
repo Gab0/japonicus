@@ -18,7 +18,7 @@ gsettings = Settings.getSettings()['global']
 settings = Settings.getSettings()['bayesian']
 
 def load_evolution_logs(filename="evolution_gen.csv"):
-    columns = ['id', 'avg', 'std', 'min', 'max']
+    columns = ['id', 'avg', 'std', 'min', 'max', 'dateRange']
     filename = os.path.join(gsettings["save_dir"], filename)
     df = pd.read_csv(filename, names=columns)
     return df
@@ -43,7 +43,7 @@ def run_server():
         [
             html.Div([
                 html.H2(
-                    'gekkoJaponicus Evolution Statistics Over Time',
+                    'japonicus Evolution Statistics',
                     style={'padding-top': '20', 'text-align': 'center'}
                 ),
                 html.Div([
@@ -59,7 +59,7 @@ def run_server():
                 ]),
             dcc.Graph(id='output')
         ],
-        style={
+        style={#Traces>Color
             'width': '1100',
             'margin-left': 'auto',
             'margin-right': 'auto',
@@ -88,15 +88,46 @@ def run_server():
     def update_graph():
         print('Loading')
         df = load_evolution_logs()
+        annotations = []
+        for W in range(len(df['dateRange'])):
+            DR = df['dateRange'][W]
+            if DR != 'None':
+                annotations.append({
+                    'xref':'axis',
+                    'yref':'paper',
+                    'xanchor': 'left',
+                    'yanchor': 'bottom',
+                    'font': {
+                        'family': 'Arial',
+                        'size': 16,
+                        'color': 'rgb(37,37,37)'
+                    },
+                    'x': W,
+                    'y': -1,
+                    'text': DR
+                })
+
         fig = {
             'data': [
-                {'x': df["id"], 'y': df["avg"], 'type': 'line', 'name': 'Average profit', 'color':'rgb(22, 96, 167)'},
-                {'x': df["id"], 'y': df["std"], 'type': 'line', 'name': 'Deviation'},
-                {'x': df["id"], 'y': df["min"], 'type': 'line', 'name': 'Minimum profit'},
-                {'x': df["id"], 'y': df["max"], 'type': 'line', 'name': 'Maximum profit'},
+                {'x': df["id"], 'y': df["avg"],
+                 'type': 'line', 'name': 'Average profit',
+                  'line': {'color': 'rgb(188, 189, 34)'}},
+
+                {'x': df["id"], 'y': df["std"],
+                 'type': 'line', 'name': 'Deviation',
+                 'line': {'color': 'rgb(100, 11, 182)'}},
+
+                {'x': df["id"], 'y': df["min"],
+                 'type': 'line', 'name': 'Minimum profit',
+                 'line': {'color': 'rgb(186, 3, 34)'}},
+
+                {'x': df["id"], 'y': df["max"],
+                 'type': 'line', 'name': 'Maximum profit',
+                 'line': {'color': 'rgb(45, 111, 45)'}}
             ],
             'layout': {
-                'title': 'Evolution Data Visualization'
+                'title': 'Evolution Data Over Time',
+                'annotations': annotations
             }
         }
         return fig
@@ -113,7 +144,7 @@ def run_server():
     # Run the Dash app
     if __name__ == '__main__':
         app.server.run(debug=True)
-        #app.server.run()
+
     else: # this way it integrates with main interface without child procs across pipes,
         return app
 

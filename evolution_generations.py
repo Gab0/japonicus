@@ -60,7 +60,8 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     #print("DEBUG %s" % json.dumps(settings_debug_min, indent=2))
     #print("DEBUG %s" % json.dumps(settings_debug_max, indent=2))
           
-    while W < genconf.NBEPOCH: 
+    while W < genconf.NBEPOCH:
+        newDateRangeLoadedOnEpoch = False
         HallOfFame = tools.HallOfFame(30)
         bestScore = 0
         Deviation = 0
@@ -77,6 +78,7 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
                 FinalBestScores.append(Stats['max'])
             DateRange = getRandomDateRange(availableDataRange, genconf.deltaDays)
             print("Loading new date range;")
+            newDateRangeLoadedOnEpoch = True
             print("\t%s to %s" % (DateRange['from'], DateRange['to']))
             for I in range(len(POP)):
                 del POP[I].fitness.values
@@ -114,6 +116,11 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
 
         # log statistcs;
         EvolutionStatistics[W] = Stats
+        if newDateRangeLoadedOnEpoch:
+            EvolutionStatistics[W]['dateRange'] = "%s ~ %s" % (DateRange['from'],
+                                                               DateRange['to'])
+        else:
+            EvolutionStatistics[W]['dateRange'] = None
 
         write_evolution_logs(W, Stats)
         if FirstEpochOfDataset:

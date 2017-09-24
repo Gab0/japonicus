@@ -102,7 +102,7 @@ def pachytene(ind1, ind2):
         childChr.append(random.choice([ind1[W], ind2[W]]))
 
     return ind1, ind2
-def mutate(ind, mutpb=0.0001, mutagg=20):
+def mutate(ind, mutpb=0.001, mutagg=12):
     for C in range(len(ind)):
         for BP in range(len(ind[C])):
             if BP < 100: # case BP is common base value;
