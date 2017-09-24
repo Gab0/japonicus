@@ -1,6 +1,8 @@
 #!/bin/python
 import json
 import random
+import promoterz
+
 from copy import deepcopy
 from gekkoWrapper import getAvailableDataset
 from coreFunctions import Evaluate, getRandomDateRange,\
@@ -92,18 +94,29 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
 
 
         # --hall of fame immigration;
+        '''
         if random.random() < 0.2 and HallOfFame.items:
             # casually insert individuals from HallOfFame on population;
             for Q in range(1):
                 CHP = deepcopy(random.choice(HallOfFame))
                 del CHP.fitness.values
                 POP += [CHP]
+        '''
+        if random.random() < 0.2:
+            POP = promoterz.immigrateHoF(POP, HallOfFame)
+
 
         # --randomic immigration;
+        '''
         if random.random() < 0.5:
+
             # should have built the wall;
             nb = random.randint(1, 9)
             POP += toolbox.population(nb)
+        '''
+        if random.random() < 0.5:
+            POP = promoterz.immigrateRandom(POP, toolbox.population)
+
 
         # --evaluate individuals;
         individues_to_simulate = [ind for ind in POP if not ind.fitness.valid]
