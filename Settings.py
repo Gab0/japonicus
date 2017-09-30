@@ -16,7 +16,7 @@ def getSettings(specific=None):
         
         'generations': {
             'POP_SIZE': 30,
-            'NBEPOCH': 600,
+            'NBEPOCH': 300,
             'deltaDays': 21, # time window of dataset for evaluation
             'cxpb': 0.2, # Probabilty of crossover 
             'mutpb': 0.8,# Probability of mutation;

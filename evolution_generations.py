@@ -16,6 +16,7 @@ from multiprocessing import Pool
 
 from deap import tools
 from deap import algorithms
+from deap import base
 
 def gekko_generations(Strategy, GenerationMethod='standard'):
 
@@ -64,6 +65,10 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     HallOfFame = tools.HallOfFame(30)
     bestScore = 0
     Deviation = 0
+
+    coreTools = base.Toolbox()
+    coreTools.register("ImmigrateHoF", promoterz.immigrateHoF, HallOfFame)
+    coreTools.register("ImmigrateRandom", promoterz.immigrateRandom, toolbox.population)
     while W < genconf.NBEPOCH:
 
         FirstEpochOfDataset = False
@@ -94,28 +99,13 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
 
 
         # --hall of fame immigration;
-        '''
-        if random.random() < 0.2 and HallOfFame.items:
-            # casually insert individuals from HallOfFame on population;
-            for Q in range(1):
-                CHP = deepcopy(random.choice(HallOfFame))
-                del CHP.fitness.values
-                POP += [CHP]
-        '''
         if random.random() < 0.2:
-            POP = promoterz.immigrateHoF(POP, HallOfFame)
+            POP = coreTools.ImmigrateHoF(POP)
 
 
         # --randomic immigration;
-        '''
         if random.random() < 0.5:
-
-            # should have built the wall;
-            nb = random.randint(1, 9)
-            POP += toolbox.population(nb)
-        '''
-        if random.random() < 0.5:
-            POP = promoterz.immigrateRandom(POP, toolbox.population)
+            POP = coreTools.ImmigrateRandom(POP)
 
 
         # --evaluate individuals;
@@ -150,8 +140,12 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
         bestScore = Stats['max']
         Deviation = Stats['std']
 
-        # --generate and integrate offspring;
-        offspring = algorithms.varOr(POP, toolbox, genconf._lambda,
+        # --select best individues to procreate
+        offspring = tools.selTournament(POP, genconf._lambda, 2*genconf._lambda)
+        offspring = [deepcopy(x) for x in offspring]
+
+        # --modify and integrate offspring;
+        offspring = algorithms.varAnd(offspring, toolbox,
                                      genconf.cxpb, genconf.mutpb)
         POP += offspring
 

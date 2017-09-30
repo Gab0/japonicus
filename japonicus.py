@@ -46,6 +46,7 @@ if options.spawn_gekko:
 
         gekko_server = Popen(gekko_args, stdin=PIPE, stdout=PIPE)
         sleep(2)
+
 if options.spawn_web:
    #web_args = ['python', 'web.py']
    #web_server = Popen(web_args, stdin=PIPE, stdout=PIPE)
@@ -55,19 +56,21 @@ if options.spawn_web:
    P.start()
 
    sleep(2)
+
 if options.genetic_algorithm:
    GenerationMethod = 'chromossome' if options.chromosome_mode else 'standard'
+   if strat == None:
+      strat = settings['generations']['Strategy']
    for s in range(options.repeater):
-      if strat == None:
-         strat = settings['generations']['Strategy']
-         gekko_generations(strat, GenerationMethod)
+      gekko_generations(strat, GenerationMethod)
+
 elif options.bayesian_optimization:
     import evolution_bayes
     if strat == None:
-        strat = settings['bayesian']['Strategy']
-    evolution_bayes.gekko_bayesian(strat)
+       strat = settings['bayesian']['Strategy']
+    for s in range(options.repeater):
+       evolution_bayes.gekko_bayesian(strat)
 
-if gekko_server:
-    gekko_server.kill()
-if web_server:
-    web_server.kill()
+if options.spawn_web:
+    print('Statistics info server still runs...')
+

@@ -3,14 +3,16 @@
 from deap import base
 from copy import deepcopy
 import random
-class SimulatedEnvironment():
+
+class SimulatedEnvironment(): # envelope main evolution loop as class? maybe tbd
     def __init__(self):
 
         self.toolbox = []
         self.HallOfFame = base.HallOfFame(30)
         self.population = []
 
-def immigrateHoF(population, HallOfFame):
+# population always as last positional argument, to blend with toolbox;
+def immigrateHoF(HallOfFame, population):
     if not HallOfFame.items:
         return population
 
@@ -20,7 +22,14 @@ def immigrateHoF(population, HallOfFame):
         population += [CHP]
     return population
 
-def immigrateRandom(population, populate): #(populate function)
+def immigrateRandom(populate, population): #(populate function)
     number = random.randint(1,9)
     population += populate(number)
     return population
+
+def filterAwayWorst(population, N=5):
+    aliveSize = len(population)-5
+    population = tools.selBest(population, aliveSize)
+    return population
+
+
