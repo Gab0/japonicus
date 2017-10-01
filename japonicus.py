@@ -2,7 +2,7 @@
 
 import optparse
 from time import sleep
-from random import choice
+from random import choice, randrange
 from subprocess import Popen, PIPE
 from threading import Thread
 from Settings import getSettings

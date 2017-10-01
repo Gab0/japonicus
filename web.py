@@ -23,6 +23,7 @@ def load_evolution_logs(filename="evolution_gen.csv"):
     df = pd.read_csv(filename, names=columns)
     return df
 
+
 def run_server():
     # Setup the app
     server = flask.Flask(__name__)
@@ -39,8 +40,7 @@ def run_server():
     # Controls
 
     # Layout
-    app.layout = html.Div(
-        [
+    app.layout =  html.Div([
             html.Div([
                 html.H2(
                     'japonicus Evolution Statistics',
@@ -57,16 +57,16 @@ def run_server():
                     ]),
                 html.Div(id='display-time'),
                 ]),
-            dcc.Graph(id='output')
-        ],
-        style={#Traces>Color
+            html.Div([dcc.Graph(id='output')], id='Graphs')
+    ],        style={
+        #Traces>Color
             'width': '1100',
             'margin-left': 'auto',
             'margin-right': 'auto',
             'font-family': 'overpass',
             'background-color': '#F3F3F3'
-        }
-    )
+    })
+
 
     @app.callback(
         Output('display-time', 'children'),
@@ -80,6 +80,19 @@ def run_server():
         [Input('set-time', 'value')])
     def update_interval(value):
         return value
+
+    ''' TODO: sucessive runs (--repeat) stacks
+    multiple graphics on web interface
+
+    APP.InternalContents[-1].id='old%i' % randrange(0,6000)
+    APP.InternalContents.append(GRAPH(id='output'))
+
+    @app.callback(
+        Output('Graphs', 'children'),
+        [Input('output')])
+    def appendGraph(oldGraph):
+        return [oldGraph, dcc.Graph(id-'output')]
+    '''
 
     @cache.memoize(timeout=timeout)
     @app.callback(
@@ -109,6 +122,10 @@ def run_server():
 
         fig = {
             'data': [
+                {'x':[0, df["id"]], 'y':[0],
+                 'type': 'line', 'name': 'markzero'.
+                 'line': {'color': 'rgb(0,0,0)'}},
+
                 {'x': df["id"], 'y': df["avg"],
                  'type': 'line', 'name': 'Average profit',
                   'line': {'color': 'rgb(188, 189, 34)'}},

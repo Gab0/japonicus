@@ -39,14 +39,21 @@ def getAllScanset():
 
     return RESP['datasets']
 
-def getAvailableDataset(watch={"exchange": "poloniex","currency": 'USDT',"asset": 'BTC'}):
-    DS = getAllScanset()
+def getAvailableDataset():
+    DatasetOfChoice=\
+    {
+        "exchange": "poloniex",
+        "currency": 'USDT',
+        "asset": 'BTC'
+    }
+    DataSetPack = getAllScanset()
     
     scanset = []
-    for s in DS:
+    for s in DataSetPack:
         for k in "exchange currency asset".split(" "):
-            if s[k] != watch[k]:
-                continue
+            # SCANS EVERY DATASET;
+            #if s[k] != watch[k]:
+            #    continue
             scanset.append(s)
     if len(scanset) == 0:
         raise "scanset not available: {}".format(watch)

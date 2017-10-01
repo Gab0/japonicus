@@ -82,6 +82,7 @@ def pasteSettingsToUI(Settings):
             text.append('\n[%s]' % W)
             for Z in Q.keys():
                 text.append(toParameter(Z, Q[Z]))
+            text.append('')
         else:
             text.append(toParameter(W, Q))
     return '\n'.join(text)
