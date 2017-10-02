@@ -123,7 +123,7 @@ def run_server():
         fig = {
             'data': [
                 {'x':[0, df["id"]], 'y':[0],
-                 'type': 'line', 'name': 'markzero'.
+                 'type': 'line', 'name': 'markzero',
                  'line': {'color': 'rgb(0,0,0)'}},
 
                 {'x': df["id"], 'y': df["avg"],

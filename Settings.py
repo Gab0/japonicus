@@ -11,12 +11,13 @@ def getSettings(specific=None):
             'gekkoPath': os.getenv("HOME")+'/gekko1',
             'Strategies': ['DEMA', 'MACD', 'PPO', 'RSI', 'StochRSI', 'TSI'],
             'configFilename': 'example-config.js',
-            'save_dir': "output",
+            'save_dir': "output"
+
         },
-        
-        'generations': {
+        # genetic algorithm settings
+        'generations': { 
             'POP_SIZE': 30,
-            'NBEPOCH': 10,
+            'NBEPOCH': 300,
             'deltaDays': 21, # time window of dataset for evaluation
             'cxpb': 0.2, # Probabilty of crossover 
             'mutpb': 0.8,# Probability of mutation;
@@ -24,8 +25,14 @@ def getSettings(specific=None):
             'Strategy': "DEMA",
             'DRP': 70,# Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
-            'ParallelBacktests': 5
+            'ParallelBacktests': 5,
+            'dataset_source': { # dataset_source can be set to None so it searches from any source;
+                "exchange": "poloniex",
+                "currency": 'USDT',
+                "asset": 'BTC'
+            }
         },
+        # bayesian optimization settings
         'bayesian': {
             'deltaDays': 21,
             'testDays': 21,

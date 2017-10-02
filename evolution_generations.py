@@ -21,6 +21,7 @@ from deap import base
 def gekko_generations(Strategy, GenerationMethod='standard'):
 
     genconf=getSettings('generations')
+    conf=getSettings('global')
     stratattr=getSettings()['strategies'][Strategy]
     # GENERATION METHOD SELECTION;
     # to easily employ various GA algorithms,
@@ -45,7 +46,7 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
 
     POP = toolbox.population(n=genconf.POP_SIZE)
     W=0
-    availableDataRange = getAvailableDataset()
+    availableDataRange = getAvailableDataset(exchange_source=genconf.dataset_source)
     print("using candlestick dataset %s" % availableDataRange)
     print("%s strategy;" % Strategy)
 
