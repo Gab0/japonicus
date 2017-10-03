@@ -32,4 +32,16 @@ def filterAwayWorst(population, N=5):
     population = tools.selBest(population, aliveSize)
     return population
 
+def evaluatePopulation(population, evaluationFunction):
+    individues_to_simulate = [ind for ind in POP if not ind.fitness.valid]
+    fitnesses = parallel.starmap(evaluationFunction, zip(individues_to_simulate))
+    for ind, fit in zip(individues_to_simulate, fitnesses):
+        ind.fitness.values = fit
 
+def getEvolutionToolbox(HallOfFame, population_generator):
+    T = base.toolbox()
+
+    coreTools.register("ImmigrateHoF", immigrateHoF, HallOfFame)
+    coreTools.register("ImmigrateRandom", immigrateRandom, population_generator)
+
+    return T

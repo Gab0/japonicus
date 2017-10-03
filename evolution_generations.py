@@ -65,15 +65,13 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     bestScore = 0
     Deviation = 0
 
-    coreTools = base.Toolbox()
-    coreTools.register("ImmigrateHoF", promoterz.immigrateHoF, HallOfFame)
-    coreTools.register("ImmigrateRandom", promoterz.immigrateRandom, toolbox.population)
+    coreTools = getEvolutionToolbox(HallOfFame, toolbox.population)
 
     while W < genconf.NBEPOCH:
 
         FirstEpochOfDataset = False
 
-        # --change environment
+        # -- periodically change environment
         Z = not W % genconf.DRP and bestScore > 0.3 and not Deviation
         K = not W % (genconf.DRP*3)
         if Z or K: # SELECT NEW DATERANGE;
@@ -109,13 +107,7 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
 
 
         # --evaluate individuals;
-        individues_to_simulate = [ind for ind in POP if not ind.fitness.valid]
-
-        #fitnesses = toolbox.map(toolbox.evaluate, individues_to_simulate)
-        fitnesses = parallel.starmap(toolbox.evaluate, zip(individues_to_simulate))
-
-        for ind, fit in zip(individues_to_simulate, fitnesses):
-            ind.fitness.values = fit
+        evaluatePopulation(POP, toolbox.evaluate)
 
         # --get proper evolution statistics;
         Stats=stats.compile(POP)
@@ -147,6 +139,8 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
         # --modify and integrate offspring;
         offspring = algorithms.varAnd(offspring, toolbox,
                                      genconf.cxpb, genconf.mutpb)
+
+        evaluatePopulation(offspring, toolbox.evaluate)
         POP += offspring
 
         # --filter best inds;
