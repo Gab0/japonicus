@@ -5,6 +5,13 @@ from deap import creator
 from deap import tools
 from copy import deepcopy
 
+import importlib
+
+def selectRepresentationMethod(methodname):
+    M = importlib.import_module("promoterz.representation.%s" % methodname)
+    return M
+
+
 def chromossomeCrossover(chr1, chr2):
     if len(chr1) != len(chr2):
         top_bottom = 1 if random.random() < 0.5 else -1

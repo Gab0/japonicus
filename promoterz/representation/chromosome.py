@@ -1,4 +1,6 @@
 #!/bin/python
+from deap import base
+from deap import creator
 
 from promoterz import *
 

@@ -49,7 +49,7 @@ def initInd(Criterion):
     return w
 
 
-def getToolbox(genconf):
+def getToolbox(genconf, Attributes):
     toolbox = base.Toolbox()
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list,

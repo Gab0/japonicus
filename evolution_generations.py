@@ -29,16 +29,10 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     # which should contain a genToolbox function to generate
     # fully working DEAP toolbox, and a reconstructTradeSettings
     # function to convert parameters from individue to usable strategy Settings;
-    # Check standard_generations.py;
+    # Check promoterz/representation;
 
-    if GenerationMethod == 'standard':
-        import promoterz.representation.oldschool as GenerationMethod
-        toolbox = GenerationMethod.getToolbox(genconf)
-    elif GenerationMethod == 'chromosome':
-        import promoterz.representation.chromosome as GenerationMethod
-        toolbox = GenerationMethod.getToolbox(genconf, stratattr)
-    else:
-        exit("UKNOWN METHOD")
+    GenerationMethod = promoterz.selectRepresentationMethod(GenerationMethod)
+    toolbox = GenerationMethod.getToolbox(genconf, stratattr)
 
     parallel = Pool(genconf.ParallelBacktests)
 
