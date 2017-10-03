@@ -32,17 +32,15 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     # Check standard_generations.py;
 
     if GenerationMethod == 'standard':
-        import standard_generations as GenerationMethod
+        import promoterz.representation.oldschool as GenerationMethod
         toolbox = GenerationMethod.getToolbox(genconf)
-    elif GenerationMethod == 'chromossome':
-        import chromosome_generations as GenerationMethod
+    elif GenerationMethod == 'chromosome':
+        import promoterz.representation.chromosome as GenerationMethod
         toolbox = GenerationMethod.getToolbox(genconf, stratattr)
     else:
         exit("UKNOWN METHOD")
 
     parallel = Pool(genconf.ParallelBacktests)
-
-
 
     POP = toolbox.population(n=genconf.POP_SIZE)
     W=0
@@ -52,17 +50,17 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
 
     EvolutionStatistics={}
 
-
     stats = getStatisticsMeter()
 
     InitialBestScores, FinalBestScores = [], []
     FirstEpochOfDataset = False
     Stats = None
-    #settings_debug_min = GenerationMethod.reconstructTradeSettings([0 for x in range(10)], Strategy)
-    #settings_debug_max = GenerationMethod.reconstructTradeSettings([100 for x in range(10)], Strategy)
+    # settings_debug_min = GenerationMethod.reconstructTradeSettings([0 for x in range(10)], Strategy)
+    # settings_debug_max = GenerationMethod.reconstructTradeSettings([100 for x in range(10)], Strategy)
     
-    #print("DEBUG %s" % json.dumps(settings_debug_min, indent=2))
-    #print("DEBUG %s" % json.dumps(settings_debug_max, indent=2))
+    # print("DEBUG %s" % json.dumps(settings_debug_min, indent=2))
+    # print("DEBUG %s" % json.dumps(settings_debug_max, indent=2))
+
     HallOfFame = tools.HallOfFame(30)
     bestScore = 0
     Deviation = 0
@@ -70,6 +68,7 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     coreTools = base.Toolbox()
     coreTools.register("ImmigrateHoF", promoterz.immigrateHoF, HallOfFame)
     coreTools.register("ImmigrateRandom", promoterz.immigrateRandom, toolbox.population)
+
     while W < genconf.NBEPOCH:
 
         FirstEpochOfDataset = False

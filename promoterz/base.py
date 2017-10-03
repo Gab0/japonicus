@@ -102,6 +102,7 @@ def pachytene(ind1, ind2):
         childChr.append(random.choice([ind1[W], ind2[W]]))
 
     return ind1, ind2
+
 def mutate(ind, mutpb=0.001, mutagg=12):
     for C in range(len(ind)):
         for BP in range(len(ind[C])):
@@ -112,6 +113,7 @@ def mutate(ind, mutpb=0.001, mutagg=12):
                 pass
 
     return ind,
+
 def clone(Chr):
     cut_point = random.randrange(-len(Chr), len(Chr))
     if not cut_point:

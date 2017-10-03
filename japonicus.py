@@ -58,7 +58,7 @@ if options.spawn_web:
    sleep(2)
 
 if options.genetic_algorithm:
-   GenerationMethod = 'chromossome' if options.chromosome_mode else 'standard'
+   GenerationMethod = 'chromosome' if options.chromosome_mode else 'standard'
    if strat == None:
       strat = settings['generations']['Strategy']
    for s in range(options.repeater):
