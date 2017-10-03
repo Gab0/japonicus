@@ -12,13 +12,7 @@ from deap import algorithms
 
 import numpy as np
 
-
-
-from gekkoWrapper import *
-
-
-from Settings import getSettings
-#from plotInfo import plotEvolutionSummary
+from Settings import getSettings # PROVISORY
 
 def reconstructTradeSettings(IND):
     # THIS FUNCTION IS UGLYLY WRITTEN; USE WITH CAUTION;

@@ -65,7 +65,7 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     bestScore = 0
     Deviation = 0
 
-    coreTools = getEvolutionToolbox(HallOfFame, toolbox.population)
+    coreTools = promoterz.getEvolutionToolbox(HallOfFame, toolbox.population)
 
     while W < genconf.NBEPOCH:
 
@@ -107,7 +107,7 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
 
 
         # --evaluate individuals;
-        evaluatePopulation(POP, toolbox.evaluate)
+        promoterz.evaluatePopulation(POP, toolbox.evaluate, parallel)
 
         # --get proper evolution statistics;
         Stats=stats.compile(POP)
@@ -140,7 +140,7 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
         offspring = algorithms.varAnd(offspring, toolbox,
                                      genconf.cxpb, genconf.mutpb)
 
-        evaluatePopulation(offspring, toolbox.evaluate)
+        promoterz.evaluatePopulation(offspring, toolbox.evaluate, parallel)
         POP += offspring
 
         # --filter best inds;

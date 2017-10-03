@@ -2,6 +2,7 @@
 
 from deap import base
 from copy import deepcopy
+
 import random
 
 class SimulatedEnvironment(): # envelope main evolution loop as class? maybe tbd
@@ -32,16 +33,16 @@ def filterAwayWorst(population, N=5):
     population = tools.selBest(population, aliveSize)
     return population
 
-def evaluatePopulation(population, evaluationFunction):
-    individues_to_simulate = [ind for ind in POP if not ind.fitness.valid]
-    fitnesses = parallel.starmap(evaluationFunction, zip(individues_to_simulate))
+def evaluatePopulation(population, evaluationFunction, pool):
+    individues_to_simulate = [ind for ind in population if not ind.fitness.valid]
+    fitnesses = pool.starmap(evaluationFunction, zip(individues_to_simulate))
     for ind, fit in zip(individues_to_simulate, fitnesses):
         ind.fitness.values = fit
 
 def getEvolutionToolbox(HallOfFame, population_generator):
-    T = base.toolbox()
+    T = base.Toolbox()
 
-    coreTools.register("ImmigrateHoF", immigrateHoF, HallOfFame)
-    coreTools.register("ImmigrateRandom", immigrateRandom, population_generator)
+    T.register("ImmigrateHoF", immigrateHoF, HallOfFame)
+    T.register("ImmigrateRandom", immigrateRandom, population_generator)
 
     return T
