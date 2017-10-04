@@ -59,14 +59,18 @@ def getRandomDateRange(Limits, deltaDays, testDays=0):
 
 def stratSettingsProofOfViability(Settings, DatasetLimits):
     AllProofs = []
-    for W in range(10):
+    for W in range(12):
         DateRange = getRandomDateRange(DatasetLimits, 30)
         q=runBacktest(Settings, DateRange)
         AllProofs.append(q)
         print('Testing monthly profit %.3f' % q)
-        
+
+    iValue = 100
+    for W in AllProofs:
+        iValue += iValue * (W/100)
     check = [x for x in AllProofs if x > 0]
     Valid = len(check) == len(AllProofs)
+    print("Annual profit %.3f%%" % (iValue-100))
     return Valid   
  
 def pasteSettingsToUI(Settings):

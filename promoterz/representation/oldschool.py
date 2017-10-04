@@ -14,7 +14,7 @@ import numpy as np
 
 from Settings import getSettings # PROVISORY
 
-def reconstructTradeSettings(IND):
+def constructPhenotype(IND):
     # THIS FUNCTION IS UGLYLY WRITTEN; USE WITH CAUTION;
     # (still works :})
     Strategy = IND.Strategy

@@ -49,8 +49,8 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     InitialBestScores, FinalBestScores = [], []
     FirstEpochOfDataset = False
     Stats = None
-    # settings_debug_min = GenerationMethod.reconstructTradeSettings([0 for x in range(10)], Strategy)
-    # settings_debug_max = GenerationMethod.reconstructTradeSettings([100 for x in range(10)], Strategy)
+    # settings_debug_min = GenerationMethod.constructPhenotype([0 for x in range(10)], Strategy)
+    # settings_debug_max = GenerationMethod.constructPhenotype([100 for x in range(10)], Strategy)
     
     # print("DEBUG %s" % json.dumps(settings_debug_min, indent=2))
     # print("DEBUG %s" % json.dumps(settings_debug_max, indent=2))
@@ -84,7 +84,7 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
             for I in range(len(POP)):
                 del POP[I].fitness.values
             toolbox.register("evaluate", Evaluate,
-                             GenerationMethod.reconstructTradeSettings, DateRange)
+                             GenerationMethod.constructPhenotype, DateRange)
             FirstEpochOfDataset = True
             bestScore = 0
 
@@ -146,7 +146,7 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
     FinalBestScores.append(Stats['max'])
     FinalIndividue = tools.selBest(POP, 1)[0]
-    FinalIndividueSettings = GenerationMethod.reconstructTradeSettings(FinalIndividue)
+    FinalIndividueSettings = GenerationMethod.constructPhenotype(FinalIndividue)
 
     Show = json.dumps(FinalIndividueSettings, indent=2)
     logInfo("~" * 18)

@@ -8,7 +8,7 @@ from coreFunctions import Evaluate
 
 getPromoterFromMap = lambda x: [x[z] for z in list(x.keys())]
 
-def reconstructTradeSettings(Individue):
+def constructPhenotype(Individue):
     Settings = {}
 
     PromotersPath = {v: k for k, v in Individue.PromoterMap.items()}
