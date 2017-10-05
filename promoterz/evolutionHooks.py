@@ -37,12 +37,8 @@ def evaluatePopulation(population, evaluationFunction, pool):
     individues_to_simulate = [ind for ind in population if not ind.fitness.valid]
     fitnesses = pool.starmap(evaluationFunction, zip(individues_to_simulate))
     for i, fit in zip(range(len(individues_to_simulate)), fitnesses):
-        if fit[1]:
-            individues_to_simulate[i].fitness.values = fit[0],
-        else:
-            print('--destroying invalid citizen--')
-            individues_to_simulate[i] = None
-    population = [x for x in population if x]
+        individues_to_simulate[i].fitness.values = fit
+    return len(individues_to_simulate)
 
 def getEvolutionToolbox(HallOfFame, population_generator):
     T = base.Toolbox()

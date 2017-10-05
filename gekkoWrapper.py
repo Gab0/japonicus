@@ -151,6 +151,8 @@ def createConfig(TradeSetting, DateRange, gekko_config=None):
 
     CONFIG = {
         "gekkoConfig": {
+            "debug":false,
+            "info":false,
             "watch": watch,
             "paperTrader": {
                 "fee": 0.25, # declare deprecated 'fee' so keeps working w/ old gekko;

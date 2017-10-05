@@ -7,7 +7,7 @@ var config = {};
 //                          GENERAL SETTINGS
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-config.debug = true; // for additional logging / debugging
+config.debug = false; // for additional logging / debugging
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                         WATCHING A MARKET

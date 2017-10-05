@@ -5,14 +5,12 @@ import promoterz
 
 from copy import deepcopy
 from gekkoWrapper import getAvailableDataset
-from coreFunctions import Evaluate, getRandomDateRange,\
-    stratSettingsProofOfViability, pasteSettingsToUI,\
-    getStatisticsMeter,\
-    logInfo, write_evolution_logs, statisticsNames
 
-from promoterz.supplement.age import *
+import coreFunctions
+
+
 from promoterz.supplement.geneticDivergence import *
-
+from promoterz.supplement.age import *
 from Settings import getSettings
 
 from multiprocessing import Pool
@@ -38,6 +36,7 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     GenerationMethod = promoterz.selectRepresentationMethod(GenerationMethod)
     toolbox = GenerationMethod.getToolbox(genconf, TargetParameters)
 
+    ageTools = promoterz.supplement.age.getToolbox(genconf.ageBoundaries)
     parallel = Pool(genconf.ParallelBacktests)
 
     POP = toolbox.population(n=genconf.POP_SIZE)
@@ -48,7 +47,7 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
 
     EvolutionStatistics={}
 
-    stats = getStatisticsMeter()
+    stats = coreFunctions.getStatisticsMeter()
 
     InitialBestScores, FinalBestScores = [], []
     FirstEpochOfDataset = False
@@ -65,6 +64,7 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
 
     coreTools = promoterz.getEvolutionToolbox(HallOfFame, toolbox.population)
 
+    print("evaluated parameters ranges %s" % coreFunctions.flattenParameters(TargetParameters))
     while W < genconf.NBEPOCH:
 
         FirstEpochOfDataset = False
@@ -73,7 +73,6 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
         Z = not W % genconf.DRP and bestScore > 0.3 and not Deviation
         K = not W % (genconf.DRP*3)
         if Z or K: # SELECT NEW DATERANGE;
-
             if W:# SEND BEST IND TO HoF;
                 BestSetting = tools.selBest(POP, 1)[0]
                 HallOfFame.insert(BestSetting)
@@ -81,19 +80,19 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
 
                 FinalBestScores.append(Stats['max'])
 
-            DateRange = getRandomDateRange(availableDataRange, genconf.deltaDays)
+            DateRange = coreFunctions.getRandomDateRange(availableDataRange, genconf.deltaDays)
             print("Loading new date range;")
 
             print("\t%s to %s" % (DateRange['from'], DateRange['to']))
             for I in range(len(POP)):
                 del POP[I].fitness.values
-            toolbox.register("evaluate", Evaluate,
+            toolbox.register("evaluate", coreFunctions.Evaluate,
                              GenerationMethod.constructPhenotype, DateRange)
             FirstEpochOfDataset = True
             bestScore = 0
 
 
-
+        assert(None not in POP)
         # --hall of fame immigration;
         if random.random() < 0.2:
             POP = coreTools.ImmigrateHoF(POP)
@@ -110,32 +109,32 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
         # --modify and integrate offspring;
         offspring = algorithms.varAnd(offspring, toolbox,
                                       genconf.cxpb, genconf.mutpb)
-        ageZero(offspring)
+        ageTools.zero(offspring)
         POP += offspring
 
+
+        POP=coreFunctions.validatePopulation(GenerationMethod.constructPhenotype,
+                                        {Strategy:TargetParameters}, POP)
         # --evaluate individuals;
-        promoterz.evaluatePopulation(POP, toolbox.evaluate, parallel)
+        nb_evaluated=promoterz.evaluatePopulation(POP, toolbox.evaluate, parallel)
         # --filter best inds;
         POP[:] = tools.selBest(POP, genconf.POP_SIZE)
-
 
         # --get proper evolution statistics;
         Stats=stats.compile(POP)
 
         # show information;
-        print("EPOCH %i/%i" % (W, genconf.NBEPOCH))
+        print("EPOCH %i/%i\t&%i" % (W, genconf.NBEPOCH, nb_evaluated))
         statnames = ['max', 'avg', 'min', 'std']
 
         statText = ""
         for s in range(len(statnames)):
             SNAME = statnames[s]
-            statText += "%s %.3f%%\t" % (statisticsNames[SNAME], Stats[SNAME])
+            statText += "%s %.3f%%\t" % (coreFunctions.statisticsNames[SNAME], Stats[SNAME])
             if s % 2:
                 statText += '\n'
         print(statText)
         print('')
-
-
 
         if FirstEpochOfDataset:
             InitialBestScores.append(Stats['max'])
@@ -145,21 +144,19 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
 
         # --log statistcs;
         EvolutionStatistics[W] = Stats
-        write_evolution_logs(W, Stats)
+        coreFunctions.write_evolution_logs(W, Stats)
 
         bestScore = Stats['max']
         Deviation = Stats['std']
-
-
+        assert(None not in POP)
 
         #print("POPSIZE %i" % len(POP))
         # --population ages
         qpop=len(POP)
-        maturePopulation(POP)
-        POP=killElders(POP, Stats['avg'], (10,19))
+        POP=ageTools.populationAges(POP, Stats['avg'])
         wpop=len(POP)
         print('elder %i' % (qpop-wpop))
-        print(W)
+        assert(None not in POP)
         W+=1
 
     # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
@@ -168,9 +165,10 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     FinalIndividueSettings = GenerationMethod.constructPhenotype(FinalIndividue)
 
     Show = json.dumps(FinalIndividueSettings, indent=2)
-    logInfo("~" * 18)
+    coreFunctions.logInfo("~" * 18)
+
     for S in range(len(FinalBestScores)):
-        logInfo("Candlestick Set %i: \n\n" % (S+1)+\
+        coreFunctions.logInfo("Candlestick Set %i: \n\n" % (S+1)+\
                 "EPOCH ONE BEST PROFIT: %.3f\n" % InitialBestScores[S] +\
                 "FINAL EPOCH BEST PROFIT: %.3f\n" % FinalBestScores[S])
 
@@ -178,15 +176,15 @@ def gekko_generations(Strategy, GenerationMethod='standard'):
     print("Settings for Gekko config.js:")
     print(Show)
     print("Settings for Gekko --ui webpage")
-    logInfo(pasteSettingsToUI(FinalIndividueSettings))
+    coreFunctions.logInfo(coreFunctions.pasteSettingsToUI(FinalIndividueSettings))
 
     print("\nRemember to check MAX and MIN values for each parameter.")
     print("\tresults may improve with extended ranges.")
 
     print("Testing Strategy:\n")
-    Vv=stratSettingsProofOfViability(FinalIndividueSettings, availableDataRange)
+    Vv=coreFunctions.stratSettingsProofOfViability(FinalIndividueSettings, availableDataRange)
     Vv = "GOOD STRAT" if Vv else "SEEMS BAD"
-    logInfo(Vv)
+    coreFunctions.logInfo(Vv)
     print("\t\t.RUN ENDS.")
 
     return FinalIndividueSettings, EvolutionStatistics

@@ -24,16 +24,24 @@ def getStatisticsMeter():
 
     return stats
 
+def validatePopulation(IndividualToSettings, TargetParameters, population):
+    for p in range(len(population)):
+        phenotype=IndividualToSettings(population[p])
+        if not(checkPhenotypeIntegrity(phenotype, TargetParameters)):
+            population[p] = None
+            print('--destroying invalid citizen--')
+    population = [x for x in population if x]
+    return population
+
 def Evaluate(IndividualToSettings, DateRange, Individual):
     # IndividualToSettings(IND, STRAT) is a function that depends on GA algorithm,
     # so should be provided;
     Settings = IndividualToSettings(Individual)
     #print(Settings)
-    if not checkPhenotypeIntegrity(Settings, TargetParameters):
-        return 0, False
+
 
     Profit = runBacktest(Settings, DateRange)
-    return Profit, True
+    return Profit,
 
 def getDateRange(Limits, deltaDays=3):
     DateFormat="%Y-%m-%d %H:%M:%S"
@@ -127,3 +135,36 @@ def write_evolution_logs(i, stats, filename="evolution_gen.csv"):
     f.write(message+"\n")
     #print(message)
     f.close()
+
+
+def flattenParameters(Parameters):
+    result = {}
+    def iter(D, path=[]):
+        for q in D.keys():
+            if type(D[q]) == dict:
+                iter(D[q], path+[q])
+            else:
+                path_keyname= ".".join(path+[q])
+                result.update({path_keyname: D[q]})
+
+    iter(Parameters)
+    return result
+
+
+def getFromDict(DataDict, Indexes):
+    return reduce(operator.getitem, Indexes, DataDict)
+def writeToDict(DataDict, Indexes, Value):
+    getFromDict(DataDict, Indexes[:-1])[Indexes[-1]] = Value
+
+def checkPhenotypeIntegrity(Settings, TargetParameters):
+    cmp = [TargetParameters, Settings]
+
+    cmp = [flattenParameters(x) for x in cmp]
+    #print(cmp)
+    cmp = [list(x.keys()) for x in cmp]
+    for w in cmp[1]:
+        if not w in cmp[0]:
+
+            return False
+    return True
+
