@@ -36,8 +36,13 @@ def filterAwayWorst(population, N=5):
 def evaluatePopulation(population, evaluationFunction, pool):
     individues_to_simulate = [ind for ind in population if not ind.fitness.valid]
     fitnesses = pool.starmap(evaluationFunction, zip(individues_to_simulate))
-    for ind, fit in zip(individues_to_simulate, fitnesses):
-        ind.fitness.values = fit
+    for i, fit in zip(range(len(individues_to_simulate)), fitnesses):
+        if fit[1]:
+            individues_to_simulate[i].fitness.values = fit[0],
+        else:
+            print('--destroying invalid citizen--')
+            individues_to_simulate[i] = None
+    population = [x for x in population if x]
 
 def getEvolutionToolbox(HallOfFame, population_generator):
     T = base.Toolbox()

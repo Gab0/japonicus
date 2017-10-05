@@ -49,6 +49,7 @@ def getToolbox(genconf, Attributes):
     toolbox.register("newind", initInd, creator.Individual, PromoterMap)
     toolbox.register("population", tools.initRepeat, list, toolbox.newind)
 
+    toolbox.register("phenotypeDifference", constructPhenotype)
     return toolbox
 
 def initPromoterMap(ParameterRanges):

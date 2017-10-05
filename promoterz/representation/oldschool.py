@@ -14,10 +14,10 @@ import numpy as np
 
 from Settings import getSettings # PROVISORY
 
-def constructPhenotype(IND):
+def constructPhenotype(individue):
     # THIS FUNCTION IS UGLYLY WRITTEN; USE WITH CAUTION;
     # (still works :})
-    Strategy = IND.Strategy
+    Strategy = individue.Strategy
     R = lambda V, lim: ((lim[1]-lim[0])/100) * V + lim[0]
     stratSettings = getSettings()['strategies'][Strategy]
     Settings = {
@@ -25,7 +25,7 @@ def constructPhenotype(IND):
         }
     i=0
     for K in stratSettings.keys():
-        Value = R(IND[i], stratSettings[K])
+        Value = R(individue[i], stratSettings[K])
         if '.' in K:
             K=K.split('.')
             if not K[0] in list(Settings[Strategy].keys()):
@@ -61,4 +61,5 @@ def getToolbox(genconf, Attributes):
     toolbox.register("mate", tools.cxTwoPoint)
     toolbox.register("mutate", tools.mutUniformInt, low=10, up=10, indpb=0.2)
 
+    toolbox.register("phenotypeDifference", constructPhenotype)
     return toolbox

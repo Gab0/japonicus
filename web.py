@@ -11,7 +11,7 @@ from dash.dependencies import Input, Output, Event
 import dash_core_components as dcc
 import dash_html_components as html
 from flask_caching import Cache
-
+from coreFunctions import statisticsNames
 import Settings
 
 gsettings = Settings.getSettings()['global']
@@ -127,19 +127,19 @@ def run_server():
                  'line': {'color': 'rgb(0,0,0)'}},
 
                 {'x': df["id"], 'y': df["avg"],
-                 'type': 'line', 'name': 'Average profit',
+                 'type': 'line', 'name': statisticsNames['avg'],
                   'line': {'color': 'rgb(188, 189, 34)'}},
 
                 {'x': df["id"], 'y': df["std"],
-                 'type': 'line', 'name': 'Deviation',
+                 'type': 'line', 'name': statisticsNames['std'],
                  'line': {'color': 'rgb(100, 11, 182)'}},
 
                 {'x': df["id"], 'y': df["min"],
-                 'type': 'line', 'name': 'Minimum profit',
+                 'type': 'line', 'name': statisticsNames['min'],
                  'line': {'color': 'rgb(186, 3, 34)'}},
 
                 {'x': df["id"], 'y': df["max"],
-                 'type': 'line', 'name': 'Maximum profit',
+                 'type': 'line', 'name': statistcsNames['max'],
                  'line': {'color': 'rgb(45, 111, 45)'}}
             ],
             'layout': {

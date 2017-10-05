@@ -10,6 +10,11 @@ import numpy as np
 from gekkoWrapper import runBacktest
 from Settings import getSettings
 
+statisticsNames = {'avg': 'Average profit',
+                   'std': 'Profit variation',
+                   'min': 'Minimum profit',
+                   'max': 'Maximum profit'}
+
 def getStatisticsMeter():
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", np.mean)
@@ -24,8 +29,11 @@ def Evaluate(IndividualToSettings, DateRange, Individual):
     # so should be provided;
     Settings = IndividualToSettings(Individual)
     #print(Settings)
+    if not checkPhenotypeIntegrity(Settings, TargetParameters):
+        return 0, False
+
     Profit = runBacktest(Settings, DateRange)
-    return Profit,
+    return Profit, True
 
 def getDateRange(Limits, deltaDays=3):
     DateFormat="%Y-%m-%d %H:%M:%S"

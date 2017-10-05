@@ -25,7 +25,7 @@ def httpPost(URL, data={}):
     try:
         Response = json.loads(Request.text)
     except Exception as e:
-        print("Error: setting wrong")
+        print("Error: config failure")
         print(URL)
         print(data)
         raise e
