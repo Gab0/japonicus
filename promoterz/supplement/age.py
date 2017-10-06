@@ -1,6 +1,7 @@
 #1/bin/python
 
 from deap import base
+
 def _maturePopulation(population):
     for W in range(len(population)):
         try:
@@ -9,16 +10,31 @@ def _maturePopulation(population):
             population[W].Age = 0
         population[W].Age += 1
 
-def _checkRetirement(individue, averageScore, ageBoundary):
-    inaptitude = individue.fitness.values[0] < averageScore/2
-    oldenough = individue.Age > ageBoundary[0]
+def _checkRetirement(individue, statistics, ageBoundary):
+    # (Minetti, 2005)
+    indscore = individue.fitness.values[0]
+    N = (ageBoundary[1] - ageBoundary[0]) /2
+    aptitude = indscore - statistics['avg']
 
-    dies = (inaptitude and oldenough) or individue.Age > ageBoundary[1]
-    return dies
+    if aptitude > 0:
+        ABC = sum(ageBoundary)/2
+        RSB = statistics['max'] - statistics['avg']
+    else:
+        ABC = ageBoundary[0]
+        RSB = statistics['avg'] - statistics['min']
 
-def _killElders(population, averageScore, ageBoundary):
+    survival = ABC + (N * aptitude / RSB)
+
+    #oldenough = individue.Age > ageBoundary[0]
+    #relativeAge = (individue.Age-ageBoundary[0]) / (ageBoundary[1]-ageBoundary[0]) 
+
+    retires = individue.Age - survival > ageBoundary[1]
+    #print(survival)
+    return retires
+
+def _killElders(population, statistics, ageBoundary):
     for I in range(len(population)):
-        if _checkRetirement(population[I], averageScore, ageBoundary):
+        if _checkRetirement(population[I], statistics, ageBoundary):
             population[I] = None
 
     population = [ x for x in population if x ]
@@ -30,7 +46,7 @@ def ageZero(population):
 
 def populationAges(ageBoundary, population, averageScore):
     _maturePopulation(population)
-    _killElders(population, averageScore, ageBoundary)
+    population=_killElders(population, averageScore, ageBoundary)
     return population
 
 def getToolbox(ageBoundaries):

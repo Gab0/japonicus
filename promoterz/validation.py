@@ -7,9 +7,8 @@ def checkPhenotypeIntegrity(Settings, TargetParameters):
     cmp = [flattenParameters(x) for x in cmp]
     #print(cmp)
     cmp = [list(x.keys()) for x in cmp]
-    for w in cmp[1]:
-        if not w in cmp[0]:
-
+    for w in cmp[0]:
+        if not w in cmp[1]:
             return False
     return True
 

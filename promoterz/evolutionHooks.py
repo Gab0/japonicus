@@ -12,7 +12,7 @@ class SimulatedEnvironment(): # envelope main evolution loop as class? maybe tbd
         self.HallOfFame = base.HallOfFame(30)
         self.population = []
 
-# population always as last positional argument, to blend with toolbox;
+# population as last positional argument, to blend with toolbox;
 def immigrateHoF(HallOfFame, population):
     if not HallOfFame.items:
         return population
@@ -23,8 +23,8 @@ def immigrateHoF(HallOfFame, population):
         population += [CHP]
     return population
 
-def immigrateRandom(populate, population): #(populate function)
-    number = random.randint(1,9)
+def immigrateRandom(populate, nb_range, population): #(populate function)
+    number = random.randint(*nb_range)
     population += populate(number)
     return population
 

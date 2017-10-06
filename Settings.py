@@ -26,6 +26,7 @@ def getSettings(specific=None):
             'DRP': 70,# Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
             'ParallelBacktests': 5,
+            'PRoFIGA_beta': 0.05,
             'ageBoundaries': (9, 19),
             'dataset_source': { # dataset_source can be set to None so it searches from any source;
                 "exchange": "poloniex",
