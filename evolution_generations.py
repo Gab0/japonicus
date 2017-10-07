@@ -4,7 +4,6 @@ import random
 import promoterz
 
 from copy import deepcopy
-from gekkoWrapper import getAvailableDataset
 
 import coreFunctions
 
@@ -12,6 +11,7 @@ import coreFunctions
 from promoterz.supplement.geneticDivergence import *
 from promoterz.supplement.age import *
 import promoterz.supplement.PRoFIGA
+import promoterz.sequence.standard_loop
 from Settings import getSettings
 
 from multiprocessing import Pool
@@ -20,9 +20,11 @@ from deap import tools
 from deap import algorithms
 from deap import base
 
-LOCALE = promoterz.Locale()
 
-def gekko_generations():
+
+def gekko_generations(GenerationMethod):
+    LOCALE = promoterz.Locale(getSettings, promoterz.sequence.standard_loop.standard_loop, GenerationMethod)
+    W=0
     while W < LOCALE.genconf.NBEPOCH:
         LOCALE.run()
 

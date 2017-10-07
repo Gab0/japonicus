@@ -11,7 +11,7 @@ from dash.dependencies import Input, Output, Event
 import dash_core_components as dcc
 import dash_html_components as html
 from flask_caching import Cache
-from coreFunctions import statisticsNames
+from promoterz.statistics import statisticsNames
 import Settings
 
 gsettings = Settings.getSettings()['global']

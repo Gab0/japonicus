@@ -11,7 +11,8 @@ def getSettings(specific=None):
             'gekkoPath': os.getenv("HOME")+'/gekko1',
             'Strategies': ['DEMA', 'MACD', 'PPO', 'RSI', 'StochRSI', 'TSI'],
             'configFilename': 'example-config.js',
-            'save_dir': "output"
+            'save_dir': "output",
+            'log_name': 'evolution_gen.csv'
 
         },
         # genetic algorithm settings

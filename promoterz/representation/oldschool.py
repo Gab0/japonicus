@@ -61,5 +61,5 @@ def getToolbox(genconf, Attributes):
     toolbox.register("mate", tools.cxTwoPoint)
     toolbox.register("mutate", tools.mutUniformInt, low=10, up=10, indpb=0.2)
 
-    toolbox.register("phenotypeDifference", constructPhenotype)
+    toolbox.register("constructPhenotype", constructPhenotype)
     return toolbox

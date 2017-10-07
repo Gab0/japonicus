@@ -7,54 +7,17 @@ import pandas as pd
 from deap import tools
 import numpy as np
 
-from gekkoWrapper import runBacktest
+import promoterz
 from Settings import getSettings
 
-def Evaluate(IndividualToSettings, DateRange, Individual):
-    # IndividualToSettings(IND, STRAT) is a function that depends on GA algorithm,
-    # so should be provided;
-    Settings = IndividualToSettings(Individual)
-    #print(Settings)
 
-
-    Profit = runBacktest(Settings, DateRange)
-    return Profit,
-
-def getDateRange(Limits, deltaDays=3):
-    DateFormat="%Y-%m-%d %H:%M:%S"
-
-    epochToString = lambda D: datetime.datetime.utcfromtimestamp(D).strftime(DateFormat)
-    deltams=deltaDays * 24 * 60 * 60
-
-    DateRange = {
-        "from": "%s" % epochToString(Limits['to']-deltams),
-        "to": "%s" % epochToString(Limits['to'])
-    }
-    return DateRange
-
-def getRandomDateRange(Limits, deltaDays, testDays=0):
-    DateFormat="%Y-%m-%d %H:%M:%S"
-
-    epochToString = lambda D: datetime.datetime.utcfromtimestamp(D).strftime(DateFormat)
-    FLms = Limits['from']
-    TLms = Limits['to']
-    deltams=deltaDays * 24 * 60 * 60
-    testms=testDays * 24 * 60 * 60
-
-    Starting= random.randint(FLms,TLms-deltams-testms)
-    DateRange = {
-        "from": "%s" % epochToString(Starting),
-        "to": "%s" % epochToString(Starting+deltams)
-    }
-
-    return DateRange
 
 
 def stratSettingsProofOfViability(Settings, DatasetLimits):
     AllProofs = []
     for W in range(12):
         DateRange = getRandomDateRange(DatasetLimits, 30)
-        q=runBacktest(Settings, DateRange)
+        q=promoterz.evaluation.gekko.runBacktest(Settings, DateRange)
         AllProofs.append(q)
         print('Testing monthly profit %.3f' % q)
 
