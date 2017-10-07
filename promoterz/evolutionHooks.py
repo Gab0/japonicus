@@ -40,10 +40,9 @@ def evaluatePopulation(population, evaluationFunction, pool):
         individues_to_simulate[i].fitness.values = fit
     return len(individues_to_simulate)
 
-def getEvolutionToolbox(HallOfFame, population_generator):
-    T = base.Toolbox()
+def appendToolbox(toolbox, HallOfFame, population_generator):
 
-    T.register("ImmigrateHoF", immigrateHoF, HallOfFame)
-    T.register("ImmigrateRandom", immigrateRandom, population_generator)
+    toolbox.register("ImmigrateHoF", immigrateHoF, HallOfFame)
+    toolbox.register("ImmigrateRandom", immigrateRandom, population_generator)
 
-    return T
+
