@@ -7,4 +7,5 @@ from .locale import *
 import promoterz.supplement
 import promoterz.validation
 import promoterz.utils
+import promoterz.world
 import promoterz.evaluation.gekko

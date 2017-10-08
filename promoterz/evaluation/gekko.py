@@ -266,4 +266,5 @@ def getRandomDateRange(Limits, deltaDays, testDays=0):
 
 def appendToolbox(toolbox, constructPhenotype, DateRange):
     toolbox.register("evaluate", Evaluate, constructPhenotype, DateRange)
-
+    #toolbox.register("getDateRangeLimits", getAvailableDataset)
+    #toolbox.register(getDateRange", getRandomDateRange)

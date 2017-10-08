@@ -5,7 +5,7 @@ import random
 from deap import algorithms
 import promoterz
 def standard_loop(locale):
-
+    assert(len(locale.population))
     if not locale.EPOCH % 15:# SEND BEST IND TO HoF;
             BestSetting = tools.selBest(locale.population, 1)[0]
             locale.HallOfFame.insert(BestSetting)
@@ -26,31 +26,37 @@ def standard_loop(locale):
     assert(None not in locale.population)
     # --hall of fame immigration;
     if random.random() < 0.2:
-        locale.population = locale.tools.ImmigrateHoF(locale.population)
+        locale.population = locale.extratools.ImmigrateHoF(locale.population)
 
     # --randomic immigration;
     if random.random() < 0.5:
-        locale.population = locale.tools.ImmigrateRandom((2,7), locale.population)
+        locale.population = locale.extratools.ImmigrateRandom( (2,7), locale.population)
 
 
     assert(len(locale.population))
     # --select best individues to procreate
-    offspring = tools.selTournament(locale.population, locale.genconf._lambda, 2*locale.genconf._lambda)
+    offspring = tools.selTournament(locale.population,
+                                    locale.genconf._lambda, 2*locale.genconf._lambda)
     offspring = [deepcopy(x) for x in offspring] # is deepcopy necessary?
-    
+
     # --modify and integrate offspring;
     offspring = algorithms.varAnd(offspring, locale.tools,
                                   locale.genconf.cxpb, locale.genconf.mutpb)
-    locale.tools.zero(offspring)
+    locale.extratools.ageZero(offspring)
     locale.population += offspring
-    
 
-    locale.population=promoterz.validation.validatePopulation(locale.tools.constructPhenotype,
-                                                              {locale.genconf.Strategy:locale.TargetParameters}, locale.population)
+    locale.population=promoterz.validation.validatePopulation(
+        locale.tools.constructPhenotype,
+        {locale.genconf.Strategy: locale.TargetParameters},
+        locale.population)
+
     # --evaluate individuals;
-    nb_evaluated=promoterz.evaluatePopulation(locale.population, locale.tools.evaluate, locale.parallel)
+    nb_evaluated=promoterz.evaluatePopulation(locale.population,
+                                              locale.extratools.evaluate,
+                                              locale.parallel)
 
 
+    assert(len(locale.population))
     # --get proper evolution statistics;
     Stats=locale.stats.compile(locale.population)
 
@@ -61,7 +67,7 @@ def standard_loop(locale):
             locale.genconf.NBEPOCH,
             locale.EvolutionStatistics[locale.EPOCH-1],
             Stats)
-        locale.POP_SIZE += int(round( POP_SIZE * PRoFIGA ))
+        locale.POP_SIZE += max(int(round( locale.POP_SIZE * PRoFIGA )), locale.genconf.POP_SIZE//2)
 
     # --filter best inds;
     locale.population[:] = tools.selBest(locale.population, locale.POP_SIZE)
@@ -92,7 +98,7 @@ def standard_loop(locale):
     for s in range(len(statnames)):
         SNAME = statnames[s]
         SVAL = Stats[SNAME]
-        statText += "%s" % coreFunctions.statisticsNames[SNAME]
+        statText += "%s" % promoterz.statistics.statisticsNames[SNAME]
         if not SVAL % 1:
             statText += " %i\t" % SVAL
         else:
@@ -112,7 +118,7 @@ def standard_loop(locale):
 
     # --population ages
     qpop=len(locale.population)
-    locale.population=locale.tools.populationAges(locale.population, Stats)
+    locale.population=locale.extratools.populationAges(locale.population, Stats)
     wpop=len(locale.population)
     print('elder %i' % (qpop-wpop))
 

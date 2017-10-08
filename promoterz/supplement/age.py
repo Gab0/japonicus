@@ -52,7 +52,7 @@ def populationAges(ageBoundary, population, averageScore):
 def appendToolbox(toolbox, ageBoundaries):
 
 
-    toolbox.register('zero', ageZero)
+    toolbox.register('ageZero', ageZero)
     toolbox.register('populationAges', populationAges, ageBoundaries)
 
 

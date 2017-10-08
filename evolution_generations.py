@@ -20,41 +20,61 @@ from deap import tools
 from deap import algorithms
 from deap import base
 
+from Settings import getSettings
 
+def gekko_generations(GenerationMethod, NB_LOCALE=2):
+    GenerationMethod = promoterz.selectRepresentationMethod(GenerationMethod)
 
-def gekko_generations(GenerationMethod):
-    LOCALE = promoterz.Locale(getSettings, promoterz.sequence.standard_loop.standard_loop, GenerationMethod)
+    genconf=getSettings('generations')
+    TargetParameters=getSettings()['strategies'][genconf.Strategy]
+
+    GlobalTools = GenerationMethod.getToolbox(genconf, TargetParameters)
+
+    genLOCALE = lambda name: promoterz.Locale(name, getSettings,
+                                         promoterz.sequence.standard_loop.standard_loop,
+                                         GlobalTools)
+
+    LOCALEs = ['Locale%i' % (x+1) for x in range(NB_LOCALE)]
+    LOCALEs = [genLOCALE(Name) for Name in LOCALEs]
     W=0
-    while W < LOCALE.genconf.NBEPOCH:
-        LOCALE.run()
-
+    while W < genconf.NBEPOCH:
+        for K in LOCALEs:
+            K.run()
+        if len(LOCALEs) > 1 and random.random() < 0.1 :
+            S, D=False, False
+            while S == D:
+                S=random.choice(LOCALEs)
+                D=random.choice(LOCALEs)
+            promoterz.world.migration(S, D, (1,5))
 
     # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
     FinalBestScores.append(Stats['max'])
-    FinalIndividue = tools.selBest(LOCALE.population, 1)[0]
-    FinalIndividueSettings = GenerationMethod.constructPhenotype(FinalIndividue)
 
-    Show = json.dumps(FinalIndividueSettings, indent=2)
-    coreFunctions.logInfo("~" * 18)
+    for LOCALE in LOCALEs:
+        FinalIndividue = tools.selBest(LOCALE.population, 1)[0]
+        FinalIndividueSettings = GlobalTools.constructPhenotype(FinalIndividue)
 
-    for S in range(len(FinalBestScores)):
-        coreFunctions.logInfo("Candlestick Set %i: \n\n" % (S+1)+\
-                "EPOCH ONE BEST PROFIT: %.3f\n" % InitialBestScores[S] +\
-                "FINAL EPOCH BEST PROFIT: %.3f\n" % FinalBestScores[S])
+        Show = json.dumps(FinalIndividueSettings, indent=2)
+        coreFunctions.logInfo("~" * 18)
+
+        for S in range(len(FinalBestScores)):
+            coreFunctions.logInfo("Candlestick Set %i: \n\n" % (S+1)+\
+                                  "EPOCH ONE BEST PROFIT: %.3f\n" % InitialBestScores[S] +\
+                                  "FINAL EPOCH BEST PROFIT: %.3f\n" % FinalBestScores[S])
 
 
-    print("Settings for Gekko config.js:")
-    print(Show)
-    print("Settings for Gekko --ui webpage")
-    coreFunctions.logInfo(coreFunctions.pasteSettingsToUI(FinalIndividueSettings))
+            print("Settings for Gekko config.js:")
+            print(Show)
+            print("Settings for Gekko --ui webpage")
+            coreFunctions.logInfo(coreFunctions.pasteSettingsToUI(FinalIndividueSettings))
 
-    print("\nRemember to check MAX and MIN values for each parameter.")
-    print("\tresults may improve with extended ranges.")
+            print("\nRemember to check MAX and MIN values for each parameter.")
+            print("\tresults may improve with extended ranges.")
 
-    print("Testing Strategy:\n")
-    Vv=coreFunctions.stratSettingsProofOfViability(FinalIndividueSettings, availableDataRange)
-    Vv = "GOOD STRAT" if Vv else "SEEMS BAD"
-    coreFunctions.logInfo(Vv)
-    print("\t\t.RUN ENDS.")
+            print("Testing Strategy:\n")
+            Vv=coreFunctions.stratSettingsProofOfViability(FinalIndividueSettings, availableDataRange)
+            Vv = "GOOD STRAT" if Vv else "SEEMS BAD"
+            coreFunctions.logInfo(Vv)
+            print("\t\t.RUN ENDS.")
 
-    return FinalIndividueSettings, EvolutionStatistics
+

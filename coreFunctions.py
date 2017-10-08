@@ -34,7 +34,7 @@ def pasteSettingsToUI(Settings):
     toParameter = lambda name, value: "%s = %f" % (name,value)
     Strat = list(Settings.keys())[0]
     text.append('{ %s }' % Strat)
-    #rint("{{ %s }}" % Settings[Strat])
+    # print("{{ %s }}" % Settings[Strat])
     Settings = Settings[Strat]
     for W in Settings.keys():
         Q = Settings[W]
@@ -57,26 +57,6 @@ def logInfo(message, filename="evolution_gen.log"):
     F.write(message)
     print(message)
     F.close()
-
-def write_evolution_logs(i, stats, filename="evolution_gen.csv"):
-    #print(i, stats)
-    if type(stats) == dict:
-        message = ','.join([str(x) for x in [i,stats['avg'],stats['std'],stats['min'],stats['max'], stats['dateRange']]])
-    elif type(stats) == list:
-        message = ','.join([str(x) for x in [i,stats[1],stats[2],stats[3],stats[4],stats[5]]])
-    else:
-        raise
-    #print(message)
-    gsettings = getSettings()['global']
-    filename = os.path.join(gsettings['save_dir'], filename)
-    if i == 0 and os.path.isfile(filename):
-        os.remove(filename)
-    f=open(filename, 'a+')
-    f.write(message+"\n")
-    #print(message)
-    f.close()
-
-
 
 
 
