@@ -46,6 +46,7 @@ def gekko_generations(GenerationMethod, NB_LOCALE=2):
                 S=random.choice(LOCALEs)
                 D=random.choice(LOCALEs)
             promoterz.world.migration(S, D, (1,5))
+        W+=1
 
     # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
     FinalBestScores.append(Stats['max'])
@@ -75,6 +76,6 @@ def gekko_generations(GenerationMethod, NB_LOCALE=2):
             Vv=coreFunctions.stratSettingsProofOfViability(FinalIndividueSettings, availableDataRange)
             Vv = "GOOD STRAT" if Vv else "SEEMS BAD"
             coreFunctions.logInfo(Vv)
-            print("\t\t.RUN ENDS.")
+        print("\t\t.RUN ENDS.")
 
 

@@ -4,9 +4,23 @@ from copy import deepcopy
 import random
 from deap import algorithms
 import promoterz
+
 def standard_loop(locale):
     assert(len(locale.population))
-    if not locale.EPOCH % 15:# SEND BEST IND TO HoF;
+
+    # --validate individuals;
+    locale.population=promoterz.validation.validatePopulation(
+        locale.tools.constructPhenotype,
+        {locale.genconf.Strategy: locale.TargetParameters},
+        locale.population)
+
+    # --evaluate individuals;
+    nb_evaluated=promoterz.evaluatePopulation(locale.population,
+                                              locale.extratools.evaluate,
+                                              locale.parallel)
+
+    # --send best individue to HallOfFame;
+    if not locale.EPOCH % 15:
             BestSetting = tools.selBest(locale.population, 1)[0]
             locale.HallOfFame.insert(BestSetting)
             #print(EvolutionStatistics)
@@ -24,16 +38,18 @@ def standard_loop(locale):
             bestScore = 0
             '''
     assert(None not in locale.population)
-    # --hall of fame immigration;
+
+    # --immigrate individual from HallOfFame;
     if random.random() < 0.2:
         locale.population = locale.extratools.ImmigrateHoF(locale.population)
 
-    # --randomic immigration;
+    # --immigrate random number of random individues;
     if random.random() < 0.5:
         locale.population = locale.extratools.ImmigrateRandom( (2,7), locale.population)
 
 
     assert(len(locale.population))
+
     # --select best individues to procreate
     offspring = tools.selTournament(locale.population,
                                     locale.genconf._lambda, 2*locale.genconf._lambda)
@@ -45,22 +61,13 @@ def standard_loop(locale):
     locale.extratools.ageZero(offspring)
     locale.population += offspring
 
-    locale.population=promoterz.validation.validatePopulation(
-        locale.tools.constructPhenotype,
-        {locale.genconf.Strategy: locale.TargetParameters},
-        locale.population)
-
-    # --evaluate individuals;
-    nb_evaluated=promoterz.evaluatePopulation(locale.population,
-                                              locale.extratools.evaluate,
-                                              locale.parallel)
 
 
     assert(len(locale.population))
     # --get proper evolution statistics;
     Stats=locale.stats.compile(locale.population)
 
-    # --calculate new POPSIZE;
+    # --calculate new population size;
     if locale.EPOCH:
         PRoFIGA = promoterz.supplement.PRoFIGA.calculatePRoFIGA(
             locale.genconf.PRoFIGA_beta, locale.EPOCH,

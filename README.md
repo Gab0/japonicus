@@ -6,7 +6,10 @@ Recommended usage:
 ```
 Open two terminals;
 
-T.1 -> run Gekko on ui mode.
+T.1 -> run Gekko on ui mode, or just its webserver:
+$node gekko.js --ui
+or
+$node web/server.js
 
 T.2 -> $cd [japonicus dir]
        $python japonicus.py [-g|-b] [-c] [-k] [--repeat <X>] [--strat <Strategy>] [-w]
@@ -14,10 +17,11 @@ T.2 -> $cd [japonicus dir]
     -g for genetic algorithm;
     -b for bayesian optimization;
 
-    -c to use alternative genetic algorithm;
+    -c to use an alternative, experimental (probably weaker) genetic algorithm;
     
     -k launches a child gekko instance, so no need for the first terminal;
-    --strat choose one strat to run;
+    
+    --strat choose one strat to run [deprecated, set it on Settings.py];
     --repeat to run genetic algorithm X times; then just check evolution.log;
     
     -w launches a neat dash/flask web server @ your local machine, which can be accessed via  webbrowser. 
