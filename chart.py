@@ -8,7 +8,7 @@ import matplotlib.finance as mpf
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 #from plotInfo import plotEvolutionSummary
 
-import gekkoWrapper
+import promoterz.evaluation.gekko as gekkoWrapper
 import Settings
 import sqlite_scanner
 import coreFunctions

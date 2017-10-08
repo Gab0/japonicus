@@ -6,15 +6,16 @@ import json
 import os
 import numpy as np
 import pandas as pd
-from gekkoWrapper import getAvailableDataset, runBacktest
+
 #from plotInfo import plotEvolutionSummary
 from bayes_opt import BayesianOptimization
 from multiprocessing import Pool
 import multiprocessing as mp
 
-from coreFunctions import getRandomDateRange, getDateRange, write_evolution_logs
+from promoterz.statistics import write_evolution_logs
+
 from Settings import getSettings
-import gekkoWrapper
+import promoterz.evaluation.gekko as gekkoWrapper
 import chart
 
 dict_merge = lambda a,b: a.update(b) or a
@@ -47,7 +48,7 @@ def EvaluateRaw(watch, DateRange, Individual, Strategy):
 def Evaluate(watch, DateRange, Individual, Strategy):
     config = compressing_flatten_dict(Individual, Strategy)
     config["watch"] = watch
-    return runBacktest(config, DateRange)
+    return gekkoWrapper.runBacktest(config, DateRange)
 
 def compressing_flatten_dict(IND, Strategy):
     config = {}
@@ -67,8 +68,8 @@ def compressing_flatten_dict(IND, Strategy):
 
 def evaluate_random(Strategy, params):
     watch = settings["watch"]
-    chosenRange = getAvailableDataset(watch)
-    DateRange = getRandomDateRange(chosenRange, deltaDays=settings['deltaDays'])
+    chosenRange = gekkoWrapper.getAvailableDataset(watch)
+    DateRange = gekkoWrapper.getRandomDateRange(chosenRange, deltaDays=settings['deltaDays'])
     if "candleSize" in StratConfig:
         # parameter search trade count
         return EvaluateRaw(watch, DateRange, params, Strategy)["report"]["trades"]
@@ -135,8 +136,8 @@ def gekko_bayesian(indicator=None):
     # 2nd Evaluate
     print("")
     print("Step 2: testing searched parameters on random date")
-    chosenRange = getAvailableDataset()
-    DateRange = getDateRange(chosenRange, deltaDays=settings['testDays'])
+    chosenRange = gekkoWrapper.getAvailableDataset()
+    DateRange = gekkoWrapper.getDateRange(chosenRange, deltaDays=settings['testDays'])
     max_params = bo.res['max']['max_params'].copy()
     #max_params["persistence"] = 1
     print("Starting Second Evaluation")

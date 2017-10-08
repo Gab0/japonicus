@@ -28,8 +28,7 @@ def write_evolution_logs(i, stats, filename="output/evolution_gen.csv"):
                                              stats['max'],
                                              stats['dateRange']]])
     elif type(stats) == list:
-        raise # DEBUG;;
-        message = ','.join([str(x) for x in [i,stats[1],stats[2],stats[3],stats[4],stats[5]]])
+        message = ','.join([str(x) for x in [i] + stats])
     else:
         raise
     #print(message)

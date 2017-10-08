@@ -139,7 +139,7 @@ def run_server():
                  'line': {'color': 'rgb(186, 3, 34)'}},
 
                 {'x': df["id"], 'y': df["max"],
-                 'type': 'line', 'name': statistcsNames['max'],
+                 'type': 'line', 'name': statisticsNames['max'],
                  'line': {'color': 'rgb(45, 111, 45)'}}
             ],
             'layout': {
