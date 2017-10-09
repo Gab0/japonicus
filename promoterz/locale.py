@@ -7,7 +7,7 @@ import coreFunctions
 
 from multiprocessing import Pool
 class Locale():
-    def __init__(self, name, getSettings, loop, globaltools, availableDateRange):
+    def __init__(self, name, getSettings, loop, globaltools, availableDataRange):
         self.name = name
         self.EPOCH=0
 
