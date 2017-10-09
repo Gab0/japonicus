@@ -16,7 +16,7 @@ from Settings import getSettings
 def stratSettingsProofOfViability(Settings, DatasetLimits):
     AllProofs = []
     for W in range(12):
-        DateRange = getRandomDateRange(DatasetLimits, 30)
+        DateRange = promoterz.evaluation.gekko.getRandomDateRange(DatasetLimits, 30)
         q=promoterz.evaluation.gekko.runBacktest(Settings, DateRange)
         AllProofs.append(q)
         print('Testing monthly profit %.3f' % q)

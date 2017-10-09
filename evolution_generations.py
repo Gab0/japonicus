@@ -31,7 +31,7 @@ def gekko_generations(GenerationMethod, NB_LOCALE=2):
     GlobalTools = GenerationMethod.getToolbox(genconf, TargetParameters)
     availableDataRange = promoterz.evaluation.gekko.getAvailableDataset(
             exchange_source=genconf.dataset_source)
-    genLOCALE = lambda name: promoterz.Locale(name, getSettings,
+    genLOCALE = lambda name: promoterz.Locale(name, (random.randrange(0,500), random.randrange(0,500)),getSettings,
                                          promoterz.sequence.standard_loop.standard_loop,
                                               GlobalTools, availableDataRange)
 
