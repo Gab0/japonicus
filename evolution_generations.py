@@ -29,10 +29,11 @@ def gekko_generations(GenerationMethod, NB_LOCALE=2):
     TargetParameters=getSettings()['strategies'][genconf.Strategy]
 
     GlobalTools = GenerationMethod.getToolbox(genconf, TargetParameters)
-
+    availableDataRange = promoterz.evaluation.gekko.getAvailableDataset(
+            exchange_source=genconf.dataset_source)
     genLOCALE = lambda name: promoterz.Locale(name, getSettings,
                                          promoterz.sequence.standard_loop.standard_loop,
-                                         GlobalTools)
+                                              GlobalTools, availableDataRange)
 
     LOCALEs = ['Locale%i' % (x+1) for x in range(NB_LOCALE)]
     LOCALEs = [genLOCALE(Name) for Name in LOCALEs]

@@ -7,7 +7,7 @@ import coreFunctions
 
 from multiprocessing import Pool
 class Locale():
-    def __init__(self, name, getSettings, loop, globaltools):
+    def __init__(self, name, getSettings, loop, globaltools, availableDateRange):
         self.name = name
         self.EPOCH=0
 
@@ -47,8 +47,7 @@ class Locale():
         # --start parallel pool
         self.parallel = Pool(self.genconf.ParallelBacktests)
 
-        availableDataRange = promoterz.evaluation.gekko.getAvailableDataset(
-            exchange_source=self.genconf.dataset_source)
+
         self.DateRange = promoterz.evaluation.gekko.getRandomDateRange(availableDataRange,
                                                                        self.genconf.deltaDays)
         print("using candlestick dataset %s" % availableDataRange)
