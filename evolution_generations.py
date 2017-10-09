@@ -49,7 +49,7 @@ def gekko_generations(GenerationMethod, NB_LOCALE=2):
         W+=1
 
     # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
-    FinalBestScores.append(Stats['max'])
+    #FinalBestScores.append(Stats['max'])
 
     for LOCALE in LOCALEs:
         FinalIndividue = tools.selBest(LOCALE.population, 1)[0]
