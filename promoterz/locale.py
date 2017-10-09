@@ -65,6 +65,39 @@ class Locale():
         print("evaluated parameters ranges %s" % promoterz.utils.flattenParameters(self.TargetParameters))
         self.loop=loop
 
+    def compileStats(self):
+        # --get proper evolution statistics;
+        Stats=self.stats.compile(self.population)
+        Stats['dateRange'] = None
+        Stats['maxsize'] = self.POP_SIZE
+        Stats['size'] = len(self.population)
+        self.EvolutionStatistics[self.EPOCH] = Stats
+
+        LOGPATH ="%s/%s" % (self.globalconf.save_dir, self.globalconf.log_name)
+        promoterz.statistics.write_evolution_logs(self.EPOCH,
+                                              Stats, LOGPATH)
+
+
+    def showStats(self, nb_evaluated):
+        # show information;
+        Stats = self.EvolutionStatistics[self.EPOCH]
+        print("EPOCH %i/%i\t&%i" % (self.EPOCH, self.genconf.NBEPOCH, nb_evaluated))
+        statnames = [ 'max', 'avg', 'min', 'std', 'size', 'maxsize' ]
+
+        statText = ""
+        for s in range(len(statnames)):
+            SNAME = statnames[s]
+            SVAL = Stats[SNAME]
+            statText += "%s" % promoterz.statistics.statisticsNames[SNAME]
+            if not SVAL % 1:
+                statText += " %i\t" % SVAL
+            else:
+                statText += " %.3f\t" % SVAL
+            if s % 2:
+                statText += '\n'
+        print(statText)
+        print('')
+
     def run(self):
         print(self.name)
         self.loop(self)

@@ -10,7 +10,7 @@ statisticsNames = {'avg': 'Average profit',
                    'maxsize': 'Max population size'}
 
 def getStatisticsMeter():
-    stats = tools.Statistics(lambda ind: ind.fitness.values)
+    stats = tools.Statistics(lambda ind: ind.fitness.values[0])
     stats.register("avg", np.mean)
     stats.register("std", np.std)
     stats.register("min", np.min)

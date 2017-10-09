@@ -1,7 +1,7 @@
 #!/bin/python
 import random
 
-import .locale
+import locale
 
 class World():
     def __init__(self, NB_LOCALE=3):

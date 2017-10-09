@@ -19,6 +19,32 @@ def standard_loop(locale):
                                               locale.extratools.evaluate,
                                               locale.parallel)
 
+    assert(len(locale.population))
+    assert(sum([x.fitness.valid for x in locale.population]) == len(locale.population))
+    # --compile stats;
+    locale.compileStats()
+
+    # --show stats;
+    locale.showStats(nb_evaluated)
+
+    # --calculate new population size;
+    if locale.EPOCH:
+        PRoFIGA = promoterz.supplement.PRoFIGA.calculatePRoFIGA(
+            locale.genconf.PRoFIGA_beta, locale.EPOCH,
+            locale.genconf.NBEPOCH,
+            locale.EvolutionStatistics[locale.EPOCH-1],
+            locale.EvolutionStatistics[locale.EPOCH])
+        locale.POP_SIZE += max(int(round( locale.POP_SIZE * PRoFIGA )), locale.genconf.POP_SIZE//2)
+
+    # --population ages
+    qpop=len(locale.population)
+    locale.population=locale.extratools.populationAges(locale.population, locale.EvolutionStatistics[locale.EPOCH])
+    wpop=len(locale.population)
+    print('elder %i' % (qpop-wpop))
+
+    assert(len(locale.population))
+    assert(None not in locale.population)
+
     # --send best individue to HallOfFame;
     if not locale.EPOCH % 15:
             BestSetting = tools.selBest(locale.population, 1)[0]
@@ -64,17 +90,7 @@ def standard_loop(locale):
 
 
     assert(len(locale.population))
-    # --get proper evolution statistics;
-    Stats=locale.stats.compile(locale.population)
 
-    # --calculate new population size;
-    if locale.EPOCH:
-        PRoFIGA = promoterz.supplement.PRoFIGA.calculatePRoFIGA(
-            locale.genconf.PRoFIGA_beta, locale.EPOCH,
-            locale.genconf.NBEPOCH,
-            locale.EvolutionStatistics[locale.EPOCH-1],
-            Stats)
-        locale.POP_SIZE += max(int(round( locale.POP_SIZE * PRoFIGA )), locale.genconf.POP_SIZE//2)
 
     # --filter best inds;
     locale.population[:] = tools.selBest(locale.population, locale.POP_SIZE)
@@ -87,49 +103,14 @@ def standard_loop(locale):
     else:
         Stats['dateRange'] = None
     '''
-    Stats['dateRange'] = None
-    Stats['maxsize'] = locale.POP_SIZE
-    Stats['size'] = len(locale.population)
-    locale.EvolutionStatistics[locale.EPOCH] = Stats
-
-    LOGPATH ="%s/%s" % (locale.globalconf.save_dir, locale.globalconf.log_name)
-    promoterz.statistics.write_evolution_logs(locale.EPOCH,
-                                              Stats, LOGPATH)
-
-
-    # show information;
-    print("EPOCH %i/%i\t&%i" % (locale.EPOCH, locale.genconf.NBEPOCH, nb_evaluated))
-    statnames = [ 'max', 'avg', 'min', 'std', 'size', 'maxsize' ]
-
-    statText = ""
-    for s in range(len(statnames)):
-        SNAME = statnames[s]
-        SVAL = Stats[SNAME]
-        statText += "%s" % promoterz.statistics.statisticsNames[SNAME]
-        if not SVAL % 1:
-            statText += " %i\t" % SVAL
-        else:
-            statText += " %.3f\t" % SVAL
-        if s % 2:
-            statText += '\n'
-    print(statText)
-    print('')
 
 
 
-    bestScore = Stats['max']
-    Deviation = Stats['std']
+
     assert(None not in locale.population)
 
     #print("POPSIZE %i" % len(locale.population))
 
-    # --population ages
-    qpop=len(locale.population)
-    locale.population=locale.extratools.populationAges(locale.population, Stats)
-    wpop=len(locale.population)
-    print('elder %i' % (qpop-wpop))
 
-    assert(len(locale.population))
-    assert(None not in locale.population)
 
 
