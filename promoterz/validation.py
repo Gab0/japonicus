@@ -18,5 +18,6 @@ def validatePopulation(IndividualToSettings, TargetParameters, population):
         if not(checkPhenotypeIntegrity(phenotype, TargetParameters)):
             population[p] = None
             print('--destroying invalid citizen--')
+            print(phenotype)
     population = [x for x in population if x]
     return population

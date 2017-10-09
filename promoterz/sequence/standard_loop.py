@@ -34,7 +34,10 @@ def standard_loop(locale):
             locale.genconf.NBEPOCH,
             locale.EvolutionStatistics[locale.EPOCH-1],
             locale.EvolutionStatistics[locale.EPOCH])
-        locale.POP_SIZE += max(int(round( locale.POP_SIZE * PRoFIGA )), locale.genconf.POP_SIZE//2)
+
+        deltaPOP_SIZE = max(int(round( locale.POP_SIZE * PRoFIGA )), locale.genconf.POP_SIZE//2 )
+        deltaPOP_SIZE = min(deltaPOP_SIZE, 899)
+        locale.POP_SIZE += deltaPOP_SIZE
 
     # --population ages
     qpop=len(locale.population)

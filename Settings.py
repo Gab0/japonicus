@@ -18,7 +18,7 @@ def getSettings(specific=None):
         # genetic algorithm settings
         'generations': { 
             'POP_SIZE': 30,
-            'NBEPOCH': 300,
+            'NBEPOCH': 50,
             'deltaDays': 21, # time window of dataset for evaluation
             'cxpb': 0.2, # Probabilty of crossover 
             'mutpb': 0.8,# Probability of mutation;
