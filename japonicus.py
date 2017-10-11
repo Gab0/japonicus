@@ -62,7 +62,8 @@ if options.genetic_algorithm:
    if strat == None:
       strat = settings['generations']['Strategy']
    for s in range(options.repeater):
-      gekko_generations(GenerationMethod)
+      settings_ = getSettings('')
+      gekko_generations(settings_, GenerationMethod)
 
 elif options.bayesian_optimization:
     import evolution_bayes

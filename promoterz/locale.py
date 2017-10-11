@@ -5,9 +5,11 @@ import promoterz
 
 import coreFunctions
 
-from multiprocessing import Pool
+
+
 class Locale():
-    def __init__(self, name, position, getSettings, loop, globaltools, availableDataRange):
+    def __init__(self, World, name, position, loop):
+        self.World = World
         self.name = name
         self.EPOCH=0
 
@@ -17,10 +19,6 @@ class Locale():
 
         self.extratools=base.Toolbox()
 
-        self.genconf=getSettings('generations')
-        self.globalconf=getSettings('global')
-        self.stratconf=getSettings('strategies')
-        self.TargetParameters=getSettings()['strategies'][self.genconf.Strategy]
 
         # GENERATION METHOD SELECTION;
         # to easily employ various GA algorithms,
@@ -34,34 +32,34 @@ class Locale():
 
         #elf.GenerationMethod = promoterz.selectRepresentationMethod(GenerationMethod)
 
-        self.tools = globaltools
         #self.tools = self.GenerationMethod.getToolbox(self.genconf, self.TargetParameters)
         promoterz.evolutionHooks.appendToolbox(self.extratools,
-                                               self.HallOfFame, self.tools.population)
+                                               self.HallOfFame, World.tools.population)
 
-        promoterz.supplement.age.appendToolbox(self.extratools, self.genconf.ageBoundaries)
+        promoterz.supplement.age.appendToolbox(self.extratools, World.genconf.ageBoundaries)
 
         # --initial population
-        self.population = self.tools.population(self.genconf.POP_SIZE)
+        self.population = World.tools.population(World.genconf.POP_SIZE)
 
         # --start parallel pool
-        self.parallel = Pool(self.genconf.ParallelBacktests)
 
 
-        self.DateRange = promoterz.evaluation.gekko.getRandomDateRange(availableDataRange,
-                                                                       self.genconf.deltaDays)
-        print("using candlestick dataset %s" % availableDataRange)
-        print("%s strategy;" % self.genconf.Strategy)
+
+        self.DateRange = promoterz.evaluation.gekko.getRandomDateRange(
+            World.EnvironmentParameters, World.genconf.deltaDays)
+
+
+        print("-- Initializing %s"% self.name)
 
         self.stats = promoterz.statistics.getStatisticsMeter()
         promoterz.evaluation.gekko.appendToolbox(self.extratools,
-                                                 self.tools.constructPhenotype,
+                                                 World.tools.constructPhenotype,
                                                  self.DateRange)
 
-        InitialBestScores, FinalBestScores = [], []
-        self.POP_SIZE = self.genconf.POP_SIZE
+        self.InitialBestScores, self.FinalBestScores = [], []
+        self.POP_SIZE = World.genconf.POP_SIZE
 
-        print("evaluated parameters ranges %s" % promoterz.utils.flattenParameters(self.TargetParameters))
+
         self.loop=loop
 
     def compileStats(self):
@@ -72,7 +70,7 @@ class Locale():
         Stats['size'] = len(self.population)
         self.EvolutionStatistics[self.EPOCH] = Stats
 
-        LOGPATH ="%s/%s" % (self.globalconf.save_dir, self.globalconf.log_name)
+        LOGPATH ="output/evolution_gen.csv"
         promoterz.statistics.write_evolution_logs(self.EPOCH,
                                               Stats, LOGPATH)
 
@@ -80,7 +78,7 @@ class Locale():
     def showStats(self, nb_evaluated):
         # show information;
         Stats = self.EvolutionStatistics[self.EPOCH]
-        print("EPOCH %i/%i\t&%i" % (self.EPOCH, self.genconf.NBEPOCH, nb_evaluated))
+        print("EPOCH %i/%i\t&%i" % (self.EPOCH, self.World.genconf.NBEPOCH, nb_evaluated))
         statnames = [ 'max', 'avg', 'min', 'std', 'size', 'maxsize' ]
 
         statText = ""
@@ -99,5 +97,5 @@ class Locale():
 
     def run(self):
         print(self.name)
-        self.loop(self)
+        self.loop(self.World, self)
         self.EPOCH += 1

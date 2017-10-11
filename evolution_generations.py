@@ -12,7 +12,7 @@ from promoterz.supplement.geneticDivergence import *
 from promoterz.supplement.age import *
 import promoterz.supplement.PRoFIGA
 import promoterz.sequence.standard_loop
-from Settings import getSettings
+
 
 from multiprocessing import Pool
 
@@ -22,37 +22,26 @@ from deap import base
 
 from Settings import getSettings
 
-def gekko_generations(GenerationMethod, NB_LOCALE=2):
+def gekko_generations(settings, GenerationMethod, NB_LOCALE=2):
+
     GenerationMethod = promoterz.selectRepresentationMethod(GenerationMethod)
 
     genconf=getSettings('generations')
     TargetParameters=getSettings()['strategies'][genconf.Strategy]
-
     GlobalTools = GenerationMethod.getToolbox(genconf, TargetParameters)
+
+
     availableDataRange = promoterz.evaluation.gekko.getAvailableDataset(
             exchange_source=genconf.dataset_source)
-    genLOCALE = lambda name: promoterz.Locale(name, (random.randrange(0,500), random.randrange(0,500)),getSettings,
-                                         promoterz.sequence.standard_loop.standard_loop,
-                                              GlobalTools, availableDataRange)
+    loops = [promoterz.sequence.standard_loop.standard_loop]
+    World = promoterz.world.World(GlobalTools, loops, genconf, TargetParameters, NB_LOCALE, EnvironmentParameters=availableDataRange)
 
-    LOCALEs = ['Locale%i' % (x+1) for x in range(NB_LOCALE)]
-    LOCALEs = [genLOCALE(Name) for Name in LOCALEs]
-    W=0
-    while W < genconf.NBEPOCH:
-        for K in LOCALEs:
-            K.run()
-        if len(LOCALEs) > 1 and random.random() < 0.1 :
-            S, D=False, False
-            while S == D:
-                S=random.choice(LOCALEs)
-                D=random.choice(LOCALEs)
-            promoterz.world.migration(S, D, (1,5))
-        W+=1
-
+    while World.EPOCH < World.genconf.NBEPOCH:
+        World.runEPOCH()
     # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
     #FinalBestScores.append(Stats['max'])
 
-    for LOCALE in LOCALEs:
+    for LOCALE in World.locales:
         FinalIndividue = tools.selBest(LOCALE.population, 1)[0]
         FinalIndividueSettings = GlobalTools.constructPhenotype(FinalIndividue)
 

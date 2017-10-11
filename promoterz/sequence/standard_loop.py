@@ -5,19 +5,19 @@ import random
 from deap import algorithms
 import promoterz
 
-def standard_loop(locale):
+def standard_loop(World, locale):
     assert(len(locale.population))
 
     # --validate individuals;
     locale.population=promoterz.validation.validatePopulation(
-        locale.tools.constructPhenotype,
-        {locale.genconf.Strategy: locale.TargetParameters},
+        World.tools.constructPhenotype,
+        {World.genconf.Strategy: World.TargetParameters},
         locale.population)
 
     # --evaluate individuals;
     nb_evaluated=promoterz.evaluatePopulation(locale.population,
                                               locale.extratools.evaluate,
-                                              locale.parallel)
+                                              World.parallel)
 
     assert(len(locale.population))
     assert(sum([x.fitness.valid for x in locale.population]) == len(locale.population))
@@ -30,14 +30,14 @@ def standard_loop(locale):
     # --calculate new population size;
     if locale.EPOCH:
         PRoFIGA = promoterz.supplement.PRoFIGA.calculatePRoFIGA(
-            locale.genconf.PRoFIGA_beta, locale.EPOCH,
-            locale.genconf.NBEPOCH,
+            World.genconf.PRoFIGA_beta, locale.EPOCH,
+            World.genconf.NBEPOCH,
             locale.EvolutionStatistics[locale.EPOCH-1],
             locale.EvolutionStatistics[locale.EPOCH])
 
-        deltaPOP_SIZE = max(int(round( locale.POP_SIZE * PRoFIGA )), locale.genconf.POP_SIZE//2 )
-        deltaPOP_SIZE = min(deltaPOP_SIZE, 899)
+        deltaPOP_SIZE = max(int(round( locale.POP_SIZE * PRoFIGA )), World.genconf.POP_SIZE//2 )
         locale.POP_SIZE += deltaPOP_SIZE
+        locale.POP_SIZE = min(deltaPOP_SIZE, 899)
 
     # --population ages
     qpop=len(locale.population)
@@ -81,12 +81,12 @@ def standard_loop(locale):
 
     # --select best individues to procreate
     offspring = tools.selTournament(locale.population,
-                                    locale.genconf._lambda, 2*locale.genconf._lambda)
+                                    World.genconf._lambda, 2*World.genconf._lambda)
     offspring = [deepcopy(x) for x in offspring] # is deepcopy necessary?
 
     # --modify and integrate offspring;
-    offspring = algorithms.varAnd(offspring, locale.tools,
-                                  locale.genconf.cxpb, locale.genconf.mutpb)
+    offspring = algorithms.varAnd(offspring, World.tools,
+                                  World.genconf.cxpb, World.genconf.mutpb)
     locale.extratools.ageZero(offspring)
     locale.population += offspring
 

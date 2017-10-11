@@ -3,11 +3,24 @@ import js2py
 
 class _settings:
     def __init__(self, **entries):
+        '''
+        print(entries)
+        def iterate(self, DATA):
+            for W in DATA.keys():
+                if type(DATA[W]) == dict:
+                    iterate(self,DATA[W])
+                else:
+                    self.__dict__.update(DATA)
+        iterate(self,entries)
+        '''
         self.__dict__.update(entries)
+        
+    def getstrat(self, name):
+        return self.strategies[name]
 
 def getSettings(specific=None):
     s = {
-        'global': {
+        'Global': {
             'gekkoPath': os.getenv("HOME")+'/gekko1',
             'Strategies': ['DEMA', 'MACD', 'PPO', 'RSI', 'StochRSI', 'TSI'],
             'configFilename': 'example-config.js',
@@ -141,8 +154,11 @@ def getSettings(specific=None):
         }
     }
 
-    if specific:
-        return _settings(**s[specific])
+    if specific != None:
+        if not specific:
+            return _settings(**s)
+        else:
+            return _settings(**s[specific])
 
     return s
 

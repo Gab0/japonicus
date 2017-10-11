@@ -14,7 +14,7 @@ from flask_caching import Cache
 from promoterz.statistics import statisticsNames
 import Settings
 
-gsettings = Settings.getSettings()['global']
+gsettings = Settings.getSettings()['Global']
 settings = Settings.getSettings()['bayesian']
 
 def load_evolution_logs(filename="evolution_gen.csv"):
