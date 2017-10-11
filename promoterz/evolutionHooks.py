@@ -5,6 +5,10 @@ from copy import deepcopy
 
 import random
 
+import promoterz.supplement.age
+import promoterz.supplement.PRoFIGA
+import promoterz.supplement.phenotypicDivergence
+
 class SimulatedEnvironment(): # envelope main evolution loop as class? maybe tbd
     def __init__(self):
 
@@ -40,9 +44,18 @@ def evaluatePopulation(population, evaluationFunction, pool):
         individues_to_simulate[i].fitness.values = fit
     return len(individues_to_simulate)
 
-def appendToolbox(toolbox, HallOfFame, population_generator):
+def getLocaleEvolutionToolbox(World, locale):
+    toolbox = base.Toolbox()
+    toolbox.register("ImmigrateHoF", immigrateHoF, locale.HallOfFame)
+    toolbox.register("ImmigrateRandom", immigrateRandom, World.tools.population)
 
-    toolbox.register("ImmigrateHoF", immigrateHoF, HallOfFame)
-    toolbox.register("ImmigrateRandom", immigrateRandom, population_generator)
+    toolbox.register('ageZero', promoterz.supplement.age.ageZero)
+    toolbox.register('populationAges', promoterz.supplement.age.populationAges,
+                     World.genconf.ageBoundaries)
 
+    toolbox.register('populationPD',
+    promoterz.supplement.phenotypicDivergence.populationPhenotypicDivergence,
+                     World.tools.constructPhenotype)
+
+    return toolbox
 

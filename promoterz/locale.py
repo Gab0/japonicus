@@ -12,12 +12,12 @@ class Locale():
         self.World = World
         self.name = name
         self.EPOCH=0
-
+        self.position = position
         self.EvolutionStatistics={}
 
         self.HallOfFame = tools.HallOfFame(30)
 
-        self.extratools=base.Toolbox()
+        self.extratools=promoterz.evolutionHooks.getLocaleEvolutionToolbox(World, self)
 
 
         # GENERATION METHOD SELECTION;
@@ -30,19 +30,8 @@ class Locale():
 
         #genconf.Strategy = Strategy # ovrride strat defined on settings if needed;
 
-        #elf.GenerationMethod = promoterz.selectRepresentationMethod(GenerationMethod)
-
-        #self.tools = self.GenerationMethod.getToolbox(self.genconf, self.TargetParameters)
-        promoterz.evolutionHooks.appendToolbox(self.extratools,
-                                               self.HallOfFame, World.tools.population)
-
-        promoterz.supplement.age.appendToolbox(self.extratools, World.genconf.ageBoundaries)
-
         # --initial population
         self.population = World.tools.population(World.genconf.POP_SIZE)
-
-        # --start parallel pool
-
 
 
         self.DateRange = promoterz.evaluation.gekko.getRandomDateRange(
@@ -78,7 +67,7 @@ class Locale():
     def showStats(self, nb_evaluated):
         # show information;
         Stats = self.EvolutionStatistics[self.EPOCH]
-        print("EPOCH %i/%i\t&%i" % (self.EPOCH, self.World.genconf.NBEPOCH, nb_evaluated))
+        print("EPOCH %i\t&%i" % (self.EPOCH, nb_evaluated))
         statnames = [ 'max', 'avg', 'min', 'std', 'size', 'maxsize' ]
 
         statText = ""

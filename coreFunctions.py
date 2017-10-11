@@ -11,8 +11,6 @@ import promoterz
 from Settings import getSettings
 
 
-
-
 def stratSettingsProofOfViability(Settings, DatasetLimits):
     AllProofs = []
     for W in range(12):

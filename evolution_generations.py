@@ -7,14 +7,9 @@ from copy import deepcopy
 
 import coreFunctions
 
-
-from promoterz.supplement.geneticDivergence import *
-from promoterz.supplement.age import *
-import promoterz.supplement.PRoFIGA
 import promoterz.sequence.standard_loop
 
 
-from multiprocessing import Pool
 
 from deap import tools
 from deap import algorithms

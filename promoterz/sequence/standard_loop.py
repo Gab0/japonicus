@@ -19,6 +19,11 @@ def standard_loop(World, locale):
                                               locale.extratools.evaluate,
                                               World.parallel)
 
+    # --send best individue to HallOfFame;
+    if not locale.EPOCH % 15:
+            BestSetting = tools.selBest(locale.population, 1)[0]
+            locale.HallOfFame.insert(BestSetting)
+
     assert(len(locale.population))
     assert(sum([x.fitness.valid for x in locale.population]) == len(locale.population))
     # --compile stats;
@@ -35,37 +40,51 @@ def standard_loop(World, locale):
             locale.EvolutionStatistics[locale.EPOCH-1],
             locale.EvolutionStatistics[locale.EPOCH])
 
-        deltaPOP_SIZE = max(int(round( locale.POP_SIZE * PRoFIGA )), World.genconf.POP_SIZE//2 )
-        locale.POP_SIZE += deltaPOP_SIZE
-        locale.POP_SIZE = min(deltaPOP_SIZE, 899)
+        locale.POP_SIZE += locale.POP_SIZE * PRoFIGA
+        minps, maxps = World.genconf.POP_SIZE//2, 899
+        locale.POP_SIZE = int(round(max(min(locale.POP_SIZE, maxps), minps)))
+
+    # --filter best inds;
+    locale.population[:] = tools.selBest(locale.population, locale.POP_SIZE)
 
     # --population ages
     qpop=len(locale.population)
-    locale.population=locale.extratools.populationAges(locale.population, locale.EvolutionStatistics[locale.EPOCH])
+    locale.population=locale.extratools.populationAges(
+        locale.population,
+        locale.EvolutionStatistics[locale.EPOCH])
+
     wpop=len(locale.population)
     print('elder %i' % (qpop-wpop))
 
     assert(len(locale.population))
     assert(None not in locale.population)
 
-    # --send best individue to HallOfFame;
-    if not locale.EPOCH % 15:
-            BestSetting = tools.selBest(locale.population, 1)[0]
-            locale.HallOfFame.insert(BestSetting)
-            #print(EvolutionStatistics)
+    #print(EvolutionStatistics)
 
-            #FinalBestScores.append(Stats['max'])
-            '''
-            print("Loading new date range;")
+    #FinalBestScores.append(Stats['max'])
+    '''
+    print("Loading new date range;")
+    
+    print("\t%s to %s" % (locale.DateRange['from'], locale.DateRange['to']))
+    for I in range(len(locale.population)):
+    del locale.population[I].fitness.values
+    toolbox.register("evaluate", coreFunctions.Evaluate,
+    GenerationMethod.constructPhenotype, DateRange)
+    FirstEpochOfDataset = True
+    bestScore = 0
+    '''
+    # --select best individues to procreate
+    offspring = tools.selTournament(locale.population,
+                                    World.genconf._lambda, 2*World.genconf._lambda)
+    offspring = [deepcopy(x) for x in offspring] # is deepcopy necessary?
 
-            print("\t%s to %s" % (locale.DateRange['from'], locale.DateRange['to']))
-            for I in range(len(locale.population)):
-                del locale.population[I].fitness.values
-            toolbox.register("evaluate", coreFunctions.Evaluate,
-                                 GenerationMethod.constructPhenotype, DateRange)
-            FirstEpochOfDataset = True
-            bestScore = 0
-            '''
+    # --modify and integrate offspring;
+    offspring = algorithms.varAnd(offspring, World.tools,
+                                  World.genconf.cxpb, World.genconf.mutpb)
+    locale.extratools.ageZero(offspring)
+    locale.population += offspring
+
+    # --NOW DOESN'T MATTER IF SOME INDIVIDUE LACKS FITNESS VALUES;
     assert(None not in locale.population)
 
     # --immigrate individual from HallOfFame;
@@ -79,26 +98,7 @@ def standard_loop(World, locale):
 
     assert(len(locale.population))
 
-    # --select best individues to procreate
-    offspring = tools.selTournament(locale.population,
-                                    World.genconf._lambda, 2*World.genconf._lambda)
-    offspring = [deepcopy(x) for x in offspring] # is deepcopy necessary?
 
-    # --modify and integrate offspring;
-    offspring = algorithms.varAnd(offspring, World.tools,
-                                  World.genconf.cxpb, World.genconf.mutpb)
-    locale.extratools.ageZero(offspring)
-    locale.population += offspring
-
-
-
-    assert(len(locale.population))
-
-
-    # --filter best inds;
-    locale.population[:] = tools.selBest(locale.population, locale.POP_SIZE)
-
-    # --log statistcs;
     '''
     if FirstEpochOfDataset:
         InitialBestScores.append(Stats['max'])
@@ -107,12 +107,9 @@ def standard_loop(World, locale):
         Stats['dateRange'] = None
     '''
 
-
-
-
     assert(None not in locale.population)
 
-    #print("POPSIZE %i" % len(locale.population))
+
 
 
 

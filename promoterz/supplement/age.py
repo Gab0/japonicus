@@ -49,10 +49,9 @@ def populationAges(ageBoundary, population, averageScore):
     population=_killElders(population, averageScore, ageBoundary)
     return population
 
-def appendToolbox(toolbox, ageBoundaries):
 
 
-    toolbox.register('ageZero', ageZero)
-    toolbox.register('populationAges', populationAges, ageBoundaries)
+
+
 
 
