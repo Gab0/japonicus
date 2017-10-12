@@ -14,12 +14,12 @@ import numpy as np
 
 from Settings import getSettings # PROVISORY
 
-def constructPhenotype(individue):
+def constructPhenotype(stratSettings, individue):
     # THIS FUNCTION IS UGLYLY WRITTEN; USE WITH CAUTION;
     # (still works :})
     Strategy = individue.Strategy
     R = lambda V, lim: ((lim[1]-lim[0])/100) * V + lim[0]
-    stratSettings = getSettings()['strategies'][Strategy]
+    #stratSettings = getSettings()['strategies'][Strategy]
     Settings = {
         Strategy:{}
         }
@@ -61,5 +61,5 @@ def getToolbox(genconf, Attributes):
     toolbox.register("mate", tools.cxTwoPoint)
     toolbox.register("mutate", tools.mutUniformInt, low=10, up=10, indpb=0.2)
 
-    toolbox.register("constructPhenotype", constructPhenotype)
+    toolbox.register("constructPhenotype", constructPhenotype, Attributes)
     return toolbox
