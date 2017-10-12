@@ -62,3 +62,19 @@ def getLocaleEvolutionToolbox(World, locale):
     toolbox.register('evaluatePopulation', evaluatePopulation)
     return toolbox
 
+def getGlobalToolbox(representationModule):
+    # GLOBAL FUNCTION TO GET GLOBAL TBX UNDER DEVELOPMENT (ITS COMPLICATED);
+    toolbox = base.Toolbox()
+    creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+    creator.create("Individual", list, fitness=creator.FitnessMax,
+                   PromoterMap=None, Strategy=genconf.Strategy)
+
+    toolbox.register("mate", representationModule.crossover)
+    toolbox.register("mutate", representationModule.mutate)
+
+    PromoterMap = initPromoterMap(Attributes)
+    toolbox.register("newind", initInd, creator.Individual, PromoterMap)
+    toolbox.register("population", tools.initRepeat, list, toolbox.newind)
+
+    toolbox.register("constructPhenotype", representationModule.constructPhenotype)
+    return toolbox
