@@ -81,7 +81,7 @@ class World():
             self.migration(locale, T, (T.fugitivenumber, T.fugitivenumber+1))
             del T.tempdist
             del T.fugitivenumber
-        del locale
+        self.locales = [x for x in self.locales if x != locale]
 
 def calculateDistance(point1, point2):
     x = abs(point1[0] - point2[0])
