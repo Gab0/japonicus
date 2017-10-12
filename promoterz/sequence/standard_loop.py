@@ -15,10 +15,9 @@ def standard_loop(World, locale):
         locale.population)
 
     # --evaluate individuals;
-    nb_evaluated=promoterz.evaluatePopulation(locale.population,
-                                              locale.extratools.evaluate,
-                                              World.parallel)
+    nb_evaluated= locale.extratools.evaluatePopulation(locale)
 
+    assert(len(locale.population))
     # --send best individue to HallOfFame;
     if not locale.EPOCH % 15:
             BestSetting = tools.selBest(locale.population, 1)[0]
@@ -26,11 +25,25 @@ def standard_loop(World, locale):
 
     assert(len(locale.population))
     assert(sum([x.fitness.valid for x in locale.population]) == len(locale.population))
+
+
     # --compile stats;
     locale.compileStats()
 
+    # --population ages
+    qpop=len(locale.population)
+    locale.population=locale.extratools.populationAges(
+        locale.population,
+        locale.EvolutionStatistics[locale.EPOCH])
+
+    wpop=len(locale.population)
+    elder=qpop-wpop
+
+    # --remove equal citizens
+    locale.population = locale.extratools.populationPD(locale.population)
+
     # --show stats;
-    locale.showStats(nb_evaluated)
+    locale.showStats(nb_evaluated, elder)
 
     # --calculate new population size;
     if locale.EPOCH:
@@ -47,14 +60,7 @@ def standard_loop(World, locale):
     # --filter best inds;
     locale.population[:] = tools.selBest(locale.population, locale.POP_SIZE)
 
-    # --population ages
-    qpop=len(locale.population)
-    locale.population=locale.extratools.populationAges(
-        locale.population,
-        locale.EvolutionStatistics[locale.EPOCH])
 
-    wpop=len(locale.population)
-    print('elder %i' % (qpop-wpop))
 
     assert(len(locale.population))
     assert(None not in locale.population)

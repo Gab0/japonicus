@@ -1,11 +1,7 @@
 #!/bin/python
 
 from .base import *
-from .evolutionHooks import *
-from .locale import *
 
-import promoterz.supplement
-import promoterz.validation
-import promoterz.utils
-import promoterz.world
-import promoterz.evaluation.gekko
+from . import supplement, validation, utils
+from . import evaluation, evolutionHooks
+from . import world, locale

@@ -225,10 +225,10 @@ def getCandles(DateRange, size=100):
     return RESULT
 
 
-def Evaluate(IndividualToSettings, DateRange, Individual):
+def Evaluate(constructPhenotype, DateRange, Individual):
     # IndividualToSettings(IND, STRAT) is a function that depends on GA algorithm,
     # so should be provided;
-    Settings = IndividualToSettings(Individual)
+    Settings = constructPhenotype(Individual)
     #print(Settings)
 
 

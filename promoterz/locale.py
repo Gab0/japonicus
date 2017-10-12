@@ -36,7 +36,7 @@ class Locale():
 
         self.DateRange = promoterz.evaluation.gekko.getRandomDateRange(
             World.EnvironmentParameters, World.genconf.deltaDays)
-
+        self.extratools.register('Evaluate', World.tools.Evaluate, self.DateRange)
 
         print("-- Initializing %s"% self.name)
 
@@ -64,7 +64,7 @@ class Locale():
                                               Stats, LOGPATH)
 
 
-    def showStats(self, nb_evaluated):
+    def showStats(self, nb_evaluated,elder):
         # show information;
         Stats = self.EvolutionStatistics[self.EPOCH]
         print("EPOCH %i\t&%i" % (self.EPOCH, nb_evaluated))
@@ -82,6 +82,7 @@ class Locale():
             if s % 2:
                 statText += '\n'
         print(statText)
+        print('Elder dies %i' % elder)
         print('')
 
     def run(self):

@@ -4,6 +4,7 @@ import math
 import promoterz.locale
 
 from multiprocessing import Pool
+
 class World():
     def __init__(self, GlobalTools, loops, genconf,
                  TargetParameters, NB_LOCALE=3, EnvironmentParameters=None):
@@ -25,6 +26,7 @@ class World():
         print("%s strategy;" % self.genconf.Strategy)
         print("evaluated parameters ranges %s" %\
               promoterz.utils.flattenParameters(self.TargetParameters))
+
     def generateLocale(self):
         name = 'Locale%i' % (self.localeID)
         self.localeID +=1
@@ -33,7 +35,7 @@ class World():
         self.locales.append(L)
 
     def runEPOCH(self):
-        print("\tEPOCH %i/%i" % (self.EPOCH, self.genconf.NBEPOCH))
+        print("\t======\tEPOCH %i/%i" % (self.EPOCH, self.genconf.NBEPOCH))
         for LOCALE in self.locales:
             LOCALE.run()
         # APPLY MIGRATION;
@@ -74,7 +76,7 @@ class World():
             T.tempdist = distance
             totaldistance+=distance
         for T in self.locales:
-            T.fugitivenumber=T.tempdist/totaldistance * len(locale.population)
+            T.fugitivenumber=int(round(T.tempdist/totaldistance * len(locale.population)))
         for T in self.locales:
             self.migration(locale, T, (T.fugitivenumber, T.fugitivenumber+1))
             del T.tempdist

@@ -52,13 +52,16 @@ def getToolbox(genconf, Attributes):
     return toolbox
 
 def initPromoterMap(ParameterRanges):
-    Promoters = [x for x in list(ParameterRanges.keys())]
+    PRK = list(ParameterRanges.keys())
+    Promoters = [x for x in PRK]
     PromoterMap = {}
     for W in Promoters:
         promoter = random.randrange(120,150)
         PromoterMap[W] = promoter
 
-
+    print(ParameterRanges)
+    print(PromoterMap)
+    assert(len(PRK) == len(list(PromoterMap.keys())))
     return PromoterMap
 
 def initChromosomes(PromoterMap, Density=3):

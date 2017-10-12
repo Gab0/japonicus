@@ -20,11 +20,13 @@ from Settings import getSettings
 def gekko_generations(settings, GenerationMethod, NB_LOCALE=2):
 
     GenerationMethod = promoterz.selectRepresentationMethod(GenerationMethod)
+    EvaluationMethod = promoterz.evaluation.gekko.Evaluate
 
     genconf=getSettings('generations')
     TargetParameters=getSettings()['strategies'][genconf.Strategy]
     GlobalTools = GenerationMethod.getToolbox(genconf, TargetParameters)
 
+    GlobalTools.register('Evaluate', EvaluationMethod, GlobalTools.constructPhenotype)
 
     availableDataRange = promoterz.evaluation.gekko.getAvailableDataset(
             exchange_source=genconf.dataset_source)
