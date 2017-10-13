@@ -25,7 +25,7 @@ def stratSettingsProofOfViability(Settings, DatasetLimits):
     check = [x for x in AllProofs if x > 0]
     Valid = len(check) == len(AllProofs)
     print("Annual profit %.3f%%" % (iValue-100))
-    return Valid   
+    return Valid, iValue
  
 def pasteSettingsToUI(Settings):
     text = []

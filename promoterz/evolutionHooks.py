@@ -9,12 +9,6 @@ import promoterz.supplement.age
 import promoterz.supplement.PRoFIGA
 import promoterz.supplement.phenotypicDivergence
 
-class SimulatedEnvironment(): # envelope main evolution loop as class? maybe tbd
-    def __init__(self):
-
-        self.toolbox = []
-        self.HallOfFame = base.HallOfFame(30)
-        self.population = []
 
 # population as last positional argument, to blend with toolbox;
 def immigrateHoF(HallOfFame, population):
@@ -60,6 +54,7 @@ def getLocaleEvolutionToolbox(World, locale):
                      World.tools.constructPhenotype)
 
     toolbox.register('evaluatePopulation', evaluatePopulation)
+
     return toolbox
 
 def getGlobalToolbox(representationModule):

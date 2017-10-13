@@ -39,33 +39,38 @@ def gekko_generations(settings, GenerationMethod, NB_LOCALE=2):
     #FinalBestScores.append(Stats['max'])
 
     for LOCALE in World.locales:
-        FinalIndividue = tools.selBest(LOCALE.population, 1)[0]
-        FinalIndividueSettings = GlobalTools.constructPhenotype(FinalIndividue)
+        BestIndividues = tools.selBest(LOCALE.population, genconf.finaltest['NBBESTINDS'])
 
-        Show = json.dumps(FinalIndividueSettings, indent=2)
-        coreFunctions.logInfo("~" * 18)
+        Z=genconf.finaltest['NBADDITIONALINDS']
+        AdditionalIndividues = tools.selTournament(LOCALE.population, Z, Z*2)
+        AdditionalIndividues = [x for x in AdditionalIndividues if x not in BestIndividues]
+        FinalIndividues = BestIndividues + AdditionalIndividues
 
-        ''' DEPRECATED;
-        for S in range(len(FinalBestScores)):
+        for FinalIndividue in FinalIndividues:
+            FinalIndividueSettings = GlobalTools.constructPhenotype(FinalIndividue)
 
-            coreFunctions.logInfo("Candlestick Set %i: \n\n" % (S+1)+\
-                                  "EPOCH ONE BEST PROFIT: %.3f\n" % InitialBestScores[S] +\
-                                  "FINAL EPOCH BEST PROFIT: %.3f\n" % FinalBestScores[S])
-        '''
+            AssertFitness=coreFunctions.stratSettingsProofOfViability(FinalIndividueSettings, availableDataRange)
+            print("Testing Strategy:\n")
+            if AssertFitness[0] or AssertFitness[1] > 50:
 
-        print("Settings for Gekko config.js:")
-        print(Show)
-        print("Settings for Gekko --ui webpage")
-        coreFunctions.logInfo(coreFunctions.pasteSettingsToUI(FinalIndividueSettings))
+                Show = json.dumps(FinalIndividueSettings, indent=2)
+                coreFunctions.logInfo("~" * 18)
 
-        print("\nRemember to check MAX and MIN values for each parameter.")
-        print("\tresults may improve with extended ranges.")
 
-        print("Testing Strategy:\n")
-        Vv=coreFunctions.stratSettingsProofOfViability(FinalIndividueSettings, availableDataRange)
-        Vv = "GOOD STRAT" if Vv else "SEEMS BAD"
-        coreFunctions.logInfo(Vv)
-        print("")
+                print("Settings for Gekko config.js:")
+                print(Show)
+                print("Settings for Gekko --ui webpage")
+                coreFunctions.logInfo(coreFunctions.pasteSettingsToUI(FinalIndividueSettings))
+
+                print("\nRemember to check MAX and MIN values for each parameter.")
+                print("\tresults may improve with extended ranges.")
+
+            else:
+                print("Strategy Fails.")
+
+
+
+            print("")
     print("\t\t.RUN ENDS.")
 
 

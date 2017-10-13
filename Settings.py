@@ -30,8 +30,8 @@ def getSettings(specific=None):
         },
         # genetic algorithm settings
         'generations': { 
-            'POP_SIZE': 30,
-            'NBEPOCH': 300,
+            'POP_SIZE': 30, # Initial locale population size 
+            'NBEPOCH': 500, # number of epochs to run
             'deltaDays': 21, # time window of dataset for evaluation
             'cxpb': 0.2, # Probabilty of crossover 
             'mutpb': 0.8,# Probability of mutation;
@@ -40,12 +40,20 @@ def getSettings(specific=None):
             'DRP': 70,# Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
             'ParallelBacktests': 5,
-            'PRoFIGA_beta': 0.01,
+            'PRoFIGA_beta': 0.005,
             'ageBoundaries': (9, 19),
             'dataset_source': { # dataset_source can be set to None so it searches from any source;
                 "exchange": "poloniex",
                 "currency": 'USDT',
                 "asset": 'BTC'
+            },
+            'finaltest': {
+                'NBBESTINDS': 1,
+                'NBADDITIONALINDS': 4,
+            },
+            'chromosome': {
+                'GeneSize': 2,
+                'Density': 3,
             }
         },
         # bayesian optimization settings

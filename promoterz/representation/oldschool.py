@@ -12,8 +12,6 @@ from deap import algorithms
 
 import numpy as np
 
-from Settings import getSettings # PROVISORY
-
 def constructPhenotype(stratSettings, individue):
     # THIS FUNCTION IS UGLYLY WRITTEN; USE WITH CAUTION;
     # (still works :})
