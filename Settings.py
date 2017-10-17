@@ -36,7 +36,7 @@ def getSettings(specific=None):
             'cxpb': 0.2, # Probabilty of crossover 
             'mutpb': 0.8,# Probability of mutation;
             '_lambda': 5,# size of offspring generated per epoch;
-            'Strategy': "DEMA",
+            'Strategy': "RSI",
             'DRP': 70,# Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
             'ParallelBacktests': 5,
@@ -90,10 +90,10 @@ def getSettings(specific=None):
                 #"historySize":(1,60), # required history
                 "short": (1,10), # short EMA
                 "long": (20,50), # long EMA
-                "signal": (1,18), # shortEMA - longEMA diff
+                "signal": (9,18), # shortEMA - longEMA diff
                 "thresholds.down": (-0.5,0.), # trend thresholds
                 "thresholds.up": (0.,0.5), # trend thresholds
-                "thresholds.persistence": (0,2), # trend duration(count up by tick) thresholds
+                "thresholds.persistence": (2,10), # trend duration(count up by tick) thresholds
             },
             "PPO":{
                 #"candleSize":(1,60), # tick per day
@@ -103,7 +103,7 @@ def getSettings(specific=None):
                 "signal": (1,18), # 100 * (shortEMA - longEMA / longEMA)
                 "thresholds.down": (-0.5,0.), # trend thresholds
                 "thresholds.up": (0.,0.5), # trend thresholds
-                "thresholds.persistence": (0,4), # trend duration(count up by tick) thresholds
+                "thresholds.persistence": (2,10), # trend duration(count up by tick) thresholds
             },
             # Uses one of the momentum indicators but adjusts the thresholds when PPO is bullish or bearish
             # Uses settings from the ppo and momentum indicator config block
@@ -126,8 +126,8 @@ def getSettings(specific=None):
                            #"historySize":(1,60), # required history
                            "interval": (7,21), # weight
                            "thresholds.low": (15,45), # trend thresholds
-                           "thresholds.hith": (45.,140), # trend thresholds
-                           "thresholds.persistence": (0,4), # trend duration(count up by tick) thresholds
+                           "thresholds.hith": (45,140), # trend thresholds
+                           "thresholds.persistence": (4,10), # trend duration(count up by tick) thresholds
                     },
                     "StochRSI":{
                            #"candleSize":(1,60), # tick per day
@@ -135,7 +135,7 @@ def getSettings(specific=None):
                            "interval": (7,21), # weight
                            "thresholds.low": (15,45), # trend thresholds
                            "thresholds.hith": (45,140), # trend thresholds
-                           "thresholds.persistence": (0,4), # trend duration(count up by tick) thresholds
+                           "thresholds.persistence": (4,10), # trend duration(count up by tick) thresholds
                     },
                     "CCI":{
                            #"candleSize":(1,60), # tick per day
@@ -144,7 +144,7 @@ def getSettings(specific=None):
                            "history": (45,135), # history size, make same or smaller than history
                            "thresholds.down": (-50,-150), # trend thresholds
                            "thresholds.up": (50,150), # trend thresholds
-                           "thresholds.persistence": (0,4), # trend duration(count up by tick) thresholds
+                           "thresholds.persistence": (4,10), # trend duration(count up by tick) thresholds
                     },
                     "UO":{
                            #"candleSize":(1,60), # tick per day

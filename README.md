@@ -31,7 +31,13 @@ T.2 -> $cd [japonicus dir]
 ```
 If your Gekko UI http port is not :3000, adjust accordingly on gekkoWrapper.py.
 
-Backtesting is parallel. It runs five at a time, or adjust it on settings.py
+Backtesting is parallel. It runs five at a time, or adjust it on Settings.py
 
 This is written on python because of the nice DEAP module for genetic algorithm. It's worth it.. available on PIP.
 
+
+Known good gekko strategies to run with this (choose @ Settings.py):
+ - PPO
+ 
+Better avoid those:
+- DEMA

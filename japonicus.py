@@ -7,7 +7,7 @@ from subprocess import Popen, PIPE
 from threading import Thread
 from Settings import getSettings
 from evolution_generations import gekko_generations
-
+import datetime
 from os import chdir, path
 chdir(path.dirname(path.realpath(__file__)))
 
@@ -56,7 +56,7 @@ if options.spawn_web:
    P.start()
 
    sleep(2)
-
+markzero_time = datetime.datetime.now()
 if options.genetic_algorithm:
    GenerationMethod = 'chromosome' if options.chromosome_mode else 'oldschool'
    if strat == None:
@@ -71,7 +71,10 @@ elif options.bayesian_optimization:
        strat = settings['bayesian']['Strategy']
     for s in range(options.repeater):
        evolution_bayes.gekko_bayesian(strat)
-
+       
+deltatime = datetime.datetime.now() - markzero_time
+print("Running took %i seconds." % deltatime.seconds)
+   
 if options.spawn_web:
     print('Statistics info server still runs...')
 
