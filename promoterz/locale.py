@@ -41,7 +41,7 @@ class Locale():
         print("-- Initializing %s"% self.name)
 
         self.stats = promoterz.statistics.getStatisticsMeter()
-        
+
         self.InitialBestScores, self.FinalBestScores = [], []
         self.POP_SIZE = World.genconf.POP_SIZE
 

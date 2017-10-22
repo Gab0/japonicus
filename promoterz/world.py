@@ -59,10 +59,11 @@ class World():
         number = random.randrange(*number_range)
 
         for W in range(number):
-            index = random.randrange(0,len(source.population))
-            individual = source.population.pop(index)
-            del individual.fitness.values
-            target.population.append(individual)
+            if len(source.population):
+                index = random.randrange(0, len(source.population))
+                individual = source.population.pop(index)
+                del individual.fitness.values
+                target.population.append(individual)
 
     def explodeLocale(self, locale):
         if len(self.locales) < 2:
@@ -81,7 +82,7 @@ class World():
             self.migration(locale, T, (T.fugitivenumber, T.fugitivenumber+1))
             del T.tempdist
             del T.fugitivenumber
-        self.locales = [x for x in self.locales if x != locale]
+        self.locales = [ x for x in self.locales if x != locale ]
 
 def calculateDistance(point1, point2):
     x = abs(point1[0] - point2[0])
