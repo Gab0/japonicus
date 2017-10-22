@@ -72,20 +72,25 @@ def loadHostsFile():
     pass
 
 
-def runBacktest(TradeSetting, DateRange, gekko_config=None):
-    gekko_config = createConfig(TradeSetting, DateRange, gekko_config)
+def runBacktest(TradeSetting, DateRange, candleSize=10, gekko_config=None):
+    gekko_config = createConfig(TradeSetting, DateRange, candleSize, gekko_config)
     url = getURL('/api/backtest')
     result = httpPost(url, gekko_config)
     # sometime report is False(not dict)
     if type(result['report']) is bool:
-        print("Warning: report not found")
+        print("Warning: report not found, probable Gekko fail!")
         print(DateRange)
         #print(TradeSetting)
         #print(result)
         #print(URL)
         #print(CONFIG)
-        return 0.
-    return result['report']['relativeProfit']
+
+        # So rare that has no impact;
+        return 0, 0
+
+    rProfit = result['report']['relativeProfit']
+    nbTransactions = result['report']['trades']
+    return rProfit, nbTransactions
 
 def firePaperTrader(TradeSetting, Exchange, Currency, Asset):
     
@@ -136,7 +141,7 @@ def firePaperTrader(TradeSetting, Exchange, Currency, Asset):
     RESULT = httpPost(URL,CONFIG)
     print(RESULT)
     
-def createConfig(TradeSetting, DateRange, gekko_config=None):
+def createConfig(TradeSetting, DateRange, candleSize=10, gekko_config=None):
     if "watch" in TradeSetting:
         watch = TradeSetting["watch"]
         del TradeSetting["watch"]
@@ -171,7 +176,7 @@ def createConfig(TradeSetting, DateRange, gekko_config=None):
             "tradingAdvisor": {
                 "enabled":true,
                 "method": TradeMethod,
-                "candleSize":10, # candleSize: smaller = heavier computation + better possible results;
+                "candleSize": candleSize, # candleSize: smaller = heavier computation + better possible results;
                 "historySize":10
             },
             TradeMethod: TradeSetting[TradeMethod],
@@ -225,14 +230,14 @@ def getCandles(DateRange, size=100):
     return RESULT
 
 
-def Evaluate(constructPhenotype, DateRange, Individual):
+def Evaluate(constructPhenotype, candleSize, DateRange, Individual):
     # IndividualToSettings(IND, STRAT) is a function that depends on GA algorithm,
     # so should be provided;
     Settings = constructPhenotype(Individual)
     #print(Settings)
 
 
-    Profit = runBacktest(Settings, DateRange)
+    Profit, nbTransaction = runBacktest(Settings, DateRange, candleSize=candleSize)
     return Profit,
 
 def getDateRange(Limits, deltaDays=3):
@@ -248,9 +253,7 @@ def getDateRange(Limits, deltaDays=3):
     return DateRange
 
 def getRandomDateRange(Limits, deltaDays, testDays=0):
-    DateFormat="%Y-%m-%d %H:%M:%S"
 
-    epochToString = lambda D: datetime.datetime.utcfromtimestamp(D).strftime(DateFormat)
     FLms = Limits['from']
     TLms = Limits['to']
     deltams=deltaDays * 24 * 60 * 60
@@ -264,7 +267,14 @@ def getRandomDateRange(Limits, deltaDays, testDays=0):
 
     return DateRange
 
-def appendToolbox(toolbox, constructPhenotype, DateRange):
-    toolbox.register("evaluate", Evaluate, constructPhenotype, DateRange)
-    #toolbox.register("getDateRangeLimits", getAvailableDataset)
-    #toolbox.register(getDateRange", getRandomDateRange)
+epochToString = lambda D: datetime.datetime.utcfromtimestamp(D).strftime("%Y-%m-%d %H:%M:%S")
+
+def globalEvaluationDataset(DatasetLimits, deltaDays, NB):
+    Dataset = []
+    for W in range(NB):
+        DateRange = getRandomDateRange(DatasetLimits, deltaDays)
+        Dataset.append(DateRange)
+
+    return Dataset
+
+

@@ -19,7 +19,7 @@ import promoterz.evaluation.gekko as gekkoWrapper
 import chart
 
 dict_merge = lambda a,b: a.update(b) or a
-gsettings = getSettings()['global']
+gsettings = getSettings()['Global']
 settings = getSettings()['bayesian']
 
 Strategy = settings["Strategy"]

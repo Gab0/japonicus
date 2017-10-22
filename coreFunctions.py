@@ -11,11 +11,10 @@ import promoterz
 from Settings import getSettings
 
 
-def stratSettingsProofOfViability(Settings, DatasetLimits):
+def stratSettingsProofOfViability(World, Individual, GlobalDataset):
     AllProofs = []
-    for W in range(12):
-        DateRange = promoterz.evaluation.gekko.getRandomDateRange(DatasetLimits, 30)
-        q=promoterz.evaluation.gekko.runBacktest(Settings, DateRange)
+    for W in GlobalDataset:
+        q,=World.tools.Evaluate(W, Individual)
         AllProofs.append(q)
         print('Testing monthly profit %.3f' % q)
 

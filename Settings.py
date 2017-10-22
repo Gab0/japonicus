@@ -42,6 +42,7 @@ def getSettings(specific=None):
             'ParallelBacktests': 5,
             'PRoFIGA_beta': 0.005,
             'ageBoundaries': (9, 19),
+            'candleSize': 30,
             'dataset_source': { # dataset_source can be set to None so it searches from any source;
                 "exchange": "poloniex",
                 "currency": 'USDT',

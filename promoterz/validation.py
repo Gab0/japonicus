@@ -38,3 +38,4 @@ def validatePopulation(IndividualToSettings, TargetParameters, population):
 
     population = [x for x in population if x]
     return population
+

@@ -26,32 +26,42 @@ def gekko_generations(settings, GenerationMethod, NB_LOCALE=2):
     TargetParameters=getSettings()['strategies'][genconf.Strategy]
     GlobalTools = GenerationMethod.getToolbox(genconf, TargetParameters)
 
-    GlobalTools.register('Evaluate', EvaluationMethod, GlobalTools.constructPhenotype)
+    GlobalTools.register('Evaluate', EvaluationMethod,
+                         GlobalTools.constructPhenotype, genconf.candleSize)
 
     availableDataRange = promoterz.evaluation.gekko.getAvailableDataset(
             exchange_source=genconf.dataset_source)
-    loops = [promoterz.sequence.standard_loop.standard_loop]
-    World = promoterz.world.World(GlobalTools, loops, genconf, TargetParameters, NB_LOCALE, EnvironmentParameters=availableDataRange)
+
+    loops = [ promoterz.sequence.standard_loop.standard_loop ]
+    World = promoterz.world.World(GlobalTools, loops,
+                                  genconf, TargetParameters, NB_LOCALE,
+                                  EnvironmentParameters=availableDataRange)
 
     while World.EPOCH < World.genconf.NBEPOCH:
         World.runEPOCH()
     # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
     #FinalBestScores.append(Stats['max'])
+    print(World.EnvironmentParameters)
+    ValidationDataset =\
+        promoterz.evaluation.gekko.globalEvaluationDataset(World.EnvironmentParameters,
+                                                           genconf.deltaDays, 12)
 
     for LOCALE in World.locales:
         BestIndividues = tools.selBest(LOCALE.population, genconf.finaltest['NBBESTINDS'])
 
         Z=genconf.finaltest['NBADDITIONALINDS']
         AdditionalIndividues = tools.selTournament(LOCALE.population, Z, Z*2)
-        AdditionalIndividues = [x for x in AdditionalIndividues if x not in BestIndividues]
+        AdditionalIndividues = [ x for x in AdditionalIndividues if x not in BestIndividues ]
         FinalIndividues = BestIndividues + AdditionalIndividues
 
         for FinalIndividue in FinalIndividues:
-            FinalIndividueSettings = GlobalTools.constructPhenotype(FinalIndividue)
 
-            AssertFitness=coreFunctions.stratSettingsProofOfViability(FinalIndividueSettings, availableDataRange)
+            AssertFitness=coreFunctions.stratSettingsProofOfViability(World,
+                                                                      FinalIndividue,
+                                                                      ValidationDataset)
             print("Testing Strategy:\n")
             if AssertFitness[0] or AssertFitness[1] > 50:
+                FinalIndividueSettings = GlobalTools.constructPhenotype(FinalIndividue)
 
                 Show = json.dumps(FinalIndividueSettings, indent=2)
                 coreFunctions.logInfo("~" * 18)

@@ -41,10 +41,7 @@ class Locale():
         print("-- Initializing %s"% self.name)
 
         self.stats = promoterz.statistics.getStatisticsMeter()
-        promoterz.evaluation.gekko.appendToolbox(self.extratools,
-                                                 World.tools.constructPhenotype,
-                                                 self.DateRange)
-
+        
         self.InitialBestScores, self.FinalBestScores = [], []
         self.POP_SIZE = World.genconf.POP_SIZE
 
