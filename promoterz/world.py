@@ -3,7 +3,7 @@ import random
 import math
 import promoterz.locale
 import time
-
+from promoterz.sequence.parallel_world import *
 class World():
     def __init__(self, GlobalTools, loops, genconf, globalconf,
                  TargetParameters, NB_LOCALE=3, EnvironmentParameters=None):
@@ -17,7 +17,7 @@ class World():
         self.TargetParameters = TargetParameters
         self.genconf=genconf
         self.EnvironmentParameters=EnvironmentParameters
-
+        self.runEPOCH = world_EPOCH
         self.parallel = promoterz.evaluationPool.EvaluationPool(self.tools.Evaluate, globalconf.GekkoURLs, 4)
 
         for l in range(NB_LOCALE):
@@ -32,7 +32,8 @@ class World():
         name = 'Locale%i' % (self.localeID)
         self.localeID +=1
         position = [random.randrange(0, self.size[x]) for x in range(2)]
-        L = promoterz.locale.Locale(self, name, position, random.choice(self.loops)) 
+        L = promoterz.locale.Locale(self, name, position,
+                                    random.choice(self.loops))
         self.locales.append(L)
 
     def migration(self, source, target, number_range):
@@ -64,9 +65,4 @@ class World():
             del T.fugitivenumber
         self.locales = [ x for x in self.locales if x != locale ]
 
-def calculateDistance(point1, point2):
-    x = abs(point1[0] - point2[0])
-    y = abs(point1[1] - point2[1])
 
-    D = math.sqrt(x**2 + y**2)
-    return D
