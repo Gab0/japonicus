@@ -23,9 +23,14 @@ def gekko_generations(settings, GenerationMethod, NB_LOCALE=2):
     EvaluationMethod = promoterz.evaluation.gekko.Evaluate
 
     genconf=getSettings('generations')
+    globalconf = getSettings('Global')
     TargetParameters=getSettings()['strategies'][genconf.Strategy]
     GlobalTools = GenerationMethod.getToolbox(genconf, TargetParameters)
 
+    RemoteHosts = promoterz.evaluation.gekko.loadHostsFile(globalconf.RemoteAWS)
+    globalconf.GekkoURLs+=RemoteHosts
+    if RemoteHosts:
+        print("Using Remote Hosts %s" % RemoteHosts)
     GlobalTools.register('Evaluate', EvaluationMethod,
                          GlobalTools.constructPhenotype, genconf.candleSize)
 
@@ -34,7 +39,7 @@ def gekko_generations(settings, GenerationMethod, NB_LOCALE=2):
 
     loops = [ promoterz.sequence.standard_loop.standard_loop ]
     World = promoterz.world.World(GlobalTools, loops,
-                                  genconf, TargetParameters, NB_LOCALE,
+                                  genconf, globalconf,  TargetParameters, NB_LOCALE,
                                   EnvironmentParameters=availableDataRange)
 
     while World.EPOCH < World.genconf.NBEPOCH:

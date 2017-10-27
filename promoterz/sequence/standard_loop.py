@@ -15,7 +15,7 @@ def standard_loop(World, locale):
         locale.population)
 
     # --evaluate individuals;
-    nb_evaluated= locale.extratools.evaluatePopulation(locale)
+    nb_evaluated= World.parallel.evaluatePopulation(locale)
 
     assert(len(locale.population))
     # --send best individue to HallOfFame;

@@ -35,9 +35,20 @@ Backtesting is parallel. It runs five at a time, or adjust it on Settings.py
 
 This is written on python because of the nice DEAP module for genetic algorithm. It's worth it.. available on PIP.
 
+The full parallel backtesting is now complete. It sends backtest requests across the internet to several machines running Gekko. 
+Intended to use with Ansible-playbook + Amazon EC2 AWS machines. <br>
+At japonicus side, you should provide Ansible's `hosts` inventory file, containing
+the IPs of running machines (a simple list). <br>
+Those machines should be already fully configured, running Gekko, and loaded with the same candlestick data (history)
+files you have on local Gekko;<br>
+I can't make a tutorial for this yet, anyone interested pm me. An AWS slave machine with same
+capacity as local machine can cut EPOCH runningtimes to 66% the original time. Yet very experimental stuff...<br>
+YML playbook file to get gekko running on Amazon AMI Linux is at root folder (set the path to your local gekko history @ line 57); 
+
 
 Known good gekko strategies to run with this (choose @ Settings.py):
  - PPO
+ - RSI
  
 Better avoid those:
 - DEMA

@@ -36,7 +36,7 @@ class Locale():
 
         self.DateRange = promoterz.evaluation.gekko.getRandomDateRange(
             World.EnvironmentParameters, World.genconf.deltaDays)
-        self.extratools.register('Evaluate', World.tools.Evaluate, self.DateRange)
+        #self.extratools.register('Evaluate', World.tools.evaluatePopulation, self.DateRange)
 
         print("-- Initializing %s"% self.name)
 

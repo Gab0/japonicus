@@ -11,11 +11,12 @@ import json
 import requests
 import datetime
 
-gekkoURLs = ['http://localhost:3000']
+
 gekkoDIR = 'TBD'
 
 def getURL(path):
-    return random.choice(gekkoURLs)+path
+    pass
+#return random.choice(gekkoURLs)+path
 
 def initializeGekko(): # not used yet.
     CMD = ['node', gekkoDIR + '/gekko', '--ui']
@@ -34,7 +35,7 @@ def httpPost(URL, data={}):
     return Response
     
 def getAllScanset():
-    URL = getURL('/api/scansets')
+    URL = 'http://localhost:3000/api/scansets'
 
     RESP = httpPost(URL)
 
@@ -68,13 +69,19 @@ def getAvailableDataset(exchange_source=None):
 
     return LongestDataset
 
-def loadHostsFile():
-    pass
+def loadHostsFile(HostsFilePath):
+    remoteGekkos=[]
+    H = open(HostsFilePath).read().split('\n')
+    for W in H:
+        if W and not '=' in W and not '[' in W:
+            remoteGekkos.append("http://%s:3000" % W)
+    return remoteGekkos
 
 
-def runBacktest(TradeSetting, DateRange, candleSize=10, gekko_config=None):
+
+def runBacktest(GekkoInstanceUrl, TradeSetting, DateRange, candleSize=10, gekko_config=None):
     gekko_config = createConfig(TradeSetting, DateRange, candleSize, gekko_config)
-    url = getURL('/api/backtest')
+    url = GekkoInstanceUrl+'/api/backtest'
     result = httpPost(url, gekko_config)
     # sometime report is False(not dict)
     if type(result['report']) is bool:
@@ -86,19 +93,21 @@ def runBacktest(TradeSetting, DateRange, candleSize=10, gekko_config=None):
         #print(CONFIG)
 
         # So rare that has no impact;
-        return 0, 0
+        return {'relativeProfit':0, 'market':0, 'trades':0} # fake backtest report
 
-    rProfit = result['report']['relativeProfit']
-    nbTransactions = result['report']['trades']
-    return rProfit, nbTransactions
 
-def firePaperTrader(TradeSetting, Exchange, Currency, Asset):
+    #rProfit = result['report']['relativeProfit']
+    #nbTransactions = result['report']['trades']
+    #market = result['report']['market']
+    return result['report']
+
+def firePaperTrader(GekkoInstanceUrl, TradeSetting, Exchange, Currency, Asset):
     
     TradeMethod = list(TradeSetting.keys())[0]
     true = True
     false= False
 
-    URL = random.choice(gekkoURLs)+'/api/startGekko'
+
     CONFIG = {
         "market":{
             "type":"leech",
@@ -230,15 +239,15 @@ def getCandles(DateRange, size=100):
     return RESULT
 
 
-def Evaluate(constructPhenotype, candleSize, DateRange, Individual):
+def Evaluate(constructPhenotype, candleSize, DateRange, Individual, GekkoInstanceUrl):
     # IndividualToSettings(IND, STRAT) is a function that depends on GA algorithm,
     # so should be provided;
     Settings = constructPhenotype(Individual)
     #print(Settings)
 
 
-    Profit, nbTransaction = runBacktest(Settings, DateRange, candleSize=candleSize)
-    return Profit,
+    result = runBacktest(GekkoInstanceUrl, Settings, DateRange, candleSize=candleSize)
+    return (result['relativeProfit']-result['market']),
 
 def getDateRange(Limits, deltaDays=3):
     DateFormat="%Y-%m-%d %H:%M:%S"

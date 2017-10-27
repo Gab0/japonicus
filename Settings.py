@@ -25,24 +25,29 @@ def getSettings(specific=None):
             'Strategies': ['DEMA', 'MACD', 'PPO', 'RSI', 'StochRSI', 'TSI'],
             'configFilename': 'example-config.js',
             'save_dir': "output",
-            'log_name': 'evolution_gen.csv'
+            'log_name': 'evolution_gen.csv',
+            'RemoteAWS': '../AmazonSetup/hosts', # Hosts list of remote machines running gekko, to distribute evaluation load; BETA.
+                                                # option values: path to HOSTS file list OR False;
+            'GekkoURLs': ['http://localhost:3000']
+
+
 
         },
         # genetic algorithm settings
         'generations': { 
-            'POP_SIZE': 30, # Initial locale population size 
-            'NBEPOCH': 500, # number of epochs to run
-            'deltaDays': 21, # time window of dataset for evaluation
+            'POP_SIZE': 30, # Initial population size, per locale 
+            'NBEPOCH': 1300, # number of epochs to run
+            'deltaDays': 21, # time window size on days of candlesticks for each evaluation
             'cxpb': 0.2, # Probabilty of crossover 
             'mutpb': 0.8,# Probability of mutation;
             '_lambda': 5,# size of offspring generated per epoch;
-            'Strategy': "RSI",
+            'Strategy': "RSI", # Gekko strategy of choice;
             'DRP': 70,# Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
             'ParallelBacktests': 5,
-            'PRoFIGA_beta': 0.005,
-            'ageBoundaries': (9, 19),
-            'candleSize': 30,
+            'PRoFIGA_beta': 0.005, # weight of PRoFIGA calculations on variability of population size
+            'ageBoundaries': (9, 19), # minimum age to die, age where everyone dies (on EPOCHS)
+            'candleSize': 30, # candle size for gekko backtest, in minutes
             'dataset_source': { # dataset_source can be set to None so it searches from any source;
                 "exchange": "poloniex",
                 "currency": 'USDT',
@@ -127,7 +132,7 @@ def getSettings(specific=None):
                            #"historySize":(1,60), # required history
                            "interval": (7,21), # weight
                            "thresholds.low": (15,45), # trend thresholds
-                           "thresholds.hith": (45,140), # trend thresholds
+                           "thresholds.high": (45,140), # trend thresholds
                            "thresholds.persistence": (4,10), # trend duration(count up by tick) thresholds
                     },
                     "StochRSI":{
@@ -135,7 +140,7 @@ def getSettings(specific=None):
                            #"historySize":(1,60), # required history
                            "interval": (7,21), # weight
                            "thresholds.low": (15,45), # trend thresholds
-                           "thresholds.hith": (45,140), # trend thresholds
+                           "thresholds.high": (45,140), # trend thresholds
                            "thresholds.persistence": (4,10), # trend duration(count up by tick) thresholds
                     },
                     "CCI":{

@@ -35,6 +35,7 @@ def evaluatePopulation(locale):
     individues_to_simulate = [ind for ind in locale.population if not ind.fitness.valid]
     fitnesses = locale.World.parallel.starmap(locale.extratools.Evaluate,
                                               zip(individues_to_simulate))
+
     for i, fit in zip(range(len(individues_to_simulate)), fitnesses):
         individues_to_simulate[i].fitness.values = fit
     return len(individues_to_simulate)

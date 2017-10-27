@@ -14,7 +14,7 @@ from Settings import getSettings
 def stratSettingsProofOfViability(World, Individual, GlobalDataset):
     AllProofs = []
     for W in GlobalDataset:
-        q,=World.tools.Evaluate(W, Individual)
+        q,=World.tools.Evaluate(W, Individual, 'http://localhost:3000')
         AllProofs.append(q)
         print('Testing monthly profit %.3f' % q)
 
@@ -33,7 +33,10 @@ def pasteSettingsToUI(Settings):
     text.append('{ %s }' % Strat)
     # print("{{ %s }}" % Settings[Strat])
     Settings = Settings[Strat]
-    for W in Settings.keys():
+    Settingskeys = Settings.keys()
+    Settingskeys = sorted(list(Settingskeys),
+                          key= lambda x: type(Settings[x]) ==dict, reverse=False)
+    for W in Settingskeys:
         Q = Settings[W]
         if type(Q) == dict:
             text.append('\n[%s]' % W)
