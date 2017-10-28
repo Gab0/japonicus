@@ -1,9 +1,9 @@
 #!/bin/python
 import random
-import math
 import promoterz.locale
 import time
 from promoterz.sequence.parallel_world import *
+from functools import partial
 class World():
     def __init__(self, GlobalTools, loops, genconf, globalconf,
                  TargetParameters, NB_LOCALE=3, EnvironmentParameters=None):
@@ -12,21 +12,17 @@ class World():
         self.EPOCH = 0 
         self.locales = []
         self.size = [500,500]
-
+        self.maxdistance = calculateDistance([0,0], self.size)
         self.localeID=1
         self.TargetParameters = TargetParameters
         self.genconf=genconf
         self.EnvironmentParameters=EnvironmentParameters
-        self.runEPOCH = world_EPOCH
+        self.runEPOCH = partial(world_EPOCH, self)
         self.parallel = promoterz.evaluationPool.EvaluationPool(self.tools.Evaluate, globalconf.GekkoURLs, 4)
 
         for l in range(NB_LOCALE):
             self.generateLocale()
 
-        print("using candlestick dataset %s" % self.EnvironmentParameters)
-        print("%s strategy;" % self.genconf.Strategy)
-        print("evaluated parameters ranges %s" %\
-              promoterz.utils.flattenParameters(self.TargetParameters))
 
     def generateLocale(self):
         name = 'Locale%i' % (self.localeID)
@@ -58,7 +54,8 @@ class World():
             T.tempdist = distance
             totaldistance+=distance
         for T in self.locales:
-            T.fugitivenumber=int(round(T.tempdist/totaldistance * len(locale.population)))
+            T.fugitivenumber=int(round(T.tempdist/\
+                                       totaldistance * len(locale.population)))
         for T in self.locales:
             self.migration(locale, T, (T.fugitivenumber, T.fugitivenumber+1))
             del T.tempdist

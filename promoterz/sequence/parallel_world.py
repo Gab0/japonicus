@@ -1,5 +1,8 @@
 #!/bin/python
 import random
+import itertools
+import math
+import time
 
 def world_EPOCH(World):
     print("\t======  EPOCH %i/%i  ======" % (World.EPOCH,
@@ -9,12 +12,15 @@ def world_EPOCH(World):
         LOCALE.run()
 
     # --APPLY MIGRATION BETWEEN LOCALES;
-    if len(World.locales) > 1 and random.random() < (1-0.1 :
+    if len(World.locales):
         S, D=False, False
-        while S == D:
-            S=random.choice(World.locales)
-            D=random.choice(World.locales)
-        World.migration(S, D, (1,5))
+        LocalePairs = itertools.combinations(World.locales, 2)
+        for L in LocalePairs:
+            distance = calculateDistance(L[0].position, L[1].position)
+            distance_weight = distance/World.maxdistance
+            if random.random() > distance_weight:
+                World.migration(L[0], L[1], (1,7))
+                World.migration(L[1], L[0], (1,7))
 
     # --APPLY LOCALE CREATION;
     if random.random() < 0.01:

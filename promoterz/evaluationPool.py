@@ -12,7 +12,7 @@ class EvaluationPool():
         self.Urls = Urls
 
         self.lasttimes = [0 for x in Urls]
-        self.lasttimesperind = [0 for x in 8Urls]
+        self.lasttimesperind = [0 for x in Urls]
         self.poolsizes = [5 for x in Urls]
 
     def ejectURL(self, Index):
@@ -38,13 +38,11 @@ class EvaluationPool():
                                   if not ind.fitness.valid]
 
         props=self.distributeIndividuals(individues_to_simulate)
-        # results = [None for x in self.Urls]
-        args = [ [locale.DateRange, I, props[I]] for I in range(len(self.Urls))]
+
+        args = [ [locale.DateRange, I, props[I]]\
+                 for I in range(len(self.Urls))]
         pool = ThreadPool(len(self.Urls))
 
-        #####
-        #Eval = partial(run_with_timeout, 9, self.evaluateBackend)
-        #results = pool.starmap(Eval, args)
         results=[]
         for A in args:
             results.append(pool.apply_async(self.evaluateBackend, A))
@@ -67,7 +65,7 @@ class EvaluationPool():
 
             self.lasttimes[PoolIndex] = results[PoolIndex][1]
             L = len(props[PoolIndex])
-            self.lasttimesperind = self.lasttimes[PoolIndex] / L if L else 3
+            self.lasttimesperind[PoolIndex] = self.lasttimes[PoolIndex] / L if L else 5
 
         F = [x.fitness.valid for x in individues_to_simulate]
         assert(all(F))
@@ -86,13 +84,13 @@ class EvaluationPool():
         #print(stdTPI)
 
         if sumtimes:
-            min(1, min(1, min)(1, vel)s = [ 1)/x for x in self.lasttimes ]
+            vels = [ 1/x for x in self.lasttimes ]
             constant = nb_simulate/sum(vels)
-            proportions = [ min(1, x*constant) for x in vels ]
+            proportions = [ max(1, x*constant) for x in vels ]
         else:
             proportions = [std for x in self.Urls]
 
-        proportio8ns = [in8t(round(8x)) for x in proportions]
+        proportions = [int(round(x)) for x in proportions]
 
         C = lambda x:random.randrange(0,len(x))
         while sum(proportions) < nb_simulate:

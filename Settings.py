@@ -36,12 +36,12 @@ def getSettings(specific=None):
         # genetic algorithm settings
         'generations': { 
             'POP_SIZE': 30, # Initial population size, per locale 
-            'NBEPOCH': 1300, # number of epochs to run
+            'NBEPOCH': 800, # number of epochs to run
             'deltaDays': 21, # time window size on days of candlesticks for each evaluation
             'cxpb': 0.2, # Probabilty of crossover 
             'mutpb': 0.8,# Probability of mutation;
             '_lambda': 5,# size of offspring generated per epoch;
-            'Strategy': "RSI", # Gekko strategy of choice;
+            'Strategy': "UO", # Gekko strategy of choice;
             'DRP': 70,# Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
             'ParallelBacktests': 5,
@@ -113,19 +113,19 @@ def getSettings(specific=None):
             },
             # Uses one of the momentum indicators but adjusts the thresholds when PPO is bullish or bearish
             # Uses settings from the ppo and momentum indicator config block
-                    "varPPO":{ # TODO: merge PPO config
-                           #"candleSize":(1,60), # tick per day
-                           #"historySize":(1,60), # required history
-                           "short": (6,18), # short EMA
-                           "long": (13,39), # long EMA
-                           "signal": (1,18), # 100 * (shortEMA - longEMA / longEMA)
-                           "thresholds.down": (-0.5,0.), # trend thresholds
-                           "thresholds.up": (0.,0.5), # trend thresholds
-                           "thresholds.persistence": (0,4), # trend duration(count up by tick) thresholds
-                           "momentum": (0, 2.99999), # index of ["RSI", "TSI", "UO"]
+            "varPPO":{ # TODO: merge PPO config
+                #"candleSize":(1,60), # tick per day
+                #"historySize":(1,60), # required history
+                "short": (6,18), # short EMA
+                "long": (13,39), # long EMA
+                "signal": (1,18), # 100 * (shortEMA - longEMA / longEMA)
+                "thresholds.down": (-0.5,0.), # trend thresholds
+                "thresholds.up": (0.,0.5), # trend thresholds
+                "thresholds.persistence": (0,4), # trend duration(count up by tick) thresholds
+                "momentum": (0, 2.99999), # index of ["RSI", "TSI", "UO"]
                            # new threshold is default threshold + PPOhist * PPOweight
-                           "weightLow": (60, 180),
-                           "weightHigh": (-60, -180),
+                "weightLow": (60, 180),
+                "weightHigh": (-60, -180),
                     },
                     "RSI":{
                            #"candleSize":(1,60), # tick per day

@@ -17,6 +17,7 @@ gekkoDIR = 'TBD'
 def getURL(path):
     pass
 #return random.choice(gekkoURLs)+path
+epochToString = lambda D: datetime.datetime.utcfromtimestamp(D).strftime(DateFormat)
 
 def initializeGekko(): # not used yet.
     CMD = ['node', gekkoDIR + '/gekko', '--ui']
@@ -252,7 +253,7 @@ def Evaluate(constructPhenotype, candleSize, DateRange, Individual, GekkoInstanc
 def getDateRange(Limits, deltaDays=3):
     DateFormat="%Y-%m-%d %H:%M:%S"
 
-    epochToString = lambda D: datetime.datetime.utcfromtimestamp(D).strftime(DateFormat)
+
     deltams=deltaDays * 24 * 60 * 60
 
     DateRange = {

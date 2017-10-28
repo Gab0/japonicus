@@ -9,8 +9,6 @@ import coreFunctions
 
 import promoterz.sequence.standard_loop
 
-
-
 from deap import tools
 from deap import algorithms
 from deap import base
@@ -30,12 +28,30 @@ def gekko_generations(settings, GenerationMethod, NB_LOCALE=2):
     RemoteHosts = promoterz.evaluation.gekko.loadHostsFile(globalconf.RemoteAWS)
     globalconf.GekkoURLs+=RemoteHosts
     if RemoteHosts:
-        print("Using Remote Hosts %s" % RemoteHosts)
+        print("Connected Remote Hosts:\n%s" % ('\n').join(RemoteHosts))
+
+    print("Evolving %s strategy;\n" % genconf.Strategy)
+
+    print("evaluated parameters ranges:")
+
+    Params = promoterz.utils.flattenParameters(TargetParameters)
+
+    for k in Params.keys():
+        print( "%s%s%s" % (k, " " * (55-len(k)), Params[k]) )
+
     GlobalTools.register('Evaluate', EvaluationMethod,
-                         GlobalTools.constructPhenotype, genconf.candleSize)
+                         GlobalTools.constructPhenotype, genconf.candleSize
 
     availableDataRange = promoterz.evaluation.gekko.getAvailableDataset(
             exchange_source=genconf.dataset_source)
+
+    showdatadaterange = [ promoterz.evaluation.gekko.epochToString(availableDataRange[x])\
+                    for x in ['from', 'to'] ]
+
+    print("using candlestick dataset %s to %s" %     (showdatadaterange[0],
+                                                      showdatadaterange[1]))
+
+
 
     loops = [ promoterz.sequence.standard_loop.standard_loop ]
     World = promoterz.world.World(GlobalTools, loops,

@@ -52,3 +52,4 @@ Known good gekko strategies to run with this (choose @ Settings.py):
  
 Better avoid those:
 - DEMA
+- MACD

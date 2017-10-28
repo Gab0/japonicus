@@ -206,5 +206,6 @@ def gekko_bayesian(indicator=None):
         print("Saved: " + json2_filename)
     if settings["show_chart"]:
         chart.show_candles(result, max_params)
+        
     return max_params
 
