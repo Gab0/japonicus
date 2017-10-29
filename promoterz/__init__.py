@@ -1,6 +1,6 @@
 #!/bin/python
 
-from .base import *
+from . import functions
 
 from . import supplement, validation, utils
 from . import evaluation, evolutionHooks

@@ -6,14 +6,14 @@ import json
 import os
 import numpy as np
 import pandas as pd
-
+import copy
 #from plotInfo import plotEvolutionSummary
 from bayes_opt import BayesianOptimization
 from multiprocessing import Pool
 import multiprocessing as mp
 
 from promoterz.statistics import write_evolution_logs
-
+import promoterz
 from Settings import getSettings
 import promoterz.evaluation.gekko as gekkoWrapper
 import chart
@@ -32,7 +32,7 @@ candleSize = 0
 historySize = 0
 
 def EvaluateRaw(watch, DateRange, Individual, Strategy):
-    config = compressing_flatten_dict(Individual, Strategy)
+    config = expandGekkoStrategyParameters(Individual, Strategy)
     config["watch"] = watch
     gekko_config = gekkoWrapper.createConfig(config, DateRange)
     url = gekkoWrapper.getURL('/api/backtest')
@@ -46,57 +46,44 @@ def EvaluateRaw(watch, DateRange, Individual, Strategy):
     return gekkoWrapper.httpPost(url, gekko_config)
 
 def Evaluate(watch, DateRange, Individual, Strategy):
-    config = compressing_flatten_dict(Individual, Strategy)
+    config = expandGekkoStrategyParameters(Individual, Strategy)
     config["watch"] = watch
-    return gekkoWrapper.runBacktest(config, DateRange)
+    result =gekkoWrapper.runBacktest("http://localhost:3000", config, DateRange)
 
-def compressing_flatten_dict(IND, Strategy):
+def expandGekkoStrategyParameters(IND, Strategy):
     config = {}
-    config[Strategy] = {}
-    for key2 in IND.keys():
-        if key2.find(".") != -1:
-            k = key2.split('.')
-            if k[0] not in config[Strategy]:
-                config[Strategy][k[0]] = {}
-            config[Strategy][k[0]][k[1]] = IND[key2]
-            if k[1] == "persistence":
-                config[Strategy][k[0]][k[1]] = int(round(IND[key2]))
-        else:
-            config[Strategy][key2] = IND[key2]
 
+    IND = promoterz.functions.expandNestedParameters(IND)
+
+    config[Strategy] = IND
     return config
 
-def evaluate_random(Strategy, params):
-    watch = settings["watch"]
-    chosenRange = gekkoWrapper.getAvailableDataset(watch)
-    DateRange = gekkoWrapper.getRandomDateRange(chosenRange, deltaDays=settings['deltaDays'])
-    if "candleSize" in StratConfig:
-        # parameter search trade count
-        return EvaluateRaw(watch, DateRange, params, Strategy)["report"]["trades"]
-    else:
-        return Evaluate(watch, DateRange, params, Strategy)
+def evaluate_random(Strategy, parameters):
 
-def gekko_search(**args):
-    params = {}
-    dict_merge(params, args.copy())
+    DateRange = gekkoWrapper.getRandomDateRange(DatasetRange, deltaDays=settings['deltaDays'])
+    params = expandGekkoStrategyParameters(parameters, Strategy)
+
+    return gekkoWrapper.Evaluate(dict, 30, DateRange, params, "http://localhost:3000")
+
+def gekko_search(**parameters):
+
     parallel = settings['parallel']
     num_rounds = settings['num_rounds']
-    if 'candleSize' in params:
-        global candleSize
-        candleSize = int(params['candleSize'])
-        del params["candleSize"]
-    if 'historySize' in params:
-        global historySize
-        historySize = int(params['historySize'])
-        del params["historySize"]
+
+    # remake CS & HS variability;
+    candleSize= settings['candleSize']
+    historySize= settings['historySize']
+
     if parallel:
         p = Pool(mp.cpu_count())
-        param_list = list([(Strategy, params),] * num_rounds)
+        param_list = list([(Strategy, parameters),] * num_rounds)
         scores = p.starmap(evaluate_random, param_list)
         p.close()
         p.join()
     else:
-        scores = [evaluate_random(Strategy, params) for n in range(num_rounds)]
+        scores = [evaluate_random(Strategy, parameters) for n in range(num_rounds)]
+
+    print(scores)
     series = pd.Series(scores)
     mean = series.mean()
     stats.append([series.count(), mean, series.std(), series.min()] +
@@ -120,11 +107,16 @@ def gekko_bayesian(indicator=None):
     print("")
     global Strategy
     Strategy = indicator
+
+    watch = settings["watch"]
+    global DatasetRange
+    DatasetRange = gekkoWrapper.getAvailableDataset(watch)
+
     if indicator == None:
         Strategy = settings['Strategy']
     print("Starting search %s parameters" % Strategy)
-    bo = BayesianOptimization(gekko_search, StratConfig)
-    
+    bo = BayesianOptimization(gekko_search, copy.deepcopy(StratConfig))
+
     # 1st Evaluate
     print("")
     print("Step 1: BayesianOptimization parameter search")
@@ -132,7 +124,7 @@ def gekko_bayesian(indicator=None):
     max_val = bo.res['max']['max_val']
     index = all_val.index(max_val)
     s1 = stats[index]
-    
+
     # 2nd Evaluate
     print("")
     print("Step 2: testing searched parameters on random date")
@@ -143,7 +135,7 @@ def gekko_bayesian(indicator=None):
     print("Starting Second Evaluation")
     gekko_search(**max_params)
     s2 = stats[-1]
-    
+
     # 3rd Evaluate
     print("")
     print("Step 3: testing searched parameters on recent date")
@@ -153,7 +145,7 @@ def gekko_bayesian(indicator=None):
         s3 = 0.
     else:
         s3 = result['report']['relativeProfit']
-    resultjson = compressing_flatten_dict(max_params, Strategy)[Strategy]
+    resultjson = expandGekkoStrategyParameters(max_params, Strategy)[Strategy]
 
     # config.js like output
     percentiles = np.array([0.25, 0.5, 0.75])
@@ -188,7 +180,7 @@ def gekko_bayesian(indicator=None):
         csv_filename = os.path.join(save_dir, filename) + "_bayes.csv"
         json_filename = os.path.join(save_dir, filename) + "_config.json"
         json2_filename = os.path.join(save_dir, filename) + "_response.json"
-        config = compressing_flatten_dict(max_params, Strategy)
+        config = expandGekkoStrategyParameters(max_params, Strategy)
         config["watch"] = watch
         gekko_config = gekkoWrapper.createConfig(config, DateRange)
 
@@ -206,6 +198,6 @@ def gekko_bayesian(indicator=None):
         print("Saved: " + json2_filename)
     if settings["show_chart"]:
         chart.show_candles(result, max_params)
-        
+
     return max_params
 

@@ -55,7 +55,12 @@ def standard_loop(World, locale):
 
         locale.POP_SIZE += locale.POP_SIZE * PRoFIGA
         minps, maxps = World.genconf.POP_SIZE//2, 899
-        locale.POP_SIZE = int(round(max(min(locale.POP_SIZE, maxps), minps)))
+        try:
+            locale.POP_SIZE = int(round(max(min(locale.POP_SIZE, maxps), minps)))
+        except:
+            locale.POP_SIZE = 30
+            M="POP_SIZE PROFIGA ERROR;"
+            print(M)
 
     # --filter best inds;
     locale.population[:] = tools.selBest(locale.population, locale.POP_SIZE)

@@ -29,19 +29,22 @@ T.2 -> $cd [japonicus dir]
        
     
 ```
-If your Gekko UI http port is not :3000, adjust accordingly on gekkoWrapper.py.
+This is written on python because of the nice DEAP module for genetic algorithm, and was worth it. DEAP is available on PIP and required.
 
-Backtesting is parallel. It runs five at a time, or adjust it on Settings.py
+All settings are set at Settings.py;
 
-This is written on python because of the nice DEAP module for genetic algorithm. It's worth it.. available on PIP.
+If your Gekko UI http port is not :3000, adjust it;
+
+Backtesting is parallel, running a pool of five workers, adjustable.
+
 
 The full parallel backtesting is now complete. It sends backtest requests across the internet to several machines running Gekko. 
 Intended to use with Ansible-playbook + Amazon EC2 AWS machines. <br>
-At japonicus side, you should provide Ansible's `hosts` inventory file, containing
+At japonicus side, you should provide Ansible's `hosts` inventory file path (on settings.generations), containing
 the IPs of running machines (a simple list). <br>
-Those machines should be already fully configured, running Gekko, and loaded with the same candlestick data (history)
+Those machines should be already fully configured, running Gekko, and loaded with the same candlestick history data
 files you have on local Gekko;<br>
-I can't make a tutorial for this yet, anyone interested pm me. An AWS slave machine with same
+I can't make a tutorial for this yet, anyone interested pm me. One AWS slave machine with same
 capacity as local machine can cut EPOCH runningtimes to 66% the original time. Yet very experimental stuff...<br>
 YML playbook file to get gekko running on Amazon AMI Linux is at root folder (set the path to your local gekko history @ line 57); 
 

@@ -24,9 +24,14 @@ def initializeGekko(): # not used yet.
     D = Popen(CMD, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
 def httpPost(URL, data={}):
-    Request = requests.post(URL, json=data)
     try:
+
+        Request = requests.post(URL, json=data)
         Response = json.loads(Request.text)
+
+    except ConnectionRefusedError:
+        print("Error: Gekko comm error! Check your local Gekko instance.")
+        exit()
     except Exception as e:
         print("Error: config failure")
         print(URL)
@@ -93,7 +98,7 @@ def runBacktest(GekkoInstanceUrl, TradeSetting, DateRange, candleSize=10, gekko_
         #print(URL)
         #print(CONFIG)
 
-        # So rare that has no impact;
+        # That fail is so rare that has no impact.. still happens randomly;
         return {'relativeProfit':0, 'market':0, 'trades':0} # fake backtest report
 
 

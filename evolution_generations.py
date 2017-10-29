@@ -17,7 +17,7 @@ from Settings import getSettings
 
 def gekko_generations(settings, GenerationMethod, NB_LOCALE=2):
 
-    GenerationMethod = promoterz.selectRepresentationMethod(GenerationMethod)
+    GenerationMethod = promoterz.functions.selectRepresentationMethod(GenerationMethod)
     EvaluationMethod = promoterz.evaluation.gekko.Evaluate
 
     genconf=getSettings('generations')
@@ -37,10 +37,10 @@ def gekko_generations(settings, GenerationMethod, NB_LOCALE=2):
     Params = promoterz.utils.flattenParameters(TargetParameters)
 
     for k in Params.keys():
-        print( "%s%s%s" % (k, " " * (55-len(k)), Params[k]) )
+        print( "%s%s%s" % (k, " " * (30-len(k)), Params[k]) )
 
     GlobalTools.register('Evaluate', EvaluationMethod,
-                         GlobalTools.constructPhenotype, genconf.candleSize
+                         GlobalTools.constructPhenotype, genconf.candleSize)
 
     availableDataRange = promoterz.evaluation.gekko.getAvailableDataset(
             exchange_source=genconf.dataset_source)

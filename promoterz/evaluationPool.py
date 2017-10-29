@@ -92,12 +92,14 @@ class EvaluationPool():
 
         proportions = [int(round(x)) for x in proportions]
 
-        C = lambda x:random.randrange(0,len(x))
+        pC = lambda x:random.randrange(0,len(x))
+        pB = lambda x: x.index(min(x))
+        pM = lambda x: x.index(max(x))
         while sum(proportions) < nb_simulate:
-            proportions[C(proportions)] +=1
+            proportions[pB(proportions)] +=1
             print('+')
         while sum(proportions) > nb_simulate:
-            proportions[C(proportions)] -=1
+            proportions[pM(proportions)] -=1
             print('-')
         print(proportions)
         assert(sum(proportions) == nb_simulate)

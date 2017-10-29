@@ -11,27 +11,18 @@ from deap import tools
 from deap import algorithms
 
 import numpy as np
-
+from .. import functions
 def constructPhenotype(stratSettings, individue):
     # THIS FUNCTION IS UGLYLY WRITTEN; USE WITH CAUTION;
     # (still works :})
     Strategy = individue.Strategy
     R = lambda V, lim: ((lim[1]-lim[0])/100) * V + lim[0]
     #stratSettings = getSettings()['strategies'][Strategy]
-    Settings = {
-        Strategy:{}
-        }
+
     i=0
-    for K in stratSettings.keys():
-        Value = R(individue[i], stratSettings[K])
-        if '.' in K:
-            K=K.split('.')
-            if not K[0] in list(Settings[Strategy].keys()):
-                Settings[Strategy][K[0]] = {}
-            Settings[Strategy][K[0]][K[1]] = Value
-        else:
-            Settings[Strategy][K] = Value
-        i+=1
+
+    Settings = functions.expandNestedParameters(stratSettings)
+    Settings = {Strategy:Settings}
 
     return Settings
 

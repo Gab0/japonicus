@@ -1,8 +1,12 @@
 #!/bin/python
 from deap import base
 from deap import creator
+from deap import tools
 
-from promoterz import *
+from copy import deepcopy
+import random
+
+from .. import functions
 
 
 getPromoterFromMap = lambda x: [x[z] for z in list(x.keys())]
@@ -28,27 +32,19 @@ def constructPhenotype(stratSettings, chrconf, Individue):
 
                 Settings[ParameterName] = Value
 
-    _Settings = {}
-
-    for K in Settings.keys():
-        if '.' in K:
-            Q = K.split('.')
-            if not Q[0] in _Settings.keys():
-                _Settings[Q[0]] = {}
-            _Settings[Q[0]][Q[1]] = Settings[K]
-        else:
-            _Settings[K] = Settings[K]
-
+    _Settings = functions.expandNestedParameters(Settings)
     Settings = {Individue.Strategy: _Settings}
+
     return Settings
 
 def getToolbox(genconf, Attributes):
     toolbox = base.Toolbox()
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
-    creator.create("Individual", list, fitness=creator.FitnessMax, PromoterMap=None, Strategy=genconf.Strategy)
+    creator.create("Individual", list, fitness=creator.FitnessMax,
+                   PromoterMap=None, Strategy=genconf.Strategy)
 
-    toolbox.register("mate", pachytene)
-    toolbox.register("mutate", mutate)
+    toolbox.register("mate", functions.pachytene)
+    toolbox.register("mutate", functions.mutate)
 
     PromoterMap = initPromoterMap(Attributes)
     toolbox.register("newind", initInd, creator.Individual, PromoterMap, genconf.chromosome)

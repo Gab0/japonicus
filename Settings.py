@@ -36,7 +36,7 @@ def getSettings(specific=None):
         # genetic algorithm settings
         'generations': { 
             'POP_SIZE': 30, # Initial population size, per locale 
-            'NBEPOCH': 800, # number of epochs to run
+            'NBEPOCH': 500, # number of epochs to run
             'deltaDays': 21, # time window size on days of candlesticks for each evaluation
             'cxpb': 0.2, # Probabilty of crossover 
             'mutpb': 0.8,# Probability of mutation;
@@ -74,6 +74,8 @@ def getSettings(specific=None):
             'Strategy': 'PPO',
             'show_chart': False,
             'save': True,
+            'candleSize': 30,
+            'historySize': 10,
             'watch':{
                 "exchange": "poloniex",
                 "currency": 'USDT',
