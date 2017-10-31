@@ -12,6 +12,7 @@ from deap import algorithms
 
 import numpy as np
 from .. import functions
+
 def constructPhenotype(stratSettings, individue):
     # THIS FUNCTION IS UGLYLY WRITTEN; USE WITH CAUTION;
     # (still works :})
