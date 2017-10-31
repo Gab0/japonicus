@@ -19,12 +19,16 @@ def constructPhenotype(stratSettings, individue):
     R = lambda V, lim: ((lim[1]-lim[0])/100) * V + lim[0]
     #stratSettings = getSettings()['strategies'][Strategy]
 
-    i=0
+    Keys = sorted(list(stratSettings.keys()))
+    Phenotype = {}
+    for K in range(len(Keys)):
+        Value = R(individue[K], stratSettings[Keys[K]])
+        Phenotype[Keys[K]] = Value
 
-    Settings = functions.expandNestedParameters(stratSettings)
-    Settings = {Strategy:Settings}
+    Phenotype = functions.expandNestedParameters(Phenotype)
+    Phenotype = {Strategy:Phenotype}
 
-    return Settings
+    return Phenotype
 
 
 def createRandomVarList(SZ=10):
