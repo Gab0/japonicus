@@ -51,7 +51,9 @@ class EvaluationPool():
         TimedOut=[]
         for A in range(len(results)):
             try:
-                timeout = 18 if A else 50 # no timeout for local machine;
+                perindTime = 3 * self.lasttimesperind[A] if self.lasttimesperind[A] else 12
+
+                timeout = perindTime*len(props[A]) if A else None # no timeout for local machine;
                 results[A] = results[A].get(timeout=timeout)
             except TimeoutError: # Timeout: remote machine is dead, et al
                 print("Machine timeouts!")
@@ -95,6 +97,7 @@ class EvaluationPool():
         pC = lambda x:random.randrange(0,len(x))
         pB = lambda x: x.index(min(x))
         pM = lambda x: x.index(max(x))
+
         while sum(proportions) < nb_simulate:
             proportions[pB(proportions)] +=1
             print('+')

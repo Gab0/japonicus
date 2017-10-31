@@ -28,7 +28,7 @@ parser.add_option('-w', '--web', dest='spawn_web',
                   action='store_true', default=False)
 parser.add_option('--repeat <x>', dest='repeater',
                   type=int, default=1)
-parser.add_option('--strat <strat>', dest='strategy')
+parser.add_option('--strat <strat>', dest='strategy', default=None)
 
 options, args = parser.parse_args()
 
@@ -57,24 +57,24 @@ if options.spawn_web:
 
    sleep(2)
 markzero_time = datetime.datetime.now()
+
 if options.genetic_algorithm:
    GenerationMethod = 'chromosome' if options.chromosome_mode else 'oldschool'
-   if strat == None:
-      strat = settings['generations']['Strategy']
+
+
    for s in range(options.repeater):
-      settings_ = getSettings('')
-      gekko_generations(settings_, GenerationMethod)
+      gekko_generations(options.strategy, GenerationMethod)
 
 elif options.bayesian_optimization:
     import evolution_bayes
-    if strat == None:
-       strat = settings['bayesian']['Strategy']
+    if options.strat:
+       settings['bayesian']['Strategy'] = strat
     for s in range(options.repeater):
        evolution_bayes.gekko_bayesian(strat)
-       
+
 deltatime = datetime.datetime.now() - markzero_time
 print("Running took %i seconds." % deltatime.seconds)
-   
+
 if options.spawn_web:
     print('Statistics info server still runs...')
 

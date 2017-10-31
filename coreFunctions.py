@@ -35,7 +35,7 @@ def pasteSettingsToUI(Settings):
     Settings = Settings[Strat]
     Settingskeys = Settings.keys()
     Settingskeys = sorted(list(Settingskeys),
-                          key= lambda x: type(Settings[x]) ==dict, reverse=False)
+                          key= lambda x: type(Settings[x]) == dict, reverse=False)
     for W in Settingskeys:
         Q = Settings[W]
         if type(Q) == dict:

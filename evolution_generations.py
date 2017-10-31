@@ -15,13 +15,14 @@ from deap import base
 
 from Settings import getSettings
 
-def gekko_generations(settings, GenerationMethod, NB_LOCALE=2):
+def gekko_generations(RuntimeDefinedStrategy, GenerationMethod, NB_LOCALE=2):
 
     GenerationMethod = promoterz.functions.selectRepresentationMethod(GenerationMethod)
     EvaluationMethod = promoterz.evaluation.gekko.Evaluate
 
     genconf=getSettings('generations')
     globalconf = getSettings('Global')
+    genconf.Strategy = RuntimeDefinedStrategy if RuntimeDefinedStrategy else genconf.Strategy
     TargetParameters=getSettings()['strategies'][genconf.Strategy]
     GlobalTools = GenerationMethod.getToolbox(genconf, TargetParameters)
 
