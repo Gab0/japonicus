@@ -20,11 +20,11 @@ def constructPhenotype(stratSettings, individue):
     R = lambda V, lim: ((lim[1]-lim[0])/100) * V + lim[0]
     #stratSettings = getSettings()['strategies'][Strategy]
 
-    Keys = sorted(list(stratSettings.keys()))
+    AttributeNames = sorted(list(stratSettings.keys()))
     Phenotype = {}
-    for K in range(len(Keys)):
-        Value = R(individue[K], stratSettings[Keys[K]])
-        Phenotype[Keys[K]] = Value
+    for K in range(len(AttributeNames)):
+        Value = R(individue[K], stratSettings[AttributeNames[K]])
+        Phenotype[AttributeNames[K]] = Value
 
     Phenotype = functions.expandNestedParameters(Phenotype)
     Phenotype = {Strategy:Phenotype}

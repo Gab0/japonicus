@@ -10,7 +10,7 @@ from urllib import request, parse
 import json
 import requests
 import datetime
-
+import os
 
 gekkoDIR = 'TBD'
 
@@ -77,13 +77,13 @@ def getAvailableDataset(exchange_source=None):
 
 def loadHostsFile(HostsFilePath):
     remoteGekkos=[]
-    H = open(HostsFilePath).read().split('\n')
-    for W in H:
-        if W and not '=' in W and not '[' in W:
-            remoteGekkos.append("http://%s:3000" % W)
+    if os.path.isfile(HostsFilePath):
+        H = open(HostsFilePath).read().split('\n')
+        for W in H:
+            if W and not '=' in W and not '[' in W:
+                remoteGekkos.append("http://%s:3000" % W)
+
     return remoteGekkos
-
-
 
 def runBacktest(GekkoInstanceUrl, TradeSetting, DateRange, candleSize=10, gekko_config=None):
     gekko_config = createConfig(TradeSetting, DateRange, candleSize, gekko_config)

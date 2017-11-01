@@ -57,7 +57,8 @@ if options.spawn_web:
 
    sleep(2)
 markzero_time = datetime.datetime.now()
-
+print("The profits reported here are in relation to market price change;\n"+\
+      "\ti.e shown profit = { backtest profit } - { market profit in evaluated candlestick period };")
 if options.genetic_algorithm:
    GenerationMethod = 'chromosome' if options.chromosome_mode else 'oldschool'
 
