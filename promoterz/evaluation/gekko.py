@@ -1,6 +1,6 @@
 #!/bin/python
 
-from subprocess import run
+#from subprocess import run
 from subprocess import Popen, PIPE
 import random
 from copy import deepcopy
@@ -11,6 +11,8 @@ import json
 import requests
 import datetime
 import os
+
+from Settings import getSettings
 
 gekkoDIR = 'TBD'
 
@@ -41,7 +43,9 @@ def httpPost(URL, data={}):
     return Response
     
 def getAllScanset():
-    URL = 'http://localhost:3000/api/scansets'
+    globalconf = getSettings('Global')
+    base = random.choice(globalconf.GekkoURLs)
+    URL = base + '/api/scansets'
 
     RESP = httpPost(URL)
 
@@ -218,7 +222,10 @@ def createConfig(TradeSetting, DateRange, candleSize=10, gekko_config=None):
 
 
 def getCandles(DateRange, size=100):
-    URL = "http://localhost:3000/api/getCandles"
+    globalconf = getSettings('Global')
+    base = random.choice(globalconf.GekkoURLs)
+
+    URL = base + "/api/getCandles"
     CONFIG = {
         "watch": {
             "exchange": "poloniex",
