@@ -44,7 +44,7 @@ def pasteSettingsToUI(Settings):
                 text.append(toParameter(Z, Q[Z]))
             text.append('')
         else:
-            text.append((W, Q))
+            text.append("%s = %s" % (W, Q))
     return '\n'.join(text)
 
 def loadGekkoConfig():
