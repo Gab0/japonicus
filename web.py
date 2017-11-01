@@ -160,7 +160,7 @@ def run_server():
 
     # Run the Dash app
     if __name__ == '__main__':
-        app.server.run(debug=True)
+        app.server.run(debug=True, host='0.0.0.0')
 
     else: # this way it integrates with main interface without child procs across pipes,
         return app

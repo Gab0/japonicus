@@ -52,7 +52,7 @@ if options.spawn_web:
    #web_server = Popen(web_args, stdin=PIPE, stdout=PIPE)
    print("WEBSERVER MODE")
    APP = web.run_server()
-   P = Thread(target=APP.server.run, kwargs={'debug':False})
+   P = Thread(target=APP.server.run, kwargs={'debug':False, 'host':'0.0.0.0'})
    P.start()
 
    sleep(2)
