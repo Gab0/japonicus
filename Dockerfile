@@ -1,17 +1,24 @@
-FROM gekko:latest
+FROM python:3
 # builds on top of Gekko's docker image, so build it, named gekko ;
 
 ENV LANG en_US.UTF-8
 
 # install dependencies;
 RUN apt-get update -y
-RUN apt-get install git python3-pip python3 pandoc -y
+RUN apt-get install pandoc -y
 
-RUN pip3 install --upgrade
-RUN pip3 install pypandoc
+RUN pip install --upgrade
+RUN pip install pypandoc
+
+COPY ./requirements.txt /opt/japonicus/requirements.txt
+RUN pip install -r /opt/japonicus/requirements.txt
+
+WORKDIR /opt/japonicus/
 
 COPY . /opt/japonicus
-RUN pip3 install -r /opt/japonicus/requirements.txt
 
+EXPOSE 5000
 
-ENTRYPOINT "/bin/bash"
+RUN python3 --version
+
+CMD ["python3", "/opt/japonicus/japonicus.py", "-g", "-w"]
