@@ -56,14 +56,13 @@ def getToolbox(genconf, Attributes):
 def initPromoterMap(ParameterRanges):
     PRK = list(ParameterRanges.keys())
 
+    Promoters = [ x for x in PRK ]
+    space = list(range(120,210))
+    random.shuffle(space)
 
-    Promoters = [x for x in PRK]
-    PromoterMap = {}
-    for W in Promoters:
-        promoter = None
-        while not promoter or promoter in PromoterMap:
-            promoter = random.randrange(120, 210)
-        PromoterMap[W] = promoter
+    PromoterValues = [ space.pop() for x in Promoters ]
+    PromoterMap = dict(zip(Promoters, PromoterValues))
+
 
     print(ParameterRanges)
     print(PromoterMap)

@@ -12,7 +12,7 @@ or
 $node web/server.js
 
 T.2 -> $cd [japonicus dir]
-       $python japonicus.py [-g|-b] [-c] [-k] [--repeat <X>] [--strat <Strategy>] [-w]
+       $python japonicus.py [-g|-b] [-c] [-k] [--repeat <X>] [ [-r|--strat <Strategy>] [-w]
 
     -g for genetic algorithm;
     -b for bayesian optimization;
@@ -20,8 +20,10 @@ T.2 -> $cd [japonicus dir]
     -c to use an alternative, experimental (probably weaker) genetic algorithm;
 
     -k launches a child gekko instance, so no need for the first terminal;
-
+    
+    -r run with random strategy
     --strat choose one strat to run [deprecated, set it on Settings.py];
+    
     --repeat to run genetic algorithm X times; then just check evolution.log;
 
     -w launches a neat dash/flask web server @ your local machine, which can be accessed via  webbrowser.

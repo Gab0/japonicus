@@ -22,16 +22,12 @@ def getSettings(specific=None):
     s = {
         'Global': {
             'gekkoPath': os.getenv("HOME")+'/gekko1',
-            'Strategies': ['DEMA', 'MACD', 'PPO', 'RSI', 'StochRSI', 'TSI'],
             'configFilename': 'example-config.js',
             'save_dir': "output",
             'log_name': 'evolution_gen.csv',
             'RemoteAWS': '../AmazonSetup/hosts', # Hosts list of remote machines running gekko, to distribute evaluation load; BETA.
                                                 # option values: path to HOSTS file list OR False;
             'GekkoURLs': ['http://localhost:3000']
-
-
-
         },
         # genetic algorithm settings
         'generations': { 
@@ -167,6 +163,23 @@ def getSettings(specific=None):
                            "thresholds.high": (45,140), # trend thresholds
                            "thresholds.persistence": (0,4), # trend duration(count up by tick) thresholds
                      },
+            "MRBB": {
+                "short": (3, 12),
+                "long": (12, 32),
+                "signal": (6, 23),
+                "interval": (7, 23),
+                "crosspersistence": (7, 30),
+                "macdhigh": (30,70),
+                "macdlow": (1,35),
+                "rsihigh": (30,70),
+                "rsilow": (1,35),
+                "bbands.TimePeriod": (16,22),
+                "bbands.NbDevUp": (1,3),
+                "bbands.NbDevDn": (1,3),
+                "bbands.MAType": (1,3)
+
+	        }
+            
         }
     }
 

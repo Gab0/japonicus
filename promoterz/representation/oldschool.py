@@ -32,14 +32,15 @@ def constructPhenotype(stratSettings, individue):
     return Phenotype
 
 
-def createRandomVarList(SZ=10):
-    VAR_LIST = [random.randrange(0,100) for x in range(SZ)]
+def createRandomVarList(IndSize):
+    VAR_LIST = [random.randrange(0,100) for x in range(IndSize)]
     return VAR_LIST
 
 
-def initInd(Criterion):
+def initInd(Criterion, Attributes):
     w = Criterion()
-    w[:] = createRandomVarList()
+    IndSize =len(list(Attributes.keys()))
+    w[:] = createRandomVarList(IndSize)
     return w
 
 
@@ -48,7 +49,7 @@ def getToolbox(genconf, Attributes):
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list,
                    fitness=creator.FitnessMax, Strategy=genconf.Strategy)
-    toolbox.register("newind", initInd, creator.Individual)
+    toolbox.register("newind", initInd, creator.Individual, Attributes)
 
     toolbox.register("population", tools.initRepeat, list,  toolbox.newind)
 

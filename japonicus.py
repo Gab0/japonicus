@@ -7,6 +7,7 @@ from subprocess import Popen, PIPE
 from threading import Thread
 from Settings import getSettings
 from evolution_generations import gekko_generations
+
 import datetime
 from os import chdir, path
 chdir(path.dirname(path.realpath(__file__)))
@@ -23,6 +24,8 @@ parser.add_option('-c', '--chromosome', dest='chromosome_mode',
 parser.add_option('-b', '--bayesian', dest='bayesian_optimization',
                   action='store_true', default=False)
 parser.add_option('-k', '--gekko', dest='spawn_gekko',
+                  action='store_true', default=False),
+parser.add_option('-r', '--random', dest='random_strategy',
                   action='store_true', default=False)
 parser.add_option('-w', '--web', dest='spawn_web',
                   action='store_true', default=False)
@@ -34,9 +37,6 @@ options, args = parser.parse_args()
 
 gekko_server = None
 web_server = None
-strat = choice(settings['global']['Strategies'])\
-        if options.strategy == 'all'\
-        else options.strategy
 
 if options.spawn_gekko:
    if options.genetic_algorithm or options.bayesian_optimization:
@@ -56,22 +56,28 @@ if options.spawn_web:
    P.start()
 
    sleep(2)
+
 markzero_time = datetime.datetime.now()
 print("The profits reported here are in relation to market price change;\n"+\
       "\ti.e shown profit = { backtest profit } - { market profit in evaluated candlestick period };")
+
 if options.genetic_algorithm:
    GenerationMethod = 'chromosome' if options.chromosome_mode else 'oldschool'
 
+   if options.random_strategy:
+      Strategy = choice(list(settings['strategies'].keys()))
+   else:
+      Strategy = options.strategy
 
    for s in range(options.repeater):
-      gekko_generations(options.strategy, GenerationMethod)
+      gekko_generations(Strategy, GenerationMethod)
 
 elif options.bayesian_optimization:
-    import evolution_bayes
-    if options.strat:
-       settings['bayesian']['Strategy'] = strat
-    for s in range(options.repeater):
-       evolution_bayes.gekko_bayesian(strat)
+   import evolutio_bayes
+   if options.strat:
+      settings['bayesian']['Strategy'] = options.strat
+   for s in range(options.repeater):
+      evolution_bayes.gekko_bayesian(strat)
 
 deltatime = datetime.datetime.now() - markzero_time
 print("Running took %i seconds." % deltatime.seconds)
