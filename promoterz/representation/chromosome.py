@@ -64,8 +64,8 @@ def initPromoterMap(ParameterRanges):
     PromoterMap = dict(zip(Promoters, PromoterValues))
 
 
-    print(ParameterRanges)
-    print(PromoterMap)
+    #print(ParameterRanges)
+    #print(PromoterMap)
     assert(len(PRK) == len(list(PromoterMap.keys())))
     return PromoterMap
 

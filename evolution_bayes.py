@@ -63,7 +63,7 @@ def evaluate_random(Strategy, parameters):
     DateRange = gekkoWrapper.getRandomDateRange(DatasetRange, deltaDays=settings['deltaDays'])
     params = expandGekkoStrategyParameters(parameters, Strategy)
 
-    return gekkoWrapper.Evaluate(dict, 30, DateRange, params, "http://localhost:3000")
+    return gekkoWrapper.Evaluate(dict, 30, DateRange, params, "http://localhost:3000")[0]
 
 def gekko_search(**parameters):
 
@@ -83,7 +83,6 @@ def gekko_search(**parameters):
     else:
         scores = [evaluate_random(Strategy, parameters) for n in range(num_rounds)]
 
-    print(scores)
     series = pd.Series(scores)
     mean = series.mean()
     stats.append([series.count(), mean, series.std(), series.min()] +

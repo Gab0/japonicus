@@ -17,7 +17,8 @@ import Settings
 gsettings = Settings.getSettings()['Global']
 settings = Settings.getSettings()['bayesian']
 
-def load_evolution_logs(filename="evolution_gen.csv"):
+def load_evolution_logs(filename="evolution_gen_Locale1.csv"):
+    FileList = os.listdir(gsettings["save_dir"])
     columns = ['id', 'avg', 'std', 'min', 'max', 'dateRange']
     filename = os.path.join(gsettings["save_dir"], filename)
     df = pd.read_csv(filename, names=columns)

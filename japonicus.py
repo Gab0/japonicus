@@ -73,11 +73,10 @@ if options.genetic_algorithm:
       gekko_generations(Strategy, GenerationMethod)
 
 elif options.bayesian_optimization:
-   import evolutio_bayes
-   if options.strat:
-      settings['bayesian']['Strategy'] = options.strat
+   import evolution_bayes
+
    for s in range(options.repeater):
-      evolution_bayes.gekko_bayesian(strat)
+      evolution_bayes.gekko_bayesian(options.strategy)
 
 deltatime = datetime.datetime.now() - markzero_time
 print("Running took %i seconds." % deltatime.seconds)

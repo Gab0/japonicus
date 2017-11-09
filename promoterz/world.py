@@ -18,7 +18,8 @@ class World():
         self.genconf=genconf
         self.EnvironmentParameters=EnvironmentParameters
         self.runEPOCH = partial(world_EPOCH, self)
-        self.parallel = promoterz.evaluationPool.EvaluationPool(self.tools.Evaluate, globalconf.GekkoURLs, 4)
+        self.parallel = promoterz.evaluationPool.EvaluationPool(self.tools.Evaluate,
+                                                                globalconf.GekkoURLs, 4)
 
         for l in range(NB_LOCALE):
             self.generateLocale()

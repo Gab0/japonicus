@@ -114,7 +114,7 @@ def getSettings(specific=None):
             "varPPO":{ # TODO: merge PPO config
                 #"candleSize":(1,60), # tick per day
                 #"historySize":(1,60), # required history
-                "short": (6,18), # short EMA
+                    "short": (6,18), # short EMA
                 "long": (13,39), # long EMA
                 "signal": (1,18), # 100 * (shortEMA - longEMA / longEMA)
                 "thresholds.down": (-0.5,0.), # trend thresholds
@@ -123,7 +123,7 @@ def getSettings(specific=None):
                 "momentum": (0, 2.99999), # index of ["RSI", "TSI", "UO"]
                            # new threshold is default threshold + PPOhist * PPOweight
                 "weightLow": (60, 180),
-                "weightHigh": (-60, -180),
+                "weightHigh": (-180, -60),
                     },
                     "RSI":{
                            #"candleSize":(1,60), # tick per day
@@ -146,7 +146,7 @@ def getSettings(specific=None):
                            #"historySize":(1,60), # required history
                            "consistant": (7,21), # constant multiplier. 0.015 gets to around 70% fit
                            "history": (45,135), # history size, make same or smaller than history
-                           "thresholds.down": (-50,-150), # trend thresholds
+                           "thresholds.down": (-150,-50), # trend thresholds
                            "thresholds.up": (50,150), # trend thresholds
                            "thresholds.persistence": (4,10), # trend duration(count up by tick) thresholds
                     },

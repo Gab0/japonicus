@@ -56,10 +56,9 @@ class Locale():
         Stats['size'] = len(self.population)
         self.EvolutionStatistics[self.EPOCH] = Stats
 
-        LOGPATH ="output/evolution_gen.csv"
+        LOGPATH ="output/evolution_gen_%s.csv" % self.name
         promoterz.statistics.write_evolution_logs(self.EPOCH,
                                               Stats, LOGPATH)
-
 
     def showStats(self, nb_evaluated,elder):
         # show information;
