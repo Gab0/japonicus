@@ -65,7 +65,11 @@ if options.genetic_algorithm:
    GenerationMethod = 'chromosome' if options.chromosome_mode else 'oldschool'
 
    if options.random_strategy:
-      Strategy = choice(list(settings['strategies'].keys()))
+      Strategy = ""
+      while Strategy+'.js' not in os.listdir(settings['Global']['gekkoPath']+'/strategies'):
+         if Strategy:
+            print("Strategy %s descripted on settings but not found on strat folder." % Strategy)
+         Strategy = choice(list(settings['strategies'].keys()))
    else:
       Strategy = options.strategy
 

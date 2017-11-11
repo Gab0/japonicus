@@ -21,7 +21,7 @@ class _settings:
 def getSettings(specific=None):
     s = {
         'Global': {
-            'gekkoPath': os.getenv("HOME")+'/gekko1',
+            'gekkoPath': os.getenv("HOME")+'/Gekko',
             'configFilename': 'example-config.js',
             'save_dir': "output",
             'log_name': 'evolution_gen.csv',
