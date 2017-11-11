@@ -81,6 +81,19 @@ def getSettings(specific=None):
         'strategies': {
             # Define range of values for strat settings;
             #for all evolution methods;
+            "PPOTSI":{
+            "PPO.short": (3,12),
+            "PPO.long": (15,35),
+            "PPO.signal":(3,18),
+            "PPO.up": (0., 0.5),
+            "PPO.down": (-0.5, 0.),
+            "TSI.up": (15,35),
+            "TSI.down": (-35,-15),
+            "TSI.short": (3,12),
+            "TSI.long": (15,35),
+            "persistence": (1,5)
+                    },
+                
             "DEMA":{
                 #"candleSize":(1,60), # tick per day
                 #"historySize":(1,60),
@@ -169,9 +182,9 @@ def getSettings(specific=None):
                 "signal": (6, 23),
                 "interval": (7, 23),
                 "crosspersistence": (7, 30),
-                "macdhigh": (30,70),
-                "macdlow": (1,35),
-                "rsihigh": (30,70),
+                "macdhigh": (0.1,0.6),
+                "macdlow": (-0.6,-0.1),
+                "rsihigh": (30,100),
                 "rsilow": (1,35),
                 "bbands.TimePeriod": (16,22),
                 "bbands.NbDevUp": (1,3),

@@ -13,19 +13,21 @@ def checkPhenotypeParameterIntegrity(TargetParameters, phenotype):
             return w
     return None
 
-def checkPhenotypeAttributeRanges(TargetParameters, phenotype):
+def checkPhenotypeAttributeRanges(TargetParameters, phenotype, tolerance=0.3):
     cmp = [TargetParameters, phenotype]
     cmp = [flattenParameters(x) for x in cmp]
 
     for K in cmp[0].keys():
-        higher = cmp[1][K] > cmp[0][K][1]
-        lower = cmp[1][K] < cmp[0][K][0]
+        high_bound = cmp[0][K][1] + (tolerance * abs(cmp[0][K][1]))
+        low_bound = cmp[0][K][0]  - (tolerance * abs(cmp[0][K][0]))
+        higher = cmp[1][K] > high_bound
+        lower = cmp[1][K] < low_bound
         if higher or lower:
-            return K
+            return "%f %s %f" % (low_bound, K, high_bound)
     return None
 
 def validatePopulation(IndividualToSettings, TargetParameters, population):
-    ErrMsg = "--destroying invalid citizen; {ErrType} on {ErrParameter}--"
+    ErrMsg = "--destroying invalid citizen--\n\t({ErrType} on {ErrParameter})\n"
     for p in range(len(population)):
         phenotype=IndividualToSettings(population[p])
 

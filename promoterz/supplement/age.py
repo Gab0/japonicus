@@ -23,6 +23,7 @@ def _checkRetirement(individue, statistics, ageBoundary):
         ABC = ageBoundary[0]
         RSB = statistics['avg'] - statistics['min']
 
+    RSB= max(1,RSB)
     survival = ABC + (N * aptitude / RSB)
 
     #oldenough = individue.Age > ageBoundary[0]

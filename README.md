@@ -8,7 +8,7 @@ Open two terminals;
 
 T.1 -> run Gekko on ui mode, or just its webserver:
 $node gekko.js --ui
-or
+        or
 $node web/server.js
 
 T.2 -> $cd [japonicus dir]
@@ -40,15 +40,6 @@ If your Gekko UI http port is not :3000, adjust it;
 Backtesting is parallel, running a pool of five workers, adjustable.
 
 
-The full parallel backtesting is now complete. It sends backtest requests across the internet to several machines running Gekko.
-Intended to use with Ansible-playbook + Amazon EC2 AWS machines. <br>
-At japonicus side, you should provide Ansible's `hosts` inventory file path (on settings.generations), containing
-the IPs of running machines (a simple list). <br>
-Those machines should be already fully configured, running Gekko, and loaded with the same candlestick history data
-files you have on local Gekko;<br>
-I can't make a tutorial for this yet, anyone interested pm me. One AWS slave machine with same
-capacity as local machine can cut EPOCH runningtimes to 66% the original time. Yet very experimental stuff...<br>
-YML playbook file to get gekko running on Amazon AMI Linux is at root folder (set the path to your local gekko history @ line 57);
 
 
 Known good gekko strategies to run with this (choose @ Settings.py):
@@ -59,6 +50,33 @@ Better avoid those:
 - DEMA
 - MACD
 
+### Remote EC2 Cluster
+
+Japonicus can send backtest requests across the internet to several machines running Gekko.
+This method can greatly cut EPOCH times.
+Intended to use with Ansible-playbook + Amazon EC2 AWS machines. <br>
+At japonicus side, you should provide Ansible's `hosts` inventory file path (on settings.generations), containing
+the IPs of running machines (a simple list). <br>
+Those machines should be already fully configured, running Gekko, and loaded with the same candlestick history data
+files you have on local Gekko;<br>
+YML playbook file to get gekko running on Amazon AMI Linux is at root folder (set the path to your local gekko history @ line 57);
+
+```
+steps to put your GA online on clusters;
+
+1- Create how many EC2 instances you want - spot requests are cheaper;
+
+2- Make sure port 3000 TCP is open on them. This is configurable on security groups.
+    Theres a nice tutorial at https://www.google.com/search?q=amazon+aws+security+groups XD
+    
+3- Find a way to install node and gekko on them. Copy your local gekko/history folder to them;
+(there is a ansible playbook on the repo that can help you cover this steps)
+
+4- Make a list of your remote machine addrs and inform the path to it at Settings.py->Global.GekkoURLs. A hosts file used by ansible can be used as it is.
+
+5- Run japonicus.py in any GA mode;
+
+```
 
 ### Docker Compose
 
@@ -82,3 +100,9 @@ and by setting the `GekkoURLs` config to the container gekko name
 ```
 
 japonicus will choose a random item of the list to fetch candles and scansets.
+
+### Future
+
+Genetic Algorithms are a good way to fetch a good set of settings to run a strategy
+on gekko. But the real gamechanger is the strategy itself. The ideal evolution method
+would be a Genetic Programming that modifies the strat logic itself, we're looking for it;
