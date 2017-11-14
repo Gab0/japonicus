@@ -4,6 +4,7 @@ import promoterz.locale
 import time
 from promoterz.sequence.parallel_world import *
 from functools import partial
+
 class World():
     def __init__(self, GlobalTools, loops, genconf, globalconf,
                  TargetParameters, NB_LOCALE=3, EnvironmentParameters=None):

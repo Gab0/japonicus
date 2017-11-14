@@ -31,6 +31,10 @@ def filterAwayWorst(population, N=5):
     population = tools.selBest(population, aliveSize)
     return population
 
+def filterAwayThreshold(locale, Threshold):
+    locale.population = [ind for ind in locale.population if ind.fitness.values[0] > Threshold]
+    
+
 def evaluatePopulation(locale):
     individues_to_simulate = [ind for ind in locale.population if not ind.fitness.valid]
     fitnesses = locale.World.parallel.starmap(locale.extratools.Evaluate,
@@ -45,6 +49,8 @@ def getLocaleEvolutionToolbox(World, locale):
     toolbox.register("ImmigrateHoF", immigrateHoF, locale.HallOfFame)
     toolbox.register("ImmigrateRandom", immigrateRandom, World.tools.population)
 
+
+    toolbox.register("filterThreshold", filterAwayThreshold, locale)
     toolbox.register('ageZero', promoterz.supplement.age.ageZero)
     toolbox.register('populationAges', promoterz.supplement.age.populationAges,
                      World.genconf.ageBoundaries)

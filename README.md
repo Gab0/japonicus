@@ -2,7 +2,8 @@ This is a barebones implementation of genetic algorithm evolution to develop str
 
 It generates random configs, and evolve them by backtesting on a Gekko session via the REST API of gekko's user interface. Genetic algorithm and bayesian optimization are evolution choices.
 
-Recommended usage:
+### Usage
+
 ```
 Open two terminals;
 
@@ -12,17 +13,18 @@ $node gekko.js --ui
 $node web/server.js
 
 T.2 -> $cd [japonicus dir]
-       $python japonicus.py [-g|-b] [-c] [-k] [--repeat <X>] [ [-r|--strat <Strategy>] [-w]
+       $python japonicus.py [-g|-b] [-c] [-k] [--repeat <X>] [ [-i|-r|--strat <Strategy>] [-w]
 
     -g for genetic algorithm;
     -b for bayesian optimization;
 
-    -c to use an alternative, experimental (probably weaker) genetic algorithm;
+    -c to use an alternative ~experimental genetic algorithm;
 
     -k launches a child gekko instance, so no need for the first terminal;
     
     -r run with random strategy
-    --strat choose one strat to run [deprecated, set it on Settings.py];
+    --strat choose one strat to run;
+    -i Genetic algorithm create strategies on the fly, and run then based on varying indicators;
     
     --repeat to run genetic algorithm X times; then just check evolution.log;
 
@@ -40,17 +42,22 @@ If your Gekko UI http port is not :3000, adjust it;
 Backtesting is parallel, running a pool of five workers, adjustable.
 
 
+### Gekko Strategies
+
+Those strategies present in a fresh clone of gekko are no good, ditch them. 
+With genetic algorithm optimization, those strats can get to a level of profit that is above the market base price change 
+for given period. Even then, that power will be only shown at the dataset it was optimized for, so the settings
+will fail on different candlesticks which include real time trading.
+
+A good thing to do is to create a strategy that combines two indicators, IE you buy when both results are above buying thresolds,
+you sell when both are below selling thresholds. So dual or even triple indicator strategies are a good path to go.
 
 
-Known good gekko strategies to run with this (choose @ Settings.py):
- - PPO
- - RSI
+Known good gekko strategies to run with this:
+ - PPO+TSI strat
 
-Better avoid those:
-- DEMA
-- MACD
 
-### Remote EC2 Cluster
+### Remote Amazon EC2 Cluster
 
 Japonicus can send backtest requests across the internet to several machines running Gekko.
 This method can greatly cut EPOCH times.
@@ -80,7 +87,7 @@ steps to put your GA online on clusters;
 
 ### Docker Compose
 
-You can easily start japonicus by adding the following snippet to gekkos docker-compose file
+You can include japonicus to gekko image by adding the following snippet to gekkos docker-compose file
 
 ```yml
   japonicus:

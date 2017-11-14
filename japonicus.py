@@ -1,6 +1,5 @@
 #!/bin/python
 
-import optparse
 from time import sleep
 from random import choice, randrange
 from subprocess import Popen, PIPE
@@ -9,31 +8,15 @@ from Settings import getSettings
 from evolution_generations import gekko_generations
 
 import datetime
-from os import chdir, path
+from os import chdir, path, listdir
 chdir(path.dirname(path.realpath(__file__)))
 
+from japonicus_options import options, args
 import web
+import promoterz
+
 settings = getSettings()
 #from evolution_bayes import gekko_bayesian
-parser = optparse.OptionParser()
-
-parser.add_option('-g', '--genetic', dest='genetic_algorithm',
-                  action='store_true', default=False)
-parser.add_option('-c', '--chromosome', dest='chromosome_mode',
-                  action='store_true', default=False)
-parser.add_option('-b', '--bayesian', dest='bayesian_optimization',
-                  action='store_true', default=False)
-parser.add_option('-k', '--gekko', dest='spawn_gekko',
-                  action='store_true', default=False),
-parser.add_option('-r', '--random', dest='random_strategy',
-                  action='store_true', default=False)
-parser.add_option('-w', '--web', dest='spawn_web',
-                  action='store_true', default=False)
-parser.add_option('--repeat <x>', dest='repeater',
-                  type=int, default=1)
-parser.add_option('--strat <strat>', dest='strategy', default=None)
-
-options, args = parser.parse_args()
 
 gekko_server = None
 web_server = None
@@ -63,22 +46,43 @@ print("The profits reported here are in relation to market price change;\n"+\
 
 if options.genetic_algorithm:
    GenerationMethod = 'chromosome' if options.chromosome_mode else 'oldschool'
+   if options.indicator_mode:
+      EvaluationMode = 'indicator'
+      AllIndicators = getSettings()['indicators']
+      TargetParameters=  {}
+      for K in AllIndicators.keys():
+         if type(AllIndicators[K]) != dict:
+            TargetParameters[K] = AllIndicators[K]
+         elif AllIndicators[K]['active']:
+            TargetParameters[K] = AllIndicators[K]
+            TargetParameters[K]['active'] = (0,1)
+         else:
+            exit("Bad configIndicators!")
 
-   if options.random_strategy:
-      Strategy = ""
-      while Strategy+'.js' not in os.listdir(settings['Global']['gekkoPath']+'/strategies'):
-         if Strategy:
-            print("Strategy %s descripted on settings but not found on strat folder." % Strategy)
-         Strategy = choice(list(settings['strategies'].keys()))
    else:
-      Strategy = options.strategy
+      if options.random_strategy:
+         Strategy = ""
+         GekkoStrategyFolder = listdir(settings['Global']['gekkoPath']+'/strategies')
+         while Strategy+'.js' not in GekkoStrategyFolder:
+            if Strategy:
+               print("Strategy %s descripted on settings but not found on strat folder."\
+                     % Strategy)
+            Strategy = choice(list(settings['strategies'].keys()))
+            print("> %s" % Strategy)
+
+      elif options.strategy:
+         Strategy = options.strategy
+      else:
+         exit("No strategy specified! Use --strat or go --help")
+      EvaluationMode = Strategy
+      TargetParameters = getSettings()['strategies'][Strategy]
 
    for s in range(options.repeater):
-      gekko_generations(Strategy, GenerationMethod)
+      gekko_generations(TargetParameters, GenerationMethod, EvaluationMode)
 
 elif options.bayesian_optimization:
    import evolution_bayes
-
+   
    for s in range(options.repeater):
       evolution_bayes.gekko_bayesian(options.strategy)
 

@@ -97,10 +97,6 @@ def runBacktest(GekkoInstanceUrl, TradeSetting, DateRange, candleSize=10, gekko_
     if type(result['report']) is bool:
         print("Warning: report not found, probable Gekko fail!")
         print(DateRange)
-        #print(TradeSetting)
-        #print(result)
-        #print(URL)
-        #print(CONFIG)
 
         # That fail is so rare that has no impact.. still happens randomly;
         return {'relativeProfit':0, 'market':0, 'trades':0} # fake backtest report
@@ -252,15 +248,19 @@ def getCandles(DateRange, size=100):
     return RESULT
 
 
-def Evaluate(constructPhenotype, candleSize, DateRange, Individual, GekkoInstanceUrl):
+def Evaluate(candleSize, DateRange, phenotype, GekkoInstanceUrl):
     # IndividualToSettings(IND, STRAT) is a function that depends on GA algorithm,
     # so should be provided;
-    Settings = constructPhenotype(Individual)
+
     #print(Settings)
 
-
-    result = runBacktest(GekkoInstanceUrl, Settings, DateRange, candleSize=candleSize)
-    return (result['relativeProfit']-result['market']),
+    result = [ runBacktest(GekkoInstanceUrl,
+                           phenotype,
+                           DR,
+                           candleSize=candleSize) for DR in DateRange]
+    result = [ R['relativeProfit']-R['market'] for R in result]
+    result = sum(result)/len(result)
+    return result,
 
 def getDateRange(Limits, deltaDays=3):
     DateFormat="%Y-%m-%d %H:%M:%S"

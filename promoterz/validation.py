@@ -27,18 +27,18 @@ def checkPhenotypeAttributeRanges(TargetParameters, phenotype, tolerance=0.3):
     return None
 
 def validatePopulation(IndividualToSettings, TargetParameters, population):
-    ErrMsg = "--destroying invalid citizen--\n\t({ErrType} on {ErrParameter})\n"
+    ErrMsg = "--destroying invalid citizen--\n\t({ErrType} {ErrParameter})\n"
     for p in range(len(population)):
         phenotype=IndividualToSettings(population[p])
 
         Err = checkPhenotypeParameterIntegrity(TargetParameters, phenotype)
         if Err:
-            print(ErrMsg.format(ErrType='bad parameters', ErrParameter=Err))
+            print(ErrMsg.format(ErrType='missing parameter', ErrParameter=Err))
             population[p] = None
             continue
         Err = checkPhenotypeAttributeRanges(TargetParameters, phenotype)
         if Err:
-            print(ErrMsg.format(ErrType=' invalid values', ErrParameter=Err))
+            print(ErrMsg.format(ErrType=' invalid values on', ErrParameter=Err))
             population[p] = None
 
         if not population[p]:

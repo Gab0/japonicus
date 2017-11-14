@@ -7,6 +7,10 @@ from copy import deepcopy
 
 import importlib
 
+def PrepareAndEvaluate(constructPhenotype, evaluationMethod, Individual):
+    phenotype = constructPhenotype(Individual)
+    return evaluationMethod(phenotype)
+
 def selectRepresentationMethod(methodname):
     M = importlib.import_module("promoterz.representation.%s" % methodname)
     return M
@@ -17,9 +21,14 @@ def expandNestedParameters(Parameters):
     for K in Parameters.keys():
         if '.' in K:
             Q = K.split('.')
-            if not Q[0] in _Parameters.keys():
-                _Parameters[Q[0]] = {}
-            _Parameters[Q[0]][Q[1]] = Parameters[K]
+            cursor = 0
+            base = _Parameters
+            while cursor < len(Q)-1:
+                if not Q[cursor] in base.keys():
+                    base[Q[cursor]] = {}
+                base = base[Q[cursor]]
+                cursor +=1
+            base[Q[cursor]] = Parameters[K]
         else:
             _Parameters[K] = Parameters[K]
     return _Parameters

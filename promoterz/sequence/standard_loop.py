@@ -11,7 +11,7 @@ def standard_loop(World, locale):
     # --validate individuals;
     locale.population=promoterz.validation.validatePopulation(
         World.tools.constructPhenotype,
-        {World.genconf.Strategy: World.TargetParameters},
+        World.TargetParameters,
         locale.population)
 
     # --evaluate individuals;
@@ -42,6 +42,9 @@ def standard_loop(World, locale):
     # --remove equal citizens
     locale.population = locale.extratools.populationPD(locale.population)
 
+    # --remove very inapt citizens
+    locale.extratools.filterThreshold(-15)
+    
     # --show stats;
     locale.showStats(nb_evaluated, elder)
 

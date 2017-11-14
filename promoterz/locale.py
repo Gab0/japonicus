@@ -33,9 +33,10 @@ class Locale():
         # --initial population
         self.population = World.tools.population(World.genconf.POP_SIZE)
 
-
-        self.DateRange = promoterz.evaluation.gekko.getRandomDateRange(
+        getDateRange = lambda: promoterz.evaluation.gekko.getRandomDateRange(
             World.EnvironmentParameters, World.genconf.deltaDays)
+        
+        self.DateRange = [ getDateRange() for x in range(3) ]
         #self.extratools.register('Evaluate', World.tools.evaluatePopulation, self.DateRange)
 
         print("-- Initializing %s"% self.name)

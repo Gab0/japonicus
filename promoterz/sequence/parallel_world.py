@@ -29,7 +29,10 @@ def world_EPOCH(World):
     # --APPLY LOCALE DESTRUCTION;
     if random.random() < 0.01:
         World.explodeLocale(random.choice(World.locales))
-
+    for L in range(len(World.locales)):
+        if World.locales[L].EPOCH > 100 and len(World.locales) > 2:
+            World.explodeLocale(World.locales[L])
+            break
     World.EPOCH+=1
     etime = time.time() - stime
     print("Epoch runs in %.2f seconds;" % etime)

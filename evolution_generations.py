@@ -14,34 +14,58 @@ from deap import algorithms
 from deap import base
 
 from Settings import getSettings
+import stratego
+from functools import partial
 
-def gekko_generations(RuntimeDefinedStrategy, GenerationMethod, NB_LOCALE=2):
+# TEMPORARY ASSIGNMENT OF EVAL FUNCTIONS; SO THINGS REMAIN SANE;
+def aEvaluate(constructPhenotype, candleSize, DateRange, Individual, gekkoUrl):
+    phenotype = constructPhenotype(Individual)
+    StratName = stratego.gekko_strategy.createStrategyFile(phenotype)
+    phenotype = {StratName:phenotype}
+    SCORE = promoterz.evaluation.gekko.Evaluate(candleSize,
+                                                DateRange, phenotype, gekkoUrl)
+    return SCORE
+def bEvaluate(constructPhenotype, candleSize, DateRange, Individual, gekkoUrl):
+    phenotype = constructPhenotype(Individual)
+    phenotype = {Individual.Strategy: phenotype}
+    SCORE = promoterz.evaluation.gekko.Evaluate(candleSize,
+                                                DateRange, phenotype, gekkoUrl)
+    return SCORE
+
+
+def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOCALE=2):
 
     GenerationMethod = promoterz.functions.selectRepresentationMethod(GenerationMethod)
-    EvaluationMethod = promoterz.evaluation.gekko.Evaluate
-
     genconf=getSettings('generations')
+    if EvaluationMode == 'indicator':
+        Evaluate = aEvaluate
+        Strategy = None
+    else:
+        Evaluate = bEvaluate
+        Strategy = EvaluationMode
+
     globalconf = getSettings('Global')
-    genconf.Strategy = RuntimeDefinedStrategy if RuntimeDefinedStrategy else genconf.Strategy
-    TargetParameters=getSettings()['strategies'][genconf.Strategy]
-    GlobalTools = GenerationMethod.getToolbox(genconf, TargetParameters)
+    print("Evolving %s strategy;\n" % Strategy)
+
+    print("evaluated parameters ranges:")
+
+    TargetParameters = promoterz.utils.flattenParameters(TargetParameters)
+
+    GlobalTools = GenerationMethod.getToolbox(Strategy, genconf, TargetParameters)
+
 
     RemoteHosts = promoterz.evaluation.gekko.loadHostsFile(globalconf.RemoteAWS)
     globalconf.GekkoURLs+=RemoteHosts
     if RemoteHosts:
         print("Connected Remote Hosts:\n%s" % ('\n').join(RemoteHosts))
 
-    print("Evolving %s strategy;\n" % genconf.Strategy)
 
-    print("evaluated parameters ranges:")
+    for k in TargetParameters.keys():
+        print( "%s%s%s" % (k, " " * (30-len(k)), TargetParameters[k]) )
 
-    Params = promoterz.utils.flattenParameters(TargetParameters)
-
-    for k in Params.keys():
-        print( "%s%s%s" % (k, " " * (30-len(k)), Params[k]) )
-
-    GlobalTools.register('Evaluate', EvaluationMethod,
+    GlobalTools.register('Evaluate', Evaluate,
                          GlobalTools.constructPhenotype, genconf.candleSize)
+
 
     availableDataRange = promoterz.evaluation.gekko.getAvailableDataset(
             exchange_source=genconf.dataset_source)
@@ -51,7 +75,6 @@ def gekko_generations(RuntimeDefinedStrategy, GenerationMethod, NB_LOCALE=2):
 
     print("using candlestick dataset %s to %s" %     (showdatadaterange[0],
                                                       showdatadaterange[1]))
-
 
 
     loops = [ promoterz.sequence.standard_loop.standard_loop ]
@@ -78,11 +101,11 @@ def gekko_generations(RuntimeDefinedStrategy, GenerationMethod, NB_LOCALE=2):
 
         for FinalIndividue in FinalIndividues:
 
-            AssertFitness=coreFunctions.stratSettingsProofOfViability(World,
+            AssertFitness, FinalProfit=coreFunctions.stratSettingsProofOfViability(World,
                                                                       FinalIndividue,
                                                                       ValidationDataset)
             print("Testing Strategy:\n")
-            if AssertFitness[0] or AssertFitness[1] > 50:
+            if AssertFitness or FinalProfit > 50:
                 FinalIndividueSettings = GlobalTools.constructPhenotype(FinalIndividue)
 
                 Show = json.dumps(FinalIndividueSettings, indent=2)

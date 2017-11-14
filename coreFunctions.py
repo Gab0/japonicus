@@ -14,7 +14,7 @@ from Settings import getSettings
 def stratSettingsProofOfViability(World, Individual, GlobalDataset):
     AllProofs = []
     for W in GlobalDataset:
-        q,=World.tools.Evaluate(W, Individual, 'http://localhost:3000')
+        q,=World.tools.Evaluate([W], Individual, 'http://localhost:3000')
         AllProofs.append(q)
         print('Testing monthly profit %.3f' % q)
 
@@ -22,7 +22,7 @@ def stratSettingsProofOfViability(World, Individual, GlobalDataset):
     for W in AllProofs:
         iValue += iValue * (W/100)
     check = [x for x in AllProofs if x > 0]
-    Valid = len(check) == len(AllProofs)
+    Valid = sum(check) == len(check)
     print("Annual profit %.3f%%" % (iValue-100))
     return Valid, iValue
  

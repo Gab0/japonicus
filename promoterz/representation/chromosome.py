@@ -27,21 +27,19 @@ def constructPhenotype(stratSettings, chrconf, Individue):
                 read_window = [ V for V in read_window if type(V) == int and V < 33 ]
                 Value = sum(read_window)
                 ParameterName = PromotersPath[C[BP]]
-
                 Value = R(Value, stratSettings[ParameterName])
 
                 Settings[ParameterName] = Value
 
     _Settings = functions.expandNestedParameters(Settings)
-    Settings = {Individue.Strategy: _Settings}
 
-    return Settings
+    return _Settings
 
-def getToolbox(genconf, Attributes):
+def getToolbox(Strategy, genconf, Attributes):
     toolbox = base.Toolbox()
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMax,
-                   PromoterMap=None, Strategy=genconf.Strategy)
+                   PromoterMap=None, Strategy=Strategy)
 
     toolbox.register("mate", functions.pachytene)
     toolbox.register("mutate", functions.mutate)
@@ -57,7 +55,7 @@ def initPromoterMap(ParameterRanges):
     PRK = list(ParameterRanges.keys())
 
     Promoters = [ x for x in PRK ]
-    space = list(range(120,210))
+    space = list(range(120,240))
     random.shuffle(space)
 
     PromoterValues = [ space.pop() for x in Promoters ]
@@ -65,8 +63,9 @@ def initPromoterMap(ParameterRanges):
 
 
     #print(ParameterRanges)
-    #print(PromoterMap)
+    print(PromoterMap)
     assert(len(PRK) == len(list(PromoterMap.keys())))
+    
     return PromoterMap
 
 def initChromosomes(PromoterMap, chrconf):
@@ -100,11 +99,3 @@ def generateUID():
     UID = ''.join(random.choices(Chars), k=6)
     return UID
 
-def getIndividueMap():
-    IndividueMap = {
-        'high': generateUID(),
-        'low': generateUID(),
-        'persistence': generateUID()
-        }
-
-    return IndividueMap

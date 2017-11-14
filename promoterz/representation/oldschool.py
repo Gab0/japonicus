@@ -16,9 +16,9 @@ from .. import functions
 def constructPhenotype(stratSettings, individue):
     # THIS FUNCTION IS UGLYLY WRITTEN; USE WITH CAUTION;
     # (still works :})
+
     Strategy = individue.Strategy
     R = lambda V, lim: ((lim[1]-lim[0])/100) * V + lim[0]
-    #stratSettings = getSettings()['strategies'][Strategy]
 
     AttributeNames = sorted(list(stratSettings.keys()))
     Phenotype = {}
@@ -27,7 +27,6 @@ def constructPhenotype(stratSettings, individue):
         Phenotype[AttributeNames[K]] = Value
 
     Phenotype = functions.expandNestedParameters(Phenotype)
-    Phenotype = {Strategy:Phenotype}
 
     return Phenotype
 
@@ -44,11 +43,11 @@ def initInd(Criterion, Attributes):
     return w
 
 
-def getToolbox(genconf, Attributes):
+def getToolbox(Strategy, genconf, Attributes):
     toolbox = base.Toolbox()
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list,
-                   fitness=creator.FitnessMax, Strategy=genconf.Strategy)
+                   fitness=creator.FitnessMax, Strategy=Strategy)
     toolbox.register("newind", initInd, creator.Individual, Attributes)
 
     toolbox.register("population", tools.initRepeat, list,  toolbox.newind)
