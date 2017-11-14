@@ -6,7 +6,7 @@ gekkoStratFolder = "/home/gabs/Gekko/strategies/"
 
 AllowedIndicators = ["PPO", "DEMA", "LRC", "RSI"]
 
-stdResult = ["> thresholds.up", "< thresholds.down"]
+stdResult = ["> this.settings.{i}.thresholds.up", "< this.settings.{i}.thresholds.down"]
 IndicatorResults = {"PPO": {"PPOhist": stdResult },
            "DEMA": {"result": stdResult},
            "RSI": {"result": stdResult},
@@ -25,7 +25,7 @@ AllowedIndicators = [ x for x in AllowedIndicators if x ]
 
 addIndicatorText = lambda name: "this.addIndicator('{i}', '{I}', this.settings.{I});".format(i=name.lower(),
                                                                            I=name.upper())
-simplifyIndicators = lambda name: "var {I} = this.indicators.{I}"
+simplifyIndicators = lambda name: "var {I} = this.indicators.{i}".format(i=name.lower(), I=name.upper())
 
 def createStrategyFile(phenotype):
     BASE = open("stratego/base_strategy.js").read()
@@ -39,19 +39,19 @@ def createStrategyFile(phenotype):
     BASE = BASE.replace("//ADD_INDICATORS;", ('\n'.join(InitIndicators)))
 
     SimplifyIndicators = [ simplifyIndicators(ind) for ind in Indicators ]
-    BASE = BASE.replace("//SIMPLIFY_RESULTS;", ('\n'.join(SimplifyIndicators)))
+    BASE = BASE.replace("//SIMPLIFY_INDICATORS;", ('\n'.join(SimplifyIndicators)))
 
     BuyConditions = []
     SellConditions = []
     for ind in Indicators:
         for condition in IndicatorResults[ind].keys():
-            Bc = "%s.%s %s" % (ind, condition, IndicatorResults[ind][condition][0])
-            Sc = "%s.%s %s" % (ind, condition, IndicatorResults[ind][condition][1])
+            Bc = "%s.%s %s" % (ind, condition, IndicatorResults[ind][condition][0].format(i=ind))
+            Sc = "%s.%s %s" % (ind, condition, IndicatorResults[ind][condition][1].format(i=ind))
             BuyConditions.append(Bc)
             SellConditions.append(Sc)
 
-    BASE = BASE.replace("//BUYCONDITIONS;", "var BuyConditions = " + str(BuyConditions))
-    BASE = BASE.replace("//SELLCONDITIONS;", "var SellConditions = " + str(SellConditions))
+    BASE = BASE.replace("//BUYCONDITIONS;", "var BuyConditions = [%s];" % ','.join(BuyConditions))
+    BASE = BASE.replace("//SELLCONDITIONS;", "var SellConditions = [%s];" % ','.join(SellConditions))
 
     StrategyFileName = 'j' + ''.join(sorted(Indicators))
     FILE = open(gekkoStratFolder + StrategyFileName+'.js', 'w')
