@@ -14,12 +14,19 @@ chdir(path.dirname(path.realpath(__file__)))
 from japonicus_options import options, args
 import web
 import promoterz
-
+from version import VERSION
 settings = getSettings()
 #from evolution_bayes import gekko_bayesian
 
 gekko_server = None
 web_server = None
+TITLE ="""\tGEKKO
+     ██╗ █████╗ ██████╗  ██████╗ ███╗   ██╗██╗ ██████╗██╗   ██╗███████╗
+     ██║██╔══██╗██╔══██╗██╔═══██╗████╗  ██║██║██╔════╝██║   ██║██╔════╝
+     ██║███████║██████╔╝██║   ██║██╔██╗ ██║██║██║     ██║   ██║███████╗
+██   ██║██╔══██║██╔═══╝ ██║   ██║██║╚██╗██║██║██║     ██║   ██║╚════██║
+╚█████╔╝██║  ██║██║     ╚██████╔╝██║ ╚████║██║╚██████╗╚██████╔╝███████║
+ ╚════╝ ╚═╝  ╚═╝╚═╝      ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═════╝ ╚══════╝"""
 
 if options.spawn_gekko:
    if options.genetic_algorithm or options.bayesian_optimization:
@@ -41,8 +48,13 @@ if options.spawn_web:
    sleep(2)
 
 markzero_time = datetime.datetime.now()
-print("The profits reported here are in relation to market price change;\n"+\
-      "\ti.e shown profit = { backtest profit } - { market profit in evaluated candlestick period };")
+
+print(TITLE)
+print('\t' * 8 + 'v%.2f' % VERSION)
+print()
+print("The profits reported here are the profit beyond market price change;\n"+\
+      "\ti.e. shown profit =  <backtest profit> - <market profit in evaluated candlestick period>;")
+
 
 if options.genetic_algorithm:
    GenerationMethod = 'chromosome' if options.chromosome_mode else 'oldschool'
@@ -56,8 +68,8 @@ if options.genetic_algorithm:
          elif AllIndicators[K]['active']:
             TargetParameters[K] = AllIndicators[K]
             TargetParameters[K]['active'] = (0,1)
-         else:
-            exit("Bad configIndicators!")
+      if not TargetParameters:
+         exit("Bad configIndicators!")
 
    else:
       if options.random_strategy:

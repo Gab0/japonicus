@@ -63,9 +63,9 @@ def initPromoterMap(ParameterRanges):
 
 
     #print(ParameterRanges)
-    print(PromoterMap)
+
     assert(len(PRK) == len(list(PromoterMap.keys())))
-    
+
     return PromoterMap
 
 def initChromosomes(PromoterMap, chrconf):

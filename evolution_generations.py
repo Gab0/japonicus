@@ -58,7 +58,8 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
     globalconf.GekkoURLs+=RemoteHosts
     if RemoteHosts:
         print("Connected Remote Hosts:\n%s" % ('\n').join(RemoteHosts))
-
+        if EvaluationMode == 'indicator':
+            exit('Indicator mode is yet not compatible with multiple hosts.')
 
     for k in TargetParameters.keys():
         print( "%s%s%s" % (k, " " * (30-len(k)), TargetParameters[k]) )
@@ -73,9 +74,11 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
     showdatadaterange = [ promoterz.evaluation.gekko.epochToString(availableDataRange[x])\
                     for x in ['from', 'to'] ]
 
+    print()
     print("using candlestick dataset %s to %s" %     (showdatadaterange[0],
                                                       showdatadaterange[1]))
 
+    print()
 
     loops = [ promoterz.sequence.standard_loop.standard_loop ]
     World = promoterz.world.World(GlobalTools, loops,

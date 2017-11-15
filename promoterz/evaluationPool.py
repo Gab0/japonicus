@@ -61,9 +61,12 @@ class EvaluationPool():
                 results[A] = self.evaluateBackend(*args[A])
                 TimedOut.append(A)
         pool.join()
+
+        TotalNumberOfTrades = 0
         for PoolIndex in range(len(results)):
             for i, fit in zip(range(len(results[PoolIndex][0])), results[PoolIndex][0]):
-                props[PoolIndex][i].fitness.values = fit
+                props[PoolIndex][i].fitness.values = fit[0],
+                TotalNumberOfTrades = fit[1]
 
             self.lasttimes[PoolIndex] = results[PoolIndex][1]
             L = len(props[PoolIndex])
@@ -74,8 +77,10 @@ class EvaluationPool():
 
         for T in TimedOut:
             self.ejectURL(T)
+        N = len(individues_to_simulate)
+        averageTrades = TotalNumberOfTrades/ max(1,N)
 
-        return len(individues_to_simulate)
+        return N, averageTrades
 
     def distributeIndividuals(self, tosimulation):
         nb_simulate = len(tosimulation)

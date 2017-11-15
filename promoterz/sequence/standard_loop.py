@@ -7,7 +7,7 @@ import promoterz
 
 def standard_loop(World, locale):
     assert(len(locale.population))
-
+    locale.extraStats = {} 
     # --validate individuals;
     locale.population=promoterz.validation.validatePopulation(
         World.tools.constructPhenotype,
@@ -15,13 +15,13 @@ def standard_loop(World, locale):
         locale.population)
 
     # --evaluate individuals;
-    nb_evaluated= World.parallel.evaluatePopulation(locale)
+    locale.extraStats['nb_evaluated'], locale.extraStats['avgTrades']= World.parallel.evaluatePopulation(locale)
 
     assert(len(locale.population))
     # --send best individue to HallOfFame;
     if not locale.EPOCH % 15:
-            BestSetting = tools.selBest(locale.population, 1)[0]
-            locale.HallOfFame.insert(BestSetting)
+        BestSetting = tools.selBest(locale.population, 1)[0]
+        locale.HallOfFame.insert(BestSetting)
 
     assert(len(locale.population))
     assert(sum([x.fitness.valid for x in locale.population]) == len(locale.population))
@@ -37,7 +37,7 @@ def standard_loop(World, locale):
         locale.EvolutionStatistics[locale.EPOCH])
 
     wpop=len(locale.population)
-    elder=qpop-wpop
+    locale.extraStats['elder']=qpop-wpop
 
     # --remove equal citizens
     locale.population = locale.extratools.populationPD(locale.population)
@@ -46,7 +46,7 @@ def standard_loop(World, locale):
     locale.extratools.filterThreshold(-15)
     
     # --show stats;
-    locale.showStats(nb_evaluated, elder)
+    locale.showStats()
 
     # --calculate new population size;
     if locale.EPOCH:

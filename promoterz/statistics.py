@@ -7,7 +7,8 @@ statisticsNames = {'avg': 'Average profit',
                    'min': 'Minimum profit',
                    'max': 'Maximum profit',
                    'size': 'Population size',
-                   'maxsize': 'Max population size'}
+                   'maxsize': 'Max population size',
+                   'avgTrades': 'Average n of trades'}
 
 def getStatisticsMeter():
     stats = tools.Statistics(lambda ind: ind.fitness.values[0])

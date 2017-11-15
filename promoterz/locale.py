@@ -17,7 +17,8 @@ class Locale():
 
         self.HallOfFame = tools.HallOfFame(30)
 
-        self.extratools=promoterz.evolutionHooks.getLocaleEvolutionToolbox(World, self)
+        self.extratools = promoterz.evolutionHooks.getLocaleEvolutionToolbox(
+            World, self)
 
 
         # GENERATION METHOD SELECTION;
@@ -36,10 +37,8 @@ class Locale():
         getDateRange = lambda: promoterz.evaluation.gekko.getRandomDateRange(
             World.EnvironmentParameters, World.genconf.deltaDays)
         
-        self.DateRange = [ getDateRange() for x in range(3) ]
-        #self.extratools.register('Evaluate', World.tools.evaluatePopulation, self.DateRange)
-
-        print("-- Initializing %s"% self.name)
+        self.DateRange = [ getDateRange()\
+                           for x in range(World.genconf.NBCandlestickData) ]
 
         self.stats = promoterz.statistics.getStatisticsMeter()
 
@@ -55,17 +54,18 @@ class Locale():
         Stats['dateRange'] = None
         Stats['maxsize'] = self.POP_SIZE
         Stats['size'] = len(self.population)
+        Stats['avgTrades'] = self.extraStats['avgTrades']
         self.EvolutionStatistics[self.EPOCH] = Stats
 
         LOGPATH ="output/evolution_gen_%s.csv" % self.name
         promoterz.statistics.write_evolution_logs(self.EPOCH,
                                               Stats, LOGPATH)
 
-    def showStats(self, nb_evaluated,elder):
+    def showStats(self):
         # show information;
         Stats = self.EvolutionStatistics[self.EPOCH]
-        print("EPOCH %i\t&%i" % (self.EPOCH, nb_evaluated))
-        statnames = [ 'max', 'avg', 'min', 'std', 'size', 'maxsize' ]
+        print("EPOCH %i\t&%i" % (self.EPOCH, self.extraStats['nb_evaluated']))
+        statnames = [ 'max', 'avg', 'min', 'std', 'size', 'maxsize', 'avgTrades' ]
 
         statText = ""
         for s in range(len(statnames)):
@@ -79,7 +79,7 @@ class Locale():
             if s % 2:
                 statText += '\n'
         print(statText)
-        print('Elder dies %i' % elder)
+        print('Elder dies %i' % self.extraStats['elder'])
         print('')
 
     def run(self):

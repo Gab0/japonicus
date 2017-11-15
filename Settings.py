@@ -38,6 +38,7 @@ def getSettings(specific=None):
             'POP_SIZE': 30, # Initial population size, per locale 
             'NBEPOCH': 500, # number of epochs to run
             'deltaDays': 21, # time window size on days of candlesticks for each evaluation
+            'NBCandlestickData': 3, # Number os candlestick data loaded simultaneously in each locale; slower EPOCHS, theoretical better evolution;
             'cxpb': 0.2, # Probabilty of crossover 
             'mutpb': 0.8,# Probability of mutation;
             '_lambda': 5,# size of offspring generated per epoch;

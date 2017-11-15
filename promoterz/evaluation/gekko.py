@@ -252,15 +252,15 @@ def Evaluate(candleSize, DateRange, phenotype, GekkoInstanceUrl):
     # IndividualToSettings(IND, STRAT) is a function that depends on GA algorithm,
     # so should be provided;
 
-    #print(Settings)
-
     result = [ runBacktest(GekkoInstanceUrl,
                            phenotype,
                            DR,
-                           candleSize=candleSize) for DR in DateRange]
-    result = [ R['relativeProfit']-R['market'] for R in result]
-    result = sum(result)/len(result)
-    return result,
+                           candleSize=candleSize) for DR in DateRange ]
+
+    RelativeProfits = [ R['relativeProfit']-R['market'] for R in result]
+    avgTrades = sum( [R['trades'] for R in result] ) / len(DateRange)
+    mRelativeProfit = sum(RelativeProfits)/len(RelativeProfits)
+    return mRelativeProfit, avgTrades
 
 def getDateRange(Limits, deltaDays=3):
     DateFormat="%Y-%m-%d %H:%M:%S"

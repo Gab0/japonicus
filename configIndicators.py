@@ -3,8 +3,6 @@
 cI = {
     "PPO":{
         "active": True,
-        #"candleSize":(1,60), # tick per day
-        #"historySize":(1,60), # required history
         "short": (6,18), # short EMA
         "long": (13,39), # long EMA
         "signal": (1,18), # 100 * (shortEMA - longEMA / longEMA)
@@ -25,19 +23,19 @@ cI = {
         "depth": (3,18)
     },
     "RSI":{
-        "active": True,
+        "active": False,
         "interval": (7,21), # weight
         "thresholds.down": (15,45), # trend thresholds
         "thresholds.up": (45,140), # trend thresholds
     },
     "SMMA":{
-        "active": True,
+        "active": False,
         "weight": (7,16),
         "thresholds.up": (0,0.1),
         "thresholds.down": (-0.1,0)
         },
     "DEMA":{
-        "active": True,
+        "active": False,
         "short": (7,15),
         "long": (12,35),
         "thresholds.up": (0,0.1),

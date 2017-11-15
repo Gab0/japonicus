@@ -30,7 +30,7 @@ method.log = function() {
 
 method.validation = function(ConditionList)
     {
-       var validNB = ConditionList.filter(function(s) { return s.value; }).length;
+       var validNB = ConditionList.filter(function(s) { return s; }).length;
        return validNB/ ConditionList.length; 
     }
 
@@ -48,10 +48,8 @@ method.check = function(candle) {
     this.age++;
  
 
-    if (this.validation(BuyConditions) > 0.1)
+    if (this.validation(BuyConditions) > 0.6)
     {
-
-        log.debug('we are currently in uptrend', message);
 
         if(this.currentTrend !== 'up') {
             this.currentTrend = 'up';
@@ -60,7 +58,7 @@ method.check = function(candle) {
             this.advice();
 
     }
-    else if (this.validation(SellConditions) > 0.1)
+    else if (this.validation(SellConditions) > 0.6)
     {
 
 
