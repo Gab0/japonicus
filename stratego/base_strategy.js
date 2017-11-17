@@ -37,7 +37,7 @@ method.validation = function(ConditionList)
 
 method.check = function(candle) {
 
-
+    var price = candle.close;
 
 
     //SIMPLIFY_INDICATORS;

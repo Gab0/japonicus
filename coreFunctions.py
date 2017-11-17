@@ -14,7 +14,7 @@ from Settings import getSettings
 def stratSettingsProofOfViability(World, Individual, GlobalDataset):
     AllProofs = []
     for W in GlobalDataset:
-        q,=World.tools.Evaluate([W], Individual, 'http://localhost:3000')
+        q,m=World.tools.Evaluate([W], Individual, 'http://localhost:3000')
         AllProofs.append(q)
         print('Testing monthly profit %.3f' % q)
 

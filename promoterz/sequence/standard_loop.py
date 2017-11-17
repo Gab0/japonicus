@@ -57,7 +57,7 @@ def standard_loop(World, locale):
             locale.EvolutionStatistics[locale.EPOCH])
 
         locale.POP_SIZE += locale.POP_SIZE * PRoFIGA
-        minps, maxps = World.genconf.POP_SIZE//2, 899
+        minps, maxps = World.genconf.POP_SIZE//2, World.genconf.POP_SIZE * 3
         try:
             locale.POP_SIZE = int(round(max(min(locale.POP_SIZE, maxps), minps)))
         except:

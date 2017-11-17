@@ -16,11 +16,11 @@ from deap import base
 from Settings import getSettings
 import stratego
 from functools import partial
-
+StrategyFileManager = None
 # TEMPORARY ASSIGNMENT OF EVAL FUNCTIONS; SO THINGS REMAIN SANE;
-def aEvaluate(constructPhenotype, candleSize, DateRange, Individual, gekkoUrl):
+def aEvaluate(StrategyFileManager, constructPhenotype, candleSize, DateRange, Individual, gekkoUrl):
     phenotype = constructPhenotype(Individual)
-    StratName = stratego.gekko_strategy.createStrategyFile(phenotype)
+    StratName = StrategyFileManager.checkStrategy(phenotype)
     phenotype = {StratName:phenotype}
     SCORE = promoterz.evaluation.gekko.Evaluate(candleSize,
                                                 DateRange, phenotype, gekkoUrl)
@@ -36,15 +36,19 @@ def bEvaluate(constructPhenotype, candleSize, DateRange, Individual, gekkoUrl):
 def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOCALE=2):
 
     GenerationMethod = promoterz.functions.selectRepresentationMethod(GenerationMethod)
+
     genconf=getSettings('generations')
+    globalconf = getSettings('Global')
+
     if EvaluationMode == 'indicator':
-        Evaluate = aEvaluate
+        global StrategyFileManager
+        StrategyFileManager = stratego.gekko_strategy.StrategyFileManager(globalconf.gekkoPath)
+        Evaluate = partial(aEvaluate, StrategyFileManager)
         Strategy = None
     else:
         Evaluate = bEvaluate
         Strategy = EvaluationMode
 
-    globalconf = getSettings('Global')
     print("Evolving %s strategy;\n" % Strategy)
 
     print("evaluated parameters ranges:")
