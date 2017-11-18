@@ -63,7 +63,7 @@ def evaluate_random(Strategy, parameters):
     DateRange = gekkoWrapper.getRandomDateRange(DatasetRange, deltaDays=settings['deltaDays'])
     params = expandGekkoStrategyParameters(parameters, Strategy)
 
-    return gekkoWrapper.Evaluate(dict, 30, DateRange, params, "http://localhost:3000")[0]
+    return gekkoWrapper.Evaluate(30, [DateRange], params, "http://localhost:3000")[0]
 
 def gekko_search(**parameters):
 

@@ -11,7 +11,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import promoterz.evaluation.gekko as gekkoWrapper
 import Settings
 import sqlite_scanner
-import coreFunctions
+import resultInterface
 import evolution_bayes
 
 settings = Settings.getSettings()['bayesian']
@@ -225,7 +225,7 @@ def show_chart():
     configjs = Settings.get_configjs(filename)
     watch = settings["watch"]
     dateset = gekkoWrapper.getAvailableDataset(watch)
-    daterange = coreFunctions.getRandomDateRange(dateset, deltaDays=deltaDays)
+    daterange = resultInterface.getRandomDateRange(dateset, deltaDays=deltaDays)
     res = evolution_bayes.EvaluateRaw(watch, daterange, configjs[strategy], strategy)
     #res = gekkoWrapper.httpPost(URL, gekkoConfig)
 

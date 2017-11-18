@@ -3,8 +3,6 @@ from deap import tools
 from deap import base
 import promoterz
 
-import coreFunctions
-
 
 
 class Locale():

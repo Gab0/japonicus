@@ -5,7 +5,7 @@ import promoterz
 
 from copy import deepcopy
 
-import coreFunctions
+import resultInterface
 
 import promoterz.sequence.standard_loop
 
@@ -99,30 +99,36 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
                                                            genconf.deltaDays, 12)
 
     for LOCALE in World.locales:
-        BestIndividues = tools.selBest(LOCALE.population, genconf.finaltest['NBBESTINDS'])
+        B=genconf.finaltest['NBBESTINDS']
+        BestIndividues = tools.selBest(LOCALE.population,B)
 
         Z=genconf.finaltest['NBADDITIONALINDS']
+        print("Selecting %i+%i individues, random test;" % (B,Z))
         AdditionalIndividues = tools.selTournament(LOCALE.population, Z, Z*2)
-        AdditionalIndividues = [ x for x in AdditionalIndividues if x not in BestIndividues ]
+        AdditionalIndividues = [ x for x in AdditionalIndividues\
+                                 if x not in BestIndividues ]
+
         FinalIndividues = BestIndividues + AdditionalIndividues
+        print("%i selected;" % len(FinalIndividues))
 
         for FinalIndividue in FinalIndividues:
-
-            AssertFitness, FinalProfit=coreFunctions.stratSettingsProofOfViability(World,
-                                                                      FinalIndividue,
-                                                                      ValidationDataset)
+            proof = resultInterface.stratSettingsProofOfViability
+            AssertFitness, FinalProfit = proof(World,
+                                              FinalIndividue,
+                                              ValidationDataset)
             print("Testing Strategy:\n")
             if AssertFitness or FinalProfit > 50:
-                FinalIndividueSettings = GlobalTools.constructPhenotype(FinalIndividue)
+                FinalIndividueSettings = GlobalTools.constructPhenotype(
+                    FinalIndividue)
 
                 Show = json.dumps(FinalIndividueSettings, indent=2)
-                coreFunctions.logInfo("~" * 18)
+                resultInterface.logInfo("~" * 18)
 
 
                 print("Settings for Gekko config.js:")
                 print(Show)
                 print("Settings for Gekko --ui webpage")
-                coreFunctions.logInfo(coreFunctions.pasteSettingsToUI(FinalIndividueSettings))
+                resultInterface.logInfo(resultInterface.pasteSettingsToUI(FinalIndividueSettings))
 
                 print("\nRemember to check MAX and MIN values for each parameter.")
                 print("\tresults may improve with extended ranges.")
