@@ -1,6 +1,18 @@
-This is a barebones implementation of genetic algorithm evolution to develop strategies for digital coin trading bot Gekko. [https://github.com/askmike/gekko]
+This is an implementation of genetic algorithm evolution to develop strategies for digital coin trading bot Gekko. [https://github.com/askmike/gekko]
 
-It generates random configs, and evolve them by backtesting on a Gekko session via the REST API of gekko's user interface. Genetic algorithm and bayesian optimization are evolution choices.
+It generates random configs & evolve them by backtesting on a Gekko session via the REST API of gekko's user interface. <br>
+Genetic algorithm and quick bayesian optimization are evolution choices.
+
+
+### Setup
+
+Install gekko, then clone this repo and install dependencies:
+```
+$ git clone https://git.com/gab0/gekko_japonicus.git
+$ cd gekko_japonicus
+$ sudo pip -r requirements.txt
+
+```
 
 ### Usage
 
@@ -15,25 +27,29 @@ $node web/server.js
 T.2 -> $cd [japonicus dir]
        $python japonicus.py [-g|-b] [-c] [-k] [--repeat <X>] [ [-i|-r|--strat <Strategy>] [-w]
 
+    [main optimization options]
     -g for genetic algorithm;
     -b for bayesian optimization;
-
+    
+    [optional GA methods]
     -c to use an alternative ~experimental genetic algorithm;
 
-    -k launches a child gekko instance, so no need for the first terminal;
-    
+    [strategy selector] 
     -r run with random strategy
     --strat choose one strat to run;
-    -i Genetic algorithm create strategies on the fly, and run then based on varying indicators;
+    -i Genetic algorithm create strategies w/ combined indicators on the fly and run 'em.
     
+    [repeat runs]    
     --repeat to run genetic algorithm X times; then just check evolution.log;
 
+    [evolution visualization options]
     -w launches a neat dash/flask web server @ your local machine, which can be accessed via  webbrowser.
            Address is shown on the first line of console output. (likely http://localhost:5000)
 
-
+    -k launches a child gekko instance, so no need for the first terminal;
 ```
-This is written on python because of the nice DEAP module for genetic algorithm, and was worth it. DEAP is available on PIP and required.
+
+This is written on python because of the nice DEAP module for genetic algorithm, and was worth it. DEAP is required, available on PIP.
 
 All settings are set at Settings.py;
 
@@ -112,4 +128,5 @@ japonicus will choose a random item of the list to fetch candles and scansets.
 
 Genetic Algorithms are a good way to fetch a good set of settings to run a strategy
 on gekko. But the real gamechanger is the strategy itself. The ideal evolution method
-would be a Genetic Programming that modifies the strat logic itself, we're looking for it;
+would be a Genetic Programming that modifies the strat logic itself. This
+correspond to the -i option of japonicus, still barebones.
