@@ -18,14 +18,16 @@ import stratego
 from functools import partial
 StrategyFileManager = None
 # TEMPORARY ASSIGNMENT OF EVAL FUNCTIONS; SO THINGS REMAIN SANE;
-def aEvaluate(StrategyFileManager, constructPhenotype, candleSize, DateRange, Individual, gekkoUrl):
+def aEvaluate(StrategyFileManager, constructPhenotype,
+              candleSize, DateRange, Individual, gekkoUrl):
     phenotype = constructPhenotype(Individual)
     StratName = StrategyFileManager.checkStrategy(phenotype)
     phenotype = {StratName:phenotype}
     SCORE = promoterz.evaluation.gekko.Evaluate(candleSize,
                                                 DateRange, phenotype, gekkoUrl)
     return SCORE
-def bEvaluate(constructPhenotype, candleSize, DateRange, Individual, gekkoUrl):
+def bEvaluate(constructPhenotype, candleSize,
+              DateRange, Individual, gekkoUrl):
     phenotype = constructPhenotype(Individual)
     phenotype = {Individual.Strategy: phenotype}
     SCORE = promoterz.evaluation.gekko.Evaluate(candleSize,
@@ -41,8 +43,9 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
     globalconf = getSettings('Global')
 
     if EvaluationMode == 'indicator':
-        global StrategyFileManager
+        #global StrategyFileManager
         StrategyFileManager = stratego.gekko_strategy.StrategyFileManager(globalconf.gekkoPath)
+        print('>'+str(StrategyFileManager))
         Evaluate = partial(aEvaluate, StrategyFileManager)
         Strategy = None
     else:
@@ -97,7 +100,7 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
     ValidationDataset =\
         promoterz.evaluation.gekko.globalEvaluationDataset(World.EnvironmentParameters,
                                                            genconf.deltaDays, 12)
-
+    # After running EPOCHs, select best candidates;
     for LOCALE in World.locales:
         B=genconf.finaltest['NBBESTINDS']
         BestIndividues = tools.selBest(LOCALE.population,B)

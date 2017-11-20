@@ -11,7 +11,7 @@ method.init = function() {
 
     this.currentTrend;
     this.requiredHistory = 16;
-
+    this.persistence=0;
     //ADD_INDICATORS;
 
 }
@@ -34,6 +34,14 @@ method.validation = function(ConditionList)
        return validNB/ ConditionList.length; 
     }
 
+method.checkPersistence = function(candidateAdvice)
+{
+    if (this.persistence >= this.settings.persistence)
+        this.advice(candidateAdvice);
+    else
+        this.advice();
+
+}
 
 method.check = function(candle) {
 
@@ -53,10 +61,13 @@ method.check = function(candle) {
 
         if(this.currentTrend !== 'up') {
             this.currentTrend = 'up';
-            this.advice('long');
-        } else
             this.advice();
+            this.persistence=0;
+        } else{
+            this.persistence++;
+            this.checkPersistence('long');
 
+        }
     }
     else if (this.validation(SellConditions) > 0.6)
     {
@@ -64,9 +75,13 @@ method.check = function(candle) {
 
         if (this.currentTrend !== 'down') {
             this.currentTrend = 'down';
-            this.advice('short');
-        } else
             this.advice();
+            this.persistence=0;
+        } else{
+            this.persistence++;
+            this.checkPersistence('short');
+        }
+
 
     } else {
 
