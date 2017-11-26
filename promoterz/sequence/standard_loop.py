@@ -4,7 +4,7 @@ from copy import deepcopy
 import random
 from deap import algorithms
 import promoterz
-
+from .. import statistics, evolutionHooks
 def standard_loop(World, locale):
     assert(len(locale.population))
     locale.extraStats = {} 
@@ -28,7 +28,7 @@ def standard_loop(World, locale):
 
 
     # --compile stats;
-    locale.compileStats()
+    statistics.compileStats(locale)
 
     # --population ages
     qpop=len(locale.population)
@@ -46,7 +46,7 @@ def standard_loop(World, locale):
     locale.extratools.filterThreshold(-15)
     
     # --show stats;
-    locale.showStats()
+    statistics.showStats(locale)
 
     # --calculate new population size;
     if locale.EPOCH:
@@ -88,7 +88,7 @@ def standard_loop(World, locale):
     bestScore = 0
     '''
     # --select best individues to procreate
-    offspring = tools.selTournament(locale.population,
+    offspring = evolutionHooks.Tournament(locale.population,
                                     World.genconf._lambda, 2*World.genconf._lambda)
     offspring = [deepcopy(x) for x in offspring] # is deepcopy necessary?
 

@@ -45,7 +45,7 @@ def initInd(Criterion, Attributes):
 
 def getToolbox(Strategy, genconf, Attributes):
     toolbox = base.Toolbox()
-    creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+    creator.create("FitnessMax", base.Fitness, weights=(1.0, 3))
     creator.create("Individual", list,
                    fitness=creator.FitnessMax, Strategy=Strategy)
     toolbox.register("newind", initInd, creator.Individual, Attributes)

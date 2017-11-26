@@ -1,6 +1,6 @@
 #!/bin/python
 
-from deap import base
+from deap import base, tools
 from copy import deepcopy
 
 import random
@@ -80,3 +80,20 @@ def getGlobalToolbox(representationModule):
 
     toolbox.register("constructPhenotype", representationModule.constructPhenotype)
     return toolbox
+
+def getFitness(individual):
+    R = sum(individual.wvalues)
+
+selectCriteria = lambda x: sum(x.fitness.wvalues)
+def selBest(individuals, number):
+    chosen = sorted(individuals, key=selectCriteria, reverse=True)
+    return chosen[:number]
+
+def Tournament(individuals, finalselect, tournsize):
+    chosen = []
+    for i in range(finalselect):
+        aspirants = tools.selRandom(individuals, tournsize)
+        chosen.append(max(individuals,
+                          key=selectCriteria))
+    return chosen
+

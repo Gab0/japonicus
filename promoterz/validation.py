@@ -38,7 +38,8 @@ def validatePopulation(IndividualToSettings, TargetParameters, population):
             continue
         Err = checkPhenotypeAttributeRanges(TargetParameters, phenotype)
         if Err:
-            print(ErrMsg.format(ErrType=' invalid values on', ErrParameter=Err))
+            print(ErrMsg.format(ErrType=' invalid values on',
+                                ErrParameter=Err))
             population[p] = None
 
         if not population[p]:

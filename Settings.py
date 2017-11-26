@@ -37,11 +37,11 @@ def getSettings(specific=None):
         'generations': { 
             'POP_SIZE': 30, # Initial population size, per locale 
             'NBEPOCH': 500, # number of epochs to run
-            'deltaDays': 21, # time window size on days of candlesticks for each evaluation
-            'NBCandlestickData': 3, # Number os candlestick data loaded simultaneously in each locale; slower EPOCHS, theoretical better evolution;
-            'cxpb': 0.2, # Probabilty of crossover 
-            'mutpb': 0.8,# Probability of mutation;
-            '_lambda': 5,# size of offspring generated per epoch;
+            'deltaDays': 30, # time window size on days of candlesticks for each evaluation
+            'NBCandlestickData': 2, # Number os candlestick data loaded simultaneously in each locale; slower EPOCHS, theoretical better evolution;
+            'cxpb': 0.3, # Probabilty of crossover 
+            'mutpb': 0.7,# Probability of mutation;
+            '_lambda': 7,# size of offspring generated per epoch;
             'DRP': 70,# Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
             'ParallelBacktests': 5,

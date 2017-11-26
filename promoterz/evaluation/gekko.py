@@ -99,7 +99,7 @@ def runBacktest(GekkoInstanceUrl, TradeSetting, DateRange, candleSize=10, gekko_
         print(DateRange)
 
         # That fail is so rare that has no impact.. still happens randomly;
-        return {'relativeProfit':0, 'market':0, 'trades':0} # fake backtest report
+        return {'relativeProfit':0, 'market':0, 'trades':0, 'sharpe':0} # fake backtest report
 
 
     #rProfit = result['report']['relativeProfit']
@@ -260,7 +260,11 @@ def Evaluate(candleSize, DateRange, phenotype, GekkoInstanceUrl):
     RelativeProfits = [ R['relativeProfit']-R['market'] for R in result]
     avgTrades = sum( [R['trades'] for R in result] ) / len(DateRange)
     mRelativeProfit = sum(RelativeProfits)/len(RelativeProfits)
-    return mRelativeProfit, avgTrades
+
+    avgSharpe = sum ( [R['sharpe'] for R in result if R['sharpe']]) / len(DateRange)
+
+
+    return (mRelativeProfit, avgSharpe), avgTrades
 
 def getDateRange(Limits, deltaDays=3):
     DateFormat="%Y-%m-%d %H:%M:%S"

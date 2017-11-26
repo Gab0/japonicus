@@ -26,6 +26,7 @@ def aEvaluate(StrategyFileManager, constructPhenotype,
     SCORE = promoterz.evaluation.gekko.Evaluate(candleSize,
                                                 DateRange, phenotype, gekkoUrl)
     return SCORE
+
 def bEvaluate(constructPhenotype, candleSize,
               DateRange, Individual, gekkoUrl):
     phenotype = constructPhenotype(Individual)
@@ -45,7 +46,6 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
     if EvaluationMode == 'indicator':
         #global StrategyFileManager
         StrategyFileManager = stratego.gekko_strategy.StrategyFileManager(globalconf.gekkoPath)
-        print('>'+str(StrategyFileManager))
         Evaluate = partial(aEvaluate, StrategyFileManager)
         Strategy = None
     else:
@@ -107,13 +107,15 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
 
         Z=genconf.finaltest['NBADDITIONALINDS']
         print("Selecting %i+%i individues, random test;" % (B,Z))
-        AdditionalIndividues = tools.selTournament(LOCALE.population, Z, Z*2)
+        AdditionalIndividues = promoterz.evolutionHooks.selTournament(LOCALE.population, Z, Z*2)
+
+        print("%i selected;" % len(AdditionalIndividues))
         AdditionalIndividues = [ x for x in AdditionalIndividues\
                                  if x not in BestIndividues ]
 
         FinalIndividues = BestIndividues + AdditionalIndividues
-        print("%i selected;" % len(FinalIndividues))
 
+        print("%i selected;" % len(FinalIndividues))
         for FinalIndividue in FinalIndividues:
             proof = resultInterface.stratSettingsProofOfViability
             AssertFitness, FinalProfit = proof(World,
@@ -127,7 +129,7 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
                 Show = json.dumps(FinalIndividueSettings, indent=2)
                 resultInterface.logInfo("~" * 18)
 
-
+                resultInterface.logInfo("%.3f final profit ~~~~" % FinalProfit)
                 print("Settings for Gekko config.js:")
                 print(Show)
                 print("Settings for Gekko --ui webpage")

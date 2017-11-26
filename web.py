@@ -121,28 +121,19 @@ def run_server():
                     'text': DR
                 })
 
+        colorSequence = [ (188,189,34),(100,11,182),(186,3,34),(45,111,45) ]
+        statNames = ['avg', 'std', 'min', 'max']
+
+        DATA = [{'x': df['id'], 'y': df[statNames[S]],
+                 'type': 'line', 'name': statisticsNames[statNames[S]],
+                 'line': {'color': 'rgb%s' % colorSequence[S]} } for S in range(len(statNames))]
         fig = {
             'data': [
                 {'x':[0, df["id"]], 'y':[0],
                  'type': 'line', 'name': 'markzero',
-                 'line': {'color': 'rgb(0,0,0)'}},
+                 'line': {'color': 'rgb(0,0,0)'}}] + DATA
 
-                {'x': df["id"], 'y': df["avg"],
-                 'type': 'line', 'name': statisticsNames['avg'],
-                  'line': {'color': 'rgb(188, 189, 34)'}},
-
-                {'x': df["id"], 'y': df["std"],
-                 'type': 'line', 'name': statisticsNames['std'],
-                 'line': {'color': 'rgb(100, 11, 182)'}},
-
-                {'x': df["id"], 'y': df["min"],
-                 'type': 'line', 'name': statisticsNames['min'],
-                 'line': {'color': 'rgb(186, 3, 34)'}},
-
-                {'x': df["id"], 'y': df["max"],
-                 'type': 'line', 'name': statisticsNames['max'],
-                 'line': {'color': 'rgb(45, 111, 45)'}}
-            ],
+            ,
             'layout': {
                 'title': 'Evolution Data Over Time',
                 'annotations': annotations

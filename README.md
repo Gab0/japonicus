@@ -8,9 +8,9 @@ Genetic algorithm and quick bayesian optimization are evolution choices.
 
 Install gekko, then clone this repo and install dependencies:
 ```
-$ git clone https://git.com/gab0/gekko_japonicus.git
+$ git clone https://git.com/Gab0/gekkoJaponicus.git
 $ cd gekko_japonicus
-$ sudo pip -r requirements.txt
+$ sudo pip install -r requirements.txt
 
 ```
 
@@ -67,7 +67,10 @@ will fail on different candlesticks which include real time trading.
 
 A good thing to do is to create a strategy that combines two indicators, IE you buy when both results are above buying thresolds,
 you sell when both are below selling thresholds. So dual or even triple indicator strategies are a good path to go.
+Strategy must go beyond simple logic of indicator results on thresholds to have
+meaningfun results.
 
+Custom strategies should be added to configStrat.py, by strategy name.
 
 Known good gekko strategies to run with this:
  - PPO+TSI strat
