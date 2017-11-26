@@ -65,7 +65,6 @@ class EvaluationPool():
         TotalNumberOfTrades = 0
         for PoolIndex in range(len(results)):
             for i, fit in zip(range(len(results[PoolIndex][0])), results[PoolIndex][0]):
-                print(fit)
                 props[PoolIndex][i].fitness.values = fit[0]
                 TotalNumberOfTrades = fit[1]
 
