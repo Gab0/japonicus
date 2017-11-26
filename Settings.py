@@ -31,10 +31,11 @@ def getSettings(specific=None):
             'log_name': 'evolution_gen.csv',
             'RemoteAWS': '../AmazonSetup/hosts', # Hosts list of remote machines running gekko, to distribute evaluation load; BETA.
                                                 # option values: path to HOSTS file list OR False;
-            'GekkoURLs': ['http://localhost:3000']
+            'GekkoURLs': [ 'http://localhost:3000' ]
         },
         # genetic algorithm settings
-        'generations': { 
+        'generations': {
+            'showIndividualEvaluationInfo': True, # Verbose single evaluation results;
             'POP_SIZE': 30, # Initial population size, per locale 
             'NBEPOCH': 500, # number of epochs to run
             'deltaDays': 30, # time window size on days of candlesticks for each evaluation
