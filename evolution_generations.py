@@ -107,7 +107,7 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
 
         Z=genconf.finaltest['NBADDITIONALINDS']
         print("Selecting %i+%i individues, random test;" % (B,Z))
-        AdditionalIndividues = promoterz.evolutionHooks.selTournament(LOCALE.population, Z, Z*2)
+        AdditionalIndividues = promoterz.evolutionHooks.Tournament(LOCALE.population, Z, Z*2)
 
         print("%i selected;" % len(AdditionalIndividues))
         AdditionalIndividues = [ x for x in AdditionalIndividues\
