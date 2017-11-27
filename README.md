@@ -1,4 +1,4 @@
-This is an implementation of genetic algorithm evolution to develop strategies for digital coin trading bot Gekko. [https://github.com/askmike/gekko]
+This is an implementation of genetic algorithm evolution to develop strategies for digital coin trading bot <a href="https://github.com/askmike/gekko">Gekko</a>. 
 
 It generates random configs & evolve them by backtesting on a Gekko session via the REST API of gekko's user interface. <br>
 Genetic algorithm and quick bayesian optimization are evolution choices.
@@ -131,5 +131,5 @@ japonicus will choose a random item of the list to fetch candles and scansets.
 
 Genetic Algorithms are a good way to fetch a good set of settings to run a strategy
 on gekko. But the real gamechanger is the strategy itself. The ideal evolution method
-would be a Genetic Programming that modifies the strat logic itself. This
-correspond to the -i option of japonicus, still barebones.
+would be a Genetic Programming that modifies the strat logic itself. This somewhat
+corresponds to -i option of japonicus, still barebones.
