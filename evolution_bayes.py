@@ -31,10 +31,13 @@ stats = []
 candleSize = 0
 historySize = 0
 
-def EvaluateRaw(watch, DateRange, Individual, Strategy):
+watch = settings["watch"]
+
+watch, DatasetRange = gekkoWrapper.getAvailableDataset(watch)
+def EvaluateRaw(Dataset, DateRange, Individual, Strategy):
     config = expandGekkoStrategyParameters(Individual, Strategy)
-    config["watch"] = watch
-    gekko_config = gekkoWrapper.createConfig(config, DateRange)
+
+    gekko_config = gekkoWrapper.createConfig(config, Dataset, DateRange)
     url = gekkoWrapper.getURL('/api/backtest')
     if candleSize > 0:
         gekko_config["gekkoConfig"]["tradingAdvisor"] = {
@@ -45,10 +48,10 @@ def EvaluateRaw(watch, DateRange, Individual, Strategy):
         }
     return gekkoWrapper.httpPost(url, gekko_config)
 
-def Evaluate(watch, DateRange, Individual, Strategy):
+def Evaluate(watch, Dataset, DateRange, Individual, Strategy):
     config = expandGekkoStrategyParameters(Individual, Strategy)
     config["watch"] = watch
-    result =gekkoWrapper.runBacktest("http://localhost:3000", config, DateRange)
+    result =gekkoWrapper.runBacktest("http://localhost:3000", config, Dataset, DateRange)
 
 def expandGekkoStrategyParameters(IND, Strategy):
     config = {}
@@ -62,8 +65,10 @@ def evaluate_random(Strategy, parameters):
 
     DateRange = gekkoWrapper.getRandomDateRange(DatasetRange, deltaDays=settings['deltaDays'])
     params = expandGekkoStrategyParameters(parameters, Strategy)
-
-    return gekkoWrapper.Evaluate(30, [DateRange], params, "http://localhost:3000")[0]
+    
+    BacktestResult = gekkoWrapper.Evaluate(30, watch, [DateRange], params, "http://localhost:3000")
+    BalancedProfit = BacktestResult[0][0]
+    return BalancedProfit
 
 def gekko_search(**parameters):
 
@@ -107,9 +112,7 @@ def gekko_bayesian(indicator=None):
     global Strategy
     Strategy = indicator
 
-    watch = settings["watch"]
-    global DatasetRange
-    DatasetRange = gekkoWrapper.getAvailableDataset(watch)
+
 
     if indicator == None:
         Strategy = settings['Strategy']
