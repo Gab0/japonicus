@@ -49,7 +49,10 @@ def getSettings(specific=None):
             'PRoFIGA_beta': 0.005, # weight of PRoFIGA calculations on variability of population size
             'ageBoundaries': (9, 19), # minimum age to die, age where everyone dies (on EPOCHS)
             'candleSize': 30, # candle size for gekko backtest, in minutes
-            'dataset_source': { # dataset_source can be set to None so it searches from any source;
+             # dataset_source can be set to None so it searches from any source;
+             # leave the ! on the ignored entry as convenient;
+            'dataset_source': None,
+            '!dataset_source': {
                 "exchange": "poloniex",
                 "currency": 'USDT',
                 "asset": 'BTC'
