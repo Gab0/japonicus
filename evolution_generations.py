@@ -17,21 +17,23 @@ from Settings import getSettings
 import stratego
 from functools import partial
 StrategyFileManager = None
-# TEMPORARY ASSIGNMENT OF EVAL FUNCTIONS; SO THINGS REMAIN SANE;
+
+
+# TEMPORARY ASSIGNMENT OF EVAL FUNCTIONS; SO THINGS REMAIN SANE (SANE?);
 def aEvaluate(StrategyFileManager, constructPhenotype,
-              candleSize, DateRange, Individual, gekkoUrl):
+              candleSize, Database, DateRange, Individual, gekkoUrl):
     phenotype = constructPhenotype(Individual)
     StratName = StrategyFileManager.checkStrategy(phenotype)
     phenotype = {StratName:phenotype}
-    SCORE = promoterz.evaluation.gekko.Evaluate(candleSize,
+    SCORE = promoterz.evaluation.gekko.Evaluate(candleSize, Database, 
                                                 DateRange, phenotype, gekkoUrl)
     return SCORE
 
-def bEvaluate(constructPhenotype, candleSize,
+def bEvaluate(constructPhenotype, candleSize, Database,
               DateRange, Individual, gekkoUrl):
     phenotype = constructPhenotype(Individual)
     phenotype = {Individual.Strategy: phenotype}
-    SCORE = promoterz.evaluation.gekko.Evaluate(candleSize,
+    SCORE = promoterz.evaluation.gekko.Evaluate(candleSize, Database,
                                                 DateRange, phenotype, gekkoUrl)
     return SCORE
 
@@ -71,12 +73,17 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
     for k in TargetParameters.keys():
         print( "%s%s%s" % (k, " " * (30-len(k)), TargetParameters[k]) )
 
-    GlobalTools.register('Evaluate', Evaluate,
-                         GlobalTools.constructPhenotype, genconf.candleSize)
-
-
-    availableDataRange = promoterz.evaluation.gekko.getAvailableDataset(
+    datasetSpecifications, availableDataRange = promoterz.evaluation.gekko.getAvailableDataset(
             exchange_source=genconf.dataset_source)
+
+
+
+
+    GlobalTools.register('Evaluate', Evaluate,
+                         GlobalTools.constructPhenotype, genconf.candleSize, datasetSpecifications)
+
+
+
 
     showdatadaterange = [ promoterz.evaluation.gekko.epochToString(availableDataRange[x])\
                     for x in ['from', 'to'] ]

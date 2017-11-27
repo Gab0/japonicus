@@ -57,9 +57,12 @@ def getAvailableDataset(exchange_source=None):
 
     scanset = []
     for s in DataSetPack:
+        Valid = True
         for k in "exchange currency asset".split(" "):
             if exchange_source and s[k] != exchange_source[k]:
+                Valid = False
                 continue
+        if Valid:
             scanset.append(s)
 
     if len(scanset) == 0:
@@ -72,12 +75,17 @@ def getAvailableDataset(exchange_source=None):
         EXCHANGE['max_span'] = range_spans[LONGEST]
         EXCHANGE['max_span_index'] = LONGEST
 
-    exchange_longest_spans = [x['max_span'] for x in scanset]
+    exchange_longest_spans = [ x['max_span'] for x in scanset ]
     best_exchange = exchange_longest_spans.index(max(exchange_longest_spans))
 
-    LongestDataset = scanset[best_exchange]['ranges'][scanset[best_exchange]['max_span_index']]
+    chosenScansetRange = scanset[ best_exchange]['ranges'][scanset[best_exchange]['max_span_index'] ]
+        
+    specKeys = ['exchange', 'currency', 'asset']
+    
+    chosenScansetSpecifications = {K:scanset[best_exchange][K] for K in scanset[best_exchange] if K in specKeys}
 
-    return LongestDataset
+    
+    return chosenScansetSpecifications, chosenScansetRange
 
 def loadHostsFile(HostsFilePath):
     remoteGekkos=[]
@@ -89,8 +97,8 @@ def loadHostsFile(HostsFilePath):
 
     return remoteGekkos
 
-def runBacktest(GekkoInstanceUrl, TradeSetting, DateRange, candleSize=10, gekko_config=None):
-    gekko_config = createConfig(TradeSetting, DateRange, candleSize, gekko_config)
+def runBacktest(GekkoInstanceUrl, TradeSetting, Database, DateRange, candleSize=10, gekko_config=None):
+    gekko_config = createConfig(TradeSetting, Database, DateRange, candleSize, gekko_config)
     url = GekkoInstanceUrl+'/api/backtest'
     result = httpPost(url, gekko_config)
     # sometime report is False(not dict)
@@ -156,16 +164,8 @@ def firePaperTrader(GekkoInstanceUrl, TradeSetting, Exchange, Currency, Asset):
     RESULT = httpPost(URL,CONFIG)
     print(RESULT)
     
-def createConfig(TradeSetting, DateRange, candleSize=10, gekko_config=None):
-    if "watch" in TradeSetting:
-        watch = TradeSetting["watch"]
-        del TradeSetting["watch"]
-    else:
-        watch = {
-                "exchange": "poloniex",
-                "currency": "USDT",
-                "asset": "BTC"
-        }
+def createConfig(TradeSetting, Database, DateRange, candleSize=10, gekko_config=None):
+
     TradeMethod = list(TradeSetting.keys())[0]
     true = True
     false= False
@@ -174,7 +174,7 @@ def createConfig(TradeSetting, DateRange, candleSize=10, gekko_config=None):
         "gekkoConfig": {
             "debug":false,
             "info":false,
-            "watch": watch,
+            "watch": Database,
             "paperTrader": {
                 "fee": 0.25, # declare deprecated 'fee' so keeps working w/ old gekko;
                 "feeMaker": 0.15,
@@ -248,12 +248,12 @@ def getCandles(DateRange, size=100):
     return RESULT
 
 
-def Evaluate(candleSize, DateRange, phenotype, GekkoInstanceUrl):
+def Evaluate(candleSize, Database, DateRange, phenotype, GekkoInstanceUrl):
     # IndividualToSettings(IND, STRAT) is a function that depends on GA algorithm,
     # so should be provided;
 
     result = [ runBacktest(GekkoInstanceUrl,
-                           phenotype,
+                           phenotype, Database,
                            DR,
                            candleSize=candleSize) for DR in DateRange ]
 

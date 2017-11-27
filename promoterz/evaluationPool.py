@@ -4,6 +4,8 @@ import random
 from multiprocessing import Pool, Process, Pipe, TimeoutError
 from multiprocessing.pool import ThreadPool
 
+showIndividue = lambda evaldata: "~ bP: %.3f\tS: %.3f\tnbT:%.3f" % (
+    evaldata[0][0], evaldata[0][1], evaldata[1])
 
 class EvaluationPool():
     def __init__(self, EvaluationTool, Urls, poolsize, individual_info):
@@ -15,6 +17,7 @@ class EvaluationPool():
         self.lasttimesperind = [0 for x in Urls]
         self.poolsizes = [5 for x in Urls]
         self.individual_info = individual_info
+
     def ejectURL(self, Index):
         self.Urls.pop(Index)
         self.lasttimes.pop(Index)
@@ -66,7 +69,7 @@ class EvaluationPool():
         for PoolIndex in range(len(results)):
             for i, fit in zip(range(len(results[PoolIndex][0])), results[PoolIndex][0]):
                 if self.individual_info:
-                    print(fit)
+                    print(showIndividue(fit))
                 props[PoolIndex][i].fitness.values = fit[0]
                 TotalNumberOfTrades = fit[1]
 
