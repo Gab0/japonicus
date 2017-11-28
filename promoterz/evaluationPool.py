@@ -71,17 +71,18 @@ class EvaluationPool():
                 if self.individual_info:
                     print(showIndividue(fit))
                 props[PoolIndex][i].fitness.values = fit[0]
-                TotalNumberOfTrades = fit[1]
+                TotalNumberOfTrades += fit[1]
 
             self.lasttimes[PoolIndex] = results[PoolIndex][1]
             L = len(props[PoolIndex])
             self.lasttimesperind[PoolIndex] = self.lasttimes[PoolIndex] / L if L else 5
 
-        F = [x.fitness.valid for x in individues_to_simulate]
+        F = [ x.fitness.valid for x in individues_to_simulate ]
         assert(all(F))
 
         for T in TimedOut:
             self.ejectURL(T)
+            
         N = len(individues_to_simulate)
         averageTrades = TotalNumberOfTrades/ max(1,N)
 

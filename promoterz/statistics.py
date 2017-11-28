@@ -9,8 +9,8 @@ statisticsNames = {
     'max': 'Maximum profit',
     'size': 'Population size',
     'maxsize': 'Max population size',
-    'avgTrades': 'Average n of trades',
-    'sharpe': 'Avergare sharpe ratio'
+    'avgTrades': 'Avg trade number',
+    'sharpe': 'Avg sharpe ratio'
 }
 
 def getStatisticsMeter():
