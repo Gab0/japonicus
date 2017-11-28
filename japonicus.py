@@ -51,7 +51,11 @@ else:
    
 markzero_time = datetime.datetime.now()
 
-print(TITLE)
+try:
+   print(TITLE)
+except UnicodeEncodeError:
+   print("\nJAPONICUS\n")
+   
 print('\t' * 8 + 'v%.2f' % VERSION)
 print()
 print("The profits reported here are the profit beyond market price change;\n"+\
