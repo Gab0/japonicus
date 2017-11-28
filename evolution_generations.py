@@ -38,7 +38,7 @@ def bEvaluate(constructPhenotype, candleSize, Database,
     return SCORE
 
 
-def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOCALE=2):
+def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOCALE=2, web=None):
 
     GenerationMethod = promoterz.functions.selectRepresentationMethod(GenerationMethod)
 
@@ -97,7 +97,7 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
     loops = [ promoterz.sequence.standard_loop.standard_loop ]
     World = promoterz.world.World(GlobalTools, loops,
                                   genconf, globalconf,  TargetParameters, NB_LOCALE,
-                                  EnvironmentParameters=availableDataRange)
+                                  EnvironmentParameters=availableDataRange, web=web)
 
     while World.EPOCH < World.genconf.NBEPOCH:
         World.runEPOCH()

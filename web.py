@@ -17,13 +17,61 @@ import Settings
 gsettings = Settings.getSettings()['Global']
 settings = Settings.getSettings()['bayesian']
 
-def load_evolution_logs(filename="evolution_gen_Locale1.csv"):
+def load_evolution_logs(filename=None):
     FileList = os.listdir(gsettings["save_dir"])
     columns = ['id', 'avg', 'std', 'min', 'max', 'dateRange']
     filename = os.path.join(gsettings["save_dir"], filename)
     df = pd.read_csv(filename, names=columns)
     return df
 
+def update_graph(GraphName):
+    print('Loading')
+    ID = [s for s in GraphName if s.isdigit()]
+    df = load_evolution_logs(filename="evolution_gen_Locale%s.csv" % ''.join(ID))
+    annotations = []
+    for W in range(len(df['dateRange'])):
+        DR = df['dateRange'][W]
+        if DR != 'None':
+            annotations.append({
+                'xref':'axis',
+                'yref':'paper',
+                'xanchor': 'left',
+                'yanchor': 'bottom',
+                'font': {
+                    'family': 'Arial',
+                    'size': 12,
+                    'color': 'rgb(37,37,37)'
+                },
+                'x': W,
+                'y': 1 if not len(annotations) % 2 else 0.93, # avoid label overlap;
+                'text': DR
+            })
+
+    colorSequence = [ (188,189,34),(100,11,182),(186,3,34),(45,111,45) ]
+    statNames = ['avg', 'std', 'min', 'max']
+
+    DATA = [{'x': df['id'], 'y': df[statNames[S]],
+             'type': 'line', 'name': statisticsNames[statNames[S]],
+             'line': {'color': 'rgb%s' % str(colorSequence[S]) }
+             } for S in range(len(statNames))]
+    fig = {
+        'data': [
+            {'x':[0, df["id"]], 'y':[0],
+             'type': 'line', 'name': 'markzero',
+             'line': {'color': 'rgb(0,0,0)'}}] + DATA
+
+        ,
+        'layout': {
+            'title': 'Evolution at %s' % GraphName,
+            'annotations': annotations
+        }
+    }
+    return fig
+
+def newGraphic(name):
+    G = dcc.Graph(id=name)
+    G.Active=True
+    return G
 
 def run_server():
     # Setup the app
@@ -39,8 +87,11 @@ def run_server():
     timeout = 60 * 60  # 1 hour
 
     # Controls
-
+    
     # Layout
+    app.GraphicList = [ ]
+    app.newGraphic = lambda name: app.GraphicList.append(newGraphic(name))
+    
     app.layout =  html.Div([
             html.Div([
                 html.H2(
@@ -52,13 +103,14 @@ def run_server():
                     dcc.RadioItems(id='set-time',
                         value=5000,
                         options=[
-                            {'label': 'Every 5 seconds', 'value': 5000},
-                            {'label': 'Off', 'value': 60*60*1000} # or just every hour
+                            {'label': 'Every 60 seconds', 'value': 60000},
+                            {'label': 'Every 15 seconds', 'value': 15000},
+                            {'label': 'Every hour', 'value': 60*60*1000} # or just every hour
                         ]),
                     ]),
                 html.Div(id='display-time'),
                 ]),
-            html.Div([dcc.Graph(id='output')], id='Graphs')
+            html.Div(id='Graphs')
     ],        style={
         #Traces>Color
             'width': '1100',
@@ -68,13 +120,14 @@ def run_server():
             'background-color': '#F3F3F3'
     })
 
-
+    app.config['suppress_callback_exceptions']=True
+    
     @app.callback(
         Output('display-time', 'children'),
         events=[Event('my-interval', 'interval')])
     def display_time():
         return str(datetime.datetime.now())
-
+    
 
     @app.callback(
         Output('my-interval', 'interval'),
@@ -82,64 +135,16 @@ def run_server():
     def update_interval(value):
         return value
 
-    ''' TODO: sucessive runs (--repeat) stacks
-    multiple graphics on web interface
-
-    APP.InternalContents[-1].id='old%i' % randrange(0,6000)
-    APP.InternalContents.append(GRAPH(id='output'))
-
-    @app.callback(
-        Output('Graphs', 'children'),
-        [Input('output')])
-    def appendGraph(oldGraph):
-        return [oldGraph, dcc.Graph(id-'output')]
-    '''
-
     @cache.memoize(timeout=timeout)
     @app.callback(
-        Output('output', 'figure'),
+        Output('Graphs', 'children'),
         events=[Event('my-interval', 'interval')])
-    def update_graph():
-        print('Loading')
-        df = load_evolution_logs()
-        annotations = []
-        for W in range(len(df['dateRange'])):
-            DR = df['dateRange'][W]
-            if DR != 'None':
-                annotations.append({
-                    'xref':'axis',
-                    'yref':'paper',
-                    'xanchor': 'left',
-                    'yanchor': 'bottom',
-                    'font': {
-                        'family': 'Arial',
-                        'size': 12,
-                        'color': 'rgb(37,37,37)'
-                    },
-                    'x': W,
-                    'y': 1 if not len(annotations) % 2 else 0.93, # avoid label overlap;
-                    'text': DR
-                })
-
-        colorSequence = [ (188,189,34),(100,11,182),(186,3,34),(45,111,45) ]
-        statNames = ['avg', 'std', 'min', 'max']
-
-        DATA = [{'x': df['id'], 'y': df[statNames[S]],
-                 'type': 'line', 'name': statisticsNames[statNames[S]],
-                 'line': {'color': 'rgb%s' % colorSequence[S]} } for S in range(len(statNames))]
-        fig = {
-            'data': [
-                {'x':[0, df["id"]], 'y':[0],
-                 'type': 'line', 'name': 'markzero',
-                 'line': {'color': 'rgb(0,0,0)'}}] + DATA
-
-            ,
-            'layout': {
-                'title': 'Evolution Data Over Time',
-                'annotations': annotations
-            }
-        }
-        return fig
+    def updateGraphs():
+        for F in range(len(app.GraphicList)):
+            if app.GraphicList[F].Active:
+                app.GraphicList[F].__setattr__('figure', update_graph(app.GraphicList[F].id))
+            
+        return app.GraphicList
 
 
     # External css

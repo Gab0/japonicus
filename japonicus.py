@@ -46,7 +46,9 @@ if options.spawn_web:
    P.start()
 
    sleep(2)
-
+else:
+   APP = None
+   
 markzero_time = datetime.datetime.now()
 
 print(TITLE)
@@ -90,7 +92,7 @@ if options.genetic_algorithm:
       TargetParameters = getSettings()['strategies'][Strategy]
 
    for s in range(options.repeater):
-      gekko_generations(TargetParameters, GenerationMethod, EvaluationMode)
+      gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, web=APP)
 
 elif options.bayesian_optimization:
    import evolution_bayes
