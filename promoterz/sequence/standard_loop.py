@@ -19,7 +19,7 @@ def standard_loop(World, locale):
     
     # --remove equal citizens before evaluation for efficency
     nonevaluated = [ind for ind in locale.population if not ind.fitness.valid]
-    Lu = len(unevaluated)
+    Lu = len(nonevaluated)
     print("first unevaluated: %i" % len(nonevaluated))
     remains = locale.extratools.populationPD(nonevaluated, 1.0)
     Lr = len(remains)
