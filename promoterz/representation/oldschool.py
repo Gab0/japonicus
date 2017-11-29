@@ -11,7 +11,7 @@ from deap import tools
 from deap import algorithms
 
 import numpy as np
-from .. import functions
+from .. import utils
 
 def constructPhenotype(stratSettings, individue):
     # THIS FUNCTION IS UGLYLY WRITTEN; USE WITH CAUTION;
@@ -26,7 +26,7 @@ def constructPhenotype(stratSettings, individue):
         Value = R(individue[K], stratSettings[AttributeNames[K]])
         Phenotype[AttributeNames[K]] = Value
 
-    Phenotype = functions.expandNestedParameters(Phenotype)
+    Phenotype = utils.expandNestedParameters(Phenotype)
 
     return Phenotype
 

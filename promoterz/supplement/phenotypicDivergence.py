@@ -3,7 +3,8 @@
 from deap import tools
 from .. import utils
 import random
-def individualPhenotypicDivergence(constructPhenotype, indA, indB):
+
+def checkPhenotypicDivergence(constructPhenotype, indA, indB):
 
     cmp = [indA, indB]
     cmp = [constructPhenotype(x) for x in cmp]
@@ -17,20 +18,15 @@ def individualPhenotypicDivergence(constructPhenotype, indA, indB):
 
     return score
 
-def populationPhenotypicDivergence(constructPhenotype, population):
-    model = tools.selTournament(population,1, len(population)//3)[0]
-    PDDmedian = 0
-    for IND in population:
-        if IND == model:
-            IND.PDDscore = 1000
-            continue
-        IND.PDDscore = individualPhenotypicDivergence(constructPhenotype, model, IND)
-        PDDmedian += IND.PDDscore
-    PDDmedian = PDDmedian/(len(population)-1)
-    for I in range(len(population)):
-        if population[I].PDDscore < PDDmedian/3:
-            if random.random() < 0.3:
-                population[I] = None
+def populationPhenotypicDivergence(constructPhenotype, population, delpercent):
+    if len(population) > 1:
+        for I in range(len(population)-1):
+            for J in range(I+1, len(population)):
+                if population[I]:
+                    score = checkPhenotypicDivergence(constructPhenotype, population[I], population[J])
+                    if not score and random.random() < delpercent:
+                        population[I] = None
 
     population = [x for x in population if x]
+    
     return population

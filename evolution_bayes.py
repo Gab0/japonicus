@@ -56,7 +56,7 @@ def Evaluate(watch, Dataset, DateRange, Individual, Strategy):
 def expandGekkoStrategyParameters(IND, Strategy):
     config = {}
 
-    IND = promoterz.functions.expandNestedParameters(IND)
+    IND = promoterz.utils.expandNestedParameters(IND)
 
     config[Strategy] = IND
     return config
