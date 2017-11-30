@@ -1,6 +1,5 @@
 #!/bin/python
 from deap import base
-from deap import creator
 from deap import tools
 
 from copy import deepcopy
@@ -8,8 +7,10 @@ import random
 
 from .. import utils
 
+from . import Creator
 
 getPromoterFromMap = lambda x: [x[z] for z in list(x.keys())]
+
 
 def constructPhenotype(stratSettings, chrconf, Individue):
     Settings = {}
@@ -37,9 +38,10 @@ def constructPhenotype(stratSettings, chrconf, Individue):
 
 def getToolbox(Strategy, genconf, Attributes):
     toolbox = base.Toolbox()
-    creator.create("FitnessMax", base.Fitness, weights=(1.0, 3))
-    creator.create("Individual", list, fitness=creator.FitnessMax,
-                   PromoterMap=None, Strategy=Strategy)
+
+    creator = Creator.init(base.Fitness, {'promoterMap': None,
+                                          'Strategy': Strategy})
+    #creator.create("FitnessMax", base.Fitness, weights=(1.0, 3))
 
     toolbox.register("mate", pachytene)
     toolbox.register("mutate", mutate)

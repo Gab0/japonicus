@@ -57,7 +57,7 @@ def standard_loop(World, locale):
 
 
     # --remove very inapt citizens
-    locale.extratools.filterThreshold(-15)
+    locale.extratools.filterThreshold(-15,World.genconf._lambda)
     
     # --show stats;
     statistics.showStats(locale)

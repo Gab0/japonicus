@@ -31,9 +31,14 @@ def filterAwayWorst(population, N=5):
     population = tools.selBest(population, aliveSize)
     return population
 
-def filterAwayThreshold(locale, Threshold):
-    locale.population = [ind for ind in locale.population if ind.fitness.values[0] > Threshold]
+def filterAwayThreshold(locale, Threshold, minimum):
+    remove = [ind for ind in locale.population if ind.fitness.values[0] <= Threshold]
     
+    locale.population = [ind for ind in locale.population if ind.fitness.values[0] > Threshold]
+    NBreturn = max(0, min(minimum-len(locale.population), minimum))
+    if NBreturn and remove:
+        for k in range(NBreturn):
+            locale.population.append(random.choice(remove))
 
 def evaluatePopulation(locale):
     individues_to_simulate = [ind for ind in locale.population if not ind.fitness.valid]
