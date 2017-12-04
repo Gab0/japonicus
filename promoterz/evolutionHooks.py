@@ -90,7 +90,15 @@ def getFitness(individual):
     R = sum(individual.wvalues)
 
 #selectCriteria = lambda x: sum(x.fitness.wvalues)
-selectCriteria = lambda x: x.fitness.wvalues[0] * (1+x.fitness.wvalues[1])
+def selectCriteria(ind):
+    p = ind.fitness.wvalues[0]
+    s = (1+ind.fitness.wvalues[1])
+
+    R = p * s
+    if p < 0 and s < 0:
+        R = -abs(R)
+    return R
+
 def selBest(individuals, number):
     chosen = sorted(individuals, key=selectCriteria, reverse=True)
     return chosen[:number]

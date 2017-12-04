@@ -37,9 +37,9 @@ def getSettings(specific=None):
         'generations': {
             'showIndividualEvaluationInfo': True, # Verbose single evaluation results;
             'POP_SIZE': 30, # Initial population size, per locale 
-            'NBEPOCH': 50, # number of epochs to run
-            'deltaDays': 30, # time window size on days of candlesticks for each evaluation
-            'NBCandlestickData': 2, # Number os candlestick data loaded simultaneously in each locale; slower EPOCHS, theoretical better evolution;
+            'NBEPOCH': 400, # number of epochs to run
+            'deltaDays': 60, # time window size on days of candlesticks for each evaluation
+            'NBCandlestickData': 4, # Number os candlestick data loaded simultaneously in each locale; slower EPOCHS, theoretical better evolution;
             'cxpb': 0.3, # Probabilty of crossover 
             'mutpb': 0.7,# Probability of mutation;
             '_lambda': 7,# size of offspring generated per epoch;
