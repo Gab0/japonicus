@@ -130,8 +130,8 @@ def gekko_bayesian(indicator=None):
     # 2nd Evaluate
     print("")
     print("Step 2: testing searched parameters on random date")
-    chosenRange = gekkoWrapper.getAvailableDataset()
-    DateRange, Scanset = gekkoWrapper.getDateRange(chosenRange,
+    chosenRange, Scanset = gekkoWrapper.getAvailableDataset()
+    DateRange = gekkoWrapper.getDateRange(chosenRange,
                                                    deltaDays=settings['testDays'])
     max_params = bo.res['max']['max_params'].copy()
     #max_params["persistence"] = 1
