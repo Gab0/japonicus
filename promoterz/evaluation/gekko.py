@@ -278,14 +278,14 @@ def getDateRange(Limits, deltaDays=3):
     }
     return DateRange
 
-def getRandomDateRange(Limits, deltaDays, testDays=0):
+def getRandomDateRange(Limits, deltaDays):
 
     FLms = Limits['from']
     TLms = Limits['to']
     deltams=deltaDays * 24 * 60 * 60
-    testms=testDays * 24 * 60 * 60
 
-    Starting= random.randint(FLms,TLms-deltams-testms)
+
+    Starting= random.randint(FLms,TLms-deltams)
     DateRange = {
         "from": "%s" % epochToString(Starting),
         "to": "%s" % epochToString(Starting+deltams)
