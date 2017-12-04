@@ -89,7 +89,8 @@ def getGlobalToolbox(representationModule):
 def getFitness(individual):
     R = sum(individual.wvalues)
 
-selectCriteria = lambda x: sum(x.fitness.wvalues)
+#selectCriteria = lambda x: sum(x.fitness.wvalues)
+selectCriteria = lambda x: x.fitness.wvalues[0] * (1+x.fitness.wvalues[1])
 def selBest(individuals, number):
     chosen = sorted(individuals, key=selectCriteria, reverse=True)
     return chosen[:number]

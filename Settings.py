@@ -37,7 +37,7 @@ def getSettings(specific=None):
         'generations': {
             'showIndividualEvaluationInfo': True, # Verbose single evaluation results;
             'POP_SIZE': 30, # Initial population size, per locale 
-            'NBEPOCH': 500, # number of epochs to run
+            'NBEPOCH': 50, # number of epochs to run
             'deltaDays': 30, # time window size on days of candlesticks for each evaluation
             'NBCandlestickData': 2, # Number os candlestick data loaded simultaneously in each locale; slower EPOCHS, theoretical better evolution;
             'cxpb': 0.3, # Probabilty of crossover 
@@ -64,7 +64,10 @@ def getSettings(specific=None):
             'chromosome': {
                 'GeneSize': 2,
                 'Density': 3,
-            }
+            },
+            'weights': {
+                'profit': 1.0,
+                'sharpe': 0.1}
         },
         # bayesian optimization settings
         'bayesian': {

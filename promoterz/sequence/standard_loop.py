@@ -57,7 +57,7 @@ def standard_loop(World, locale):
 
 
     # --remove very inapt citizens
-    locale.extratools.filterThreshold(-15,World.genconf._lambda)
+    locale.extratools.filterThreshold(-15, World.genconf._lambda)
     
     # --show stats;
     statistics.showStats(locale)
@@ -80,7 +80,7 @@ def standard_loop(World, locale):
             print(M)
 
     # --filter best inds;
-    locale.population[:] = tools.selBest(locale.population, locale.POP_SIZE)
+    locale.population[:] = evolutionHooks.selBest(locale.population, locale.POP_SIZE)
 
 
 

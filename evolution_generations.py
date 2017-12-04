@@ -109,6 +109,7 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
                                                            genconf.deltaDays, 12)
     # After running EPOCHs, select best candidates;
     for LOCALE in World.locales:
+        LOCALE.population = [ ind for ind in LOCALE.population if ind.fitness.valid ]
         B=genconf.finaltest['NBBESTINDS']
         BestIndividues = tools.selBest(LOCALE.population,B)
 
@@ -136,7 +137,7 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
                 Show = json.dumps(FinalIndividueSettings, indent=2)
                 resultInterface.logInfo("~" * 18)
 
-                resultInterface.logInfo("%.3f final profit ~~~~" % FinalProfit)
+                resultInterface.logInfo(" %.3f final profit ~~~~" % FinalProfit)
                 print("Settings for Gekko config.js:")
                 print(Show)
                 print("Settings for Gekko --ui webpage")

@@ -36,8 +36,11 @@ IndicatorProperties = {
                     "input": '.depth'},
 
             "SMMA": {"input": '',
-                     "attrname": stdResult,
-                     "result": stdResult}
+                     "attrname": 'result',
+                     "result": stdResult},
+            "CCI": {"input": '',
+                    "result": stdResult,
+                    "attrname": 'result'}
         }
 
 
@@ -47,20 +50,26 @@ addIndicatorText = lambda name: "this.addIndicator('{i}', '{I}', this.settings.{
 
 class StrategyFileManager():
     def __init__(self, gekkoPath):
-        self.gekkoStratFolder = gekkoPath + '/strategies/'
-        AllowedIndicators = ["PPO", "DEMA", "LRC", "RSI", "SMMA"]
+        self.gekkoStratFolder = gekkoPath + '/strategies/japonicus/'
+        self.gekkoIndicatorFolder = gekkoPath + '/strategies/indicators/'
+        if not os.path.isdir(self.gekkoStratFolder):
+            os.mkdir(self.gekkoStratFolder)
+        
+        AllowedIndicators = ["PPO", "DEMA", "LRC", "RSI", "SMMA", "CCI", "TSI"]
 
         baseContent = open('stratego/base_strategy.js').read()
         self.baseMD5 = hashlib.md5(baseContent.encode('utf-8')).hexdigest()
         self.sessionCreatedFiles = []
         for I in range(len(AllowedIndicators)):
-            if not os.path.isfile("%s/indicators/%s.js" %\
-                                  (self.gekkoStratFolder,
+            if not os.path.isfile("%s%s.js" %\
+                                  (self.gekkoIndicatorFolder,
                                    AllowedIndicators[I])):
                 print("Indicator %s doesn't exist!" % AllowedIndicators[I])
                 AllowedIndicators[I] = None
         self.AllowedIndicators = [ x for x in AllowedIndicators if x ]
 
+        if not self.AllowedIndicators:
+            exit("No usable indicators detected.")
     def checkStrategy(self, phenotype):
         AllIndicators = self.AllowedIndicators
         Indicators = []
@@ -76,20 +85,24 @@ class StrategyFileManager():
             else:
                 return 0
 
+
+
         FallbackIndicators = [x for x in AllIndicators\
                               if x in phenotype.keys()]
+
         if not Indicators:
             Indicators = sorted(FallbackIndicators,
                                 key=sortIndicators, reverse=True)[0:2]
 
-
+        if not Indicators:
+            exit("NO INDICATORS")
         StrategyFileName = 'j' + self.baseMD5[-4:] + ''.join(sorted(Indicators))
         stratpath= self.gekkoStratFolder + StrategyFileName + '.js'
         if not os.path.isfile(stratpath):
             print(self.sessionCreatedFiles)
             self.createStrategyFile(Indicators, stratpath)
 
-        return StrategyFileName
+        return 'japonicus/'+StrategyFileName
 
     def createStrategyFile(self, Indicators, stratpath):
         BASE = open("stratego/base_strategy.js").read()

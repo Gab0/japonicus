@@ -23,24 +23,30 @@ cI = {
         "depth": (3,18)
     },
     "RSI":{
-        "active": False,
+        "active": True,
         "interval": (7,21), # weight
         "thresholds.down": (15,45), # trend thresholds
         "thresholds.up": (45,140), # trend thresholds
     },
     "SMMA":{
-        "active": False,
+        "active": True,
         "weight": (7,16),
         "thresholds.up": (0,0.1),
         "thresholds.down": (-0.1,0)
         },
     "DEMA":{
-        "active": False,
+        "active": True,
         "short": (7,15),
         "long": (12,35),
         "thresholds.up": (0,0.1),
         "thresholds.down": (-0.1,0)
     },
-
+    "CCI":{
+        "active": True,
+        "consistant": (7,21), # constant multiplier. 0.015 gets to around 70% fit
+        "history": (45,135), # history size, make same or smaller than history
+        "thresholds.down": (-150,-50), # trend thresholds
+        "thresholds.up": (50,150), # trend thresholds
+        "thresholds.persistence": (4,10)},
 "persistence": (1,5)
 }

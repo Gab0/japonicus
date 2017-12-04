@@ -6,15 +6,12 @@ import os
 from copy import deepcopy
 
 from deap import base
-
+from .
 from deap import tools
 from deap import algorithms
 
-from . import Creator
-
 import numpy as np
 from .. import utils
-
 
 def constructPhenotype(stratSettings, individue):
     # THIS FUNCTION IS UGLYLY WRITTEN; USE WITH CAUTION;
@@ -49,7 +46,6 @@ def initInd(Criterion, Attributes):
 def getToolbox(Strategy, genconf, Attributes):
     toolbox = base.Toolbox()
 
-    creator = Creator.init(base.Fitness, {'Strategy': Strategy})
     toolbox.register("newind", initInd, creator.Individual, Attributes)
 
     toolbox.register("population", tools.initRepeat, list,  toolbox.newind)
