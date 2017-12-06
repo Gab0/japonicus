@@ -34,24 +34,7 @@ historySize = 0
 watch = settings["watch"]
 
 watch, DatasetRange = gekkoWrapper.getAvailableDataset(watch)
-def EvaluateRaw(Dataset, DateRange, Individual, Strategy):
-    config = expandGekkoStrategyParameters(Individual, Strategy)
 
-    gekko_config = gekkoWrapper.createConfig(config, Dataset, DateRange)
-    url = gekkoWrapper.getURL('/api/backtest')
-    if candleSize > 0:
-        gekko_config["gekkoConfig"]["tradingAdvisor"] = {
-                "enabled": True,
-                "method": Strategy,
-                "candleSize": candleSize,
-                "historySize": historySize,
-        }
-    return gekkoWrapper.httpPost(url, gekko_config)
-
-def Evaluate(watch, Dataset, DateRange, Individual, Strategy):
-    config = expandGekkoStrategyParameters(Individual, Strategy)
-    config["watch"] = watch
-    result =gekkoWrapper.runBacktest("http://localhost:3000", config, Dataset, DateRange)
 
 def expandGekkoStrategyParameters(IND, Strategy):
     config = {}
@@ -61,12 +44,13 @@ def expandGekkoStrategyParameters(IND, Strategy):
     config[Strategy] = IND
     return config
 
-def evaluate_random(Strategy, parameters):
+def Evaluate(Strategy, parameters):
 
     DateRange = gekkoWrapper.getRandomDateRange(DatasetRange, deltaDays=settings['deltaDays'])
     params = expandGekkoStrategyParameters(parameters, Strategy)
     
-    BacktestResult = gekkoWrapper.Evaluate(30, watch, [DateRange], params, "http://localhost:3000")
+    BacktestResult = gekkoWrapper.Evaluate(30, watch,
+                                           [DateRange], params, "http://localhost:3000")
     BalancedProfit = BacktestResult[0][0]
     return BalancedProfit
 
@@ -82,11 +66,11 @@ def gekko_search(**parameters):
     if parallel:
         p = Pool(mp.cpu_count())
         param_list = list([(Strategy, parameters),] * num_rounds)
-        scores = p.starmap(evaluate_random, param_list)
+        scores = p.starmap(Evaluate, param_list)
         p.close()
         p.join()
     else:
-        scores = [evaluate_random(Strategy, parameters) for n in range(num_rounds)]
+        scores = [Evaluate(Strategy, parameters) for n in range(num_rounds)]
 
     series = pd.Series(scores)
     mean = series.mean()
@@ -130,9 +114,7 @@ def gekko_bayesian(indicator=None):
     # 2nd Evaluate
     print("")
     print("Step 2: testing searched parameters on random date")
-    Scanset, chosenRange = gekkoWrapper.getAvailableDataset()
-    DateRange = gekkoWrapper.getRandomDateRange(chosenRange,
-                                                   deltaDays=settings['testDays'])
+
     max_params = bo.res['max']['max_params'].copy()
     #max_params["persistence"] = 1
     print("Starting Second Evaluation")
@@ -141,14 +123,17 @@ def gekko_bayesian(indicator=None):
 
     # 3rd Evaluate
     print("")
-    print("Step 3: testing searched parameters on recent date")
+    print("Step 3: testing searched parameters on new date")
     watch = settings["watch"]
-    result = EvaluateRaw(watch, DateRange, max_params, Strategy)
+    print(max_params)
+    result = Evaluate(Strategy, max_params)
+    
     if type(result['report']) == bool:
         s3 = 0.
     else:
         s3 = result['report']['relativeProfit']
-    resultjson = expandGekkoStrategyParameters(max_params, Strategy)[Strategy]
+    print(max_params)
+    resultjson = expandGekkoStrategyParameters(max_params, Strategy)#[Strategy]
 
     # config.js like output
     percentiles = np.array([0.25, 0.5, 0.75])
