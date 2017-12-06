@@ -128,11 +128,6 @@ def gekko_bayesian(indicator=None):
     print(max_params)
     result = Evaluate(Strategy, max_params)
     
-    if type(result['report']) == bool:
-        s3 = 0.
-    else:
-        s3 = result['report']['relativeProfit']
-    print(max_params)
     resultjson = expandGekkoStrategyParameters(max_params, Strategy)#[Strategy]
 
     # config.js like output
