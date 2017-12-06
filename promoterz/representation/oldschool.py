@@ -5,8 +5,8 @@ import os
 
 from copy import deepcopy
 
+from . import Creator
 from deap import base
-from .
 from deap import tools
 from deap import algorithms
 
@@ -46,6 +46,7 @@ def initInd(Criterion, Attributes):
 def getToolbox(Strategy, genconf, Attributes):
     toolbox = base.Toolbox()
 
+    creator = Creator.init(base.Fitness, {'Strategy': Strategy})
     toolbox.register("newind", initInd, creator.Individual, Attributes)
 
     toolbox.register("population", tools.initRepeat, list,  toolbox.newind)
