@@ -129,7 +129,7 @@ def gekko_bayesian(indicator=None):
     result = Evaluate(Strategy, max_params)
     
     resultjson = expandGekkoStrategyParameters(max_params, Strategy)#[Strategy]
-
+    s3= result
     # config.js like output
     percentiles = np.array([0.25, 0.5, 0.75])
     formatted_percentiles = [str(int(round(x*100)))+"%" for x in percentiles]
@@ -147,40 +147,12 @@ def gekko_bayesian(indicator=None):
     for i in range(len(s2)):
         print('// %s: %.3f' % (stats_index[i], s2[i]))
     print("// "+'-'*50)
-    print("// 3rd Evaluate nearest date: %s to %s" % (DateRange['from'], DateRange['to']))
-    print("// Evaluted Score: %f" % s3)
+    print("// 3rd Evaluted: %f" % s3)
     print("// "+'-'*50)
     print("config.%s = {%s};" % (Strategy, json.dumps(resultjson, indent=2)[1:-1]))
     print("// "+'-'*50)
 
-    if settings["save"]:
-        paramsdf = pd.DataFrame.from_dict(bo.res["all"]["params"])
-        valuesdf = pd.DataFrame.from_dict(bo.res["all"]["values"])
-        paramsdf["target"] = valuesdf
-        watch = settings["watch"]
-        filename = "_".join([watch["exchange"], watch["currency"], watch["asset"], Strategy, datetime.datetime.now().strftime('%Y%m%d_%H%M%S'), str(max_val)])
-        save_dir = gsettings["save_dir"]
-        csv_filename = os.path.join(save_dir, filename) + "_bayes.csv"
-        json_filename = os.path.join(save_dir, filename) + "_config.json"
-        json2_filename = os.path.join(save_dir, filename) + "_response.json"
-        config = expandGekkoStrategyParameters(max_params, Strategy)
-        config["watch"] = watch
-        gekko_config = gekkoWrapper.createConfig(config, DateRange)
 
-        if not os.path.exists(save_dir):
-            os.mkdir(save_dir)
-        paramsdf.to_csv(csv_filename, index=False)
-        print("Saved: " + csv_filename)
-        f = open(json_filename, "w")
-        f.write(json.dumps(gekko_config, indent=2))
-        f.close()
-        print("Saved: " + json_filename)
-        f = open(json2_filename, "w")
-        f.write(json.dumps(result, indent=2))
-        f.close()
-        print("Saved: " + json2_filename)
-    if settings["show_chart"]:
-        chart.show_candles(result, max_params)
 
     return max_params
 
