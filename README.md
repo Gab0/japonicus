@@ -59,6 +59,9 @@ Backtesting is parallel, running a pool of five workers, adjustable.
 
 ### Gekko Strategies
 
+To run japonicus you must select a strat via `--strat <strategy>`, where `<strategy>` corresponds to any working strategy present on gekko `strategies` folder.
+The settings ranges for given strategy must be present as a key on `configStrategies.py`. A random strategy may be also selected with `-r` arg.
+
 Those strategies present in a fresh clone of gekko are no good, ditch them. 
 With genetic algorithm optimization, those strats can get to a level of profit that is above the market base price change 
 for given period. Even then, that power will be only shown at the dataset it was optimized for, so the settings
