@@ -39,7 +39,7 @@ def getSettings(specific=None):
             'POP_SIZE': 30, # Initial population size, per locale 
             'NBEPOCH': 400, # number of epochs to run
             'deltaDays': 60, # time window size on days of candlesticks for each evaluation
-            'NBCandlestickData': 4, # Number os candlestick data loaded simultaneously in each locale; slower EPOCHS, theoretical better evolution;
+            'NBCandlestickData': 4, # Number of candlestick data loaded simultaneously in each locale; slower EPOCHS, theoretical better evolution;
             'cxpb': 0.3, # Probabilty of crossover 
             'mutpb': 0.7,# Probability of mutation;
             '_lambda': 7,# size of offspring generated per epoch;
@@ -51,11 +51,11 @@ def getSettings(specific=None):
             'candleSize': 30, # candle size for gekko backtest, in minutes
              # dataset_source can be set to None so it searches from any source;
              # leave the ! on the ignored entry as convenient;
-            'dataset_source': None,
-            '!dataset_source': {
-                "exchange": "poloniex",
-                "currency": 'USDT',
-                "asset": 'BTC'
+            '!dataset_source': None,
+            'dataset_source': { # in case of specifying exchange-currency-asset, rename this removing the '!', and del the original key above.
+                "exchange": "kraken",
+                "currency": 'USD',
+                "asset": 'LTC'
             },
             'finaltest': {
                 'NBBESTINDS': 1,
