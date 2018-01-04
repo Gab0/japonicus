@@ -11,7 +11,7 @@ Install gekko, then clone this repo and install dependencies:
 $ git clone https://git.com/Gab0/gekkoJaponicus.git
 $ cd gekko_japonicus
 $ sudo pip install -r requirements.txt
- \t(make sure pip session runs for python3.6 --> $sudo pip3 -r requirements.txt
+    # make sure pip session runs for python3.6 --> $sudo pip3 -r requirements.txt
 ```
 ### Usage
 
