@@ -66,7 +66,10 @@ def getAvailableDataset(exchange_source=None):
             scanset.append(s)
 
     if len(scanset) == 0:
-        raise "scanset not available: {}".format(watch)
+        if exchange_source:
+            raise "scanset not available: %s" % exchange_source
+        else:
+            raise "no scanset available! check Gekko candle database."
 
     for EXCHANGE in scanset:
         ranges = EXCHANGE['ranges']
