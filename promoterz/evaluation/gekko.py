@@ -287,7 +287,9 @@ def getRandomDateRange(Limits, deltaDays):
     TLms = Limits['to']
     deltams=deltaDays * 24 * 60 * 60
 
-
+    if deltams > (TLms - FLms):
+        print("Fatal: deltaDays on Settings.py set to a value bigger than used dataset. Edit Settings file to fit your chosen candlestick dataset.")
+        exit()
     Starting= random.randint(FLms,TLms-deltams)
     DateRange = {
         "from": "%s" % epochToString(Starting),
