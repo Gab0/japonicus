@@ -27,7 +27,12 @@ def load_evolution_logs(filename=None):
 def update_graph(GraphName):
     print('Loading')
     ID = [s for s in GraphName if s.isdigit()]
-    df = load_evolution_logs(filename="evolution_gen_Locale%s.csv" % ''.join(ID))
+    try:
+        df = load_evolution_logs(filename="evolution_gen_Locale%s.csv" % ''.join(ID))
+        
+    except:
+        print("Failure to read evolution data.")
+        return None
     annotations = []
     for W in range(len(df['dateRange'])):
         DR = df['dateRange'][W]
