@@ -105,7 +105,7 @@ elif options.bayesian_optimization:
       evolution_bayes.gekko_bayesian(options.strategy)
 
 deltatime = datetime.datetime.now() - markzero_time
-print("Running took %i seconds." % deltatime.seconds)
+print("Run took %i seconds." % deltatime.seconds)
 
 if options.spawn_web:
     print('Statistics info server still runs...')

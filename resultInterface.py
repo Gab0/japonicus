@@ -10,6 +10,48 @@ import numpy as np
 import promoterz
 from Settings import getSettings
 
+def showResults(World):
+    for LOCALE in World.locales:
+        LOCALE.population = [ ind for ind in LOCALE.population if ind.fitness.valid ]
+        B=genconf.finaltest['NBBESTINDS']
+        BestIndividues = tools.selBest(LOCALE.population,B)
+
+        Z=genconf.finaltest['NBADDITIONALINDS']
+        print("Selecting %i+%i individues, random test;" % (B,Z))
+        AdditionalIndividues = promoterz.evolutionHooks.Tournament(LOCALE.population, Z, Z*2)
+
+        print("%i selected;" % len(AdditionalIndividues))
+        AdditionalIndividues = [ x for x in AdditionalIndividues\
+                                 if x not in BestIndividues ]
+
+        FinalIndividues = BestIndividues + AdditionalIndividues
+
+        print("%i selected;" % len(FinalIndividues))
+        for FinalIndividue in FinalIndividues:
+            proof = resultInterface.stratSettingsProofOfViability
+            AssertFitness, FinalProfit = proof(World,
+                                              FinalIndividue,
+                                              ValidationDataset)
+            print("Testing Strategy:\n")
+            if AssertFitness or FinalProfit > 50:
+                print("Following strategy is viable.")
+            else:
+                print("Strategy Fails.")
+            FinalIndividueSettings = GlobalTools.constructPhenotype(
+                    FinalIndividue)
+
+            Show = json.dumps(FinalIndividueSettings, indent=2)
+            resultInterface.logInfo("~" * 18)
+            
+            resultInterface.logInfo(" %.3f final profit ~~~~" % FinalProfit)
+            print("Settings for Gekko config.js:")
+            print(Show)
+            print("Settings for Gekko --ui webpage")
+            resultInterface.logInfo(resultInterface.pasteSettingsToUI(FinalIndividueSettings))
+            
+            print("\nRemember to check MAX and MIN values for each parameter.")
+            print("\tresults may improve with extended ranges.")
+
 
 def stratSettingsProofOfViability(World, Individual, GlobalDataset):
     AllProofs = []
@@ -59,8 +101,6 @@ def logInfo(message, filename="evolution_gen.log"):
     F.write(message)
     print(message)
     F.close()
-
-
 
 def getFromDict(DataDict, Indexes):
     return reduce(operator.getitem, Indexes, DataDict)

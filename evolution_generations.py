@@ -101,6 +101,8 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
 
     while World.EPOCH < World.genconf.NBEPOCH:
         World.runEPOCH()
+        if genconf.evaluateSettingsPeriodically and not World.EPOCH % genconf.evaluateSettingsPeriodically:
+            showResults(World)
     # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
     #FinalBestScores.append(Stats['max'])
     print(World.EnvironmentParameters)
@@ -108,50 +110,12 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
         promoterz.evaluation.gekko.globalEvaluationDataset(World.EnvironmentParameters,
                                                            genconf.deltaDays, 12)
     # After running EPOCHs, select best candidates;
-    for LOCALE in World.locales:
-        LOCALE.population = [ ind for ind in LOCALE.population if ind.fitness.valid ]
-        B=genconf.finaltest['NBBESTINDS']
-        BestIndividues = tools.selBest(LOCALE.population,B)
-
-        Z=genconf.finaltest['NBADDITIONALINDS']
-        print("Selecting %i+%i individues, random test;" % (B,Z))
-        AdditionalIndividues = promoterz.evolutionHooks.Tournament(LOCALE.population, Z, Z*2)
-
-        print("%i selected;" % len(AdditionalIndividues))
-        AdditionalIndividues = [ x for x in AdditionalIndividues\
-                                 if x not in BestIndividues ]
-
-        FinalIndividues = BestIndividues + AdditionalIndividues
-
-        print("%i selected;" % len(FinalIndividues))
-        for FinalIndividue in FinalIndividues:
-            proof = resultInterface.stratSettingsProofOfViability
-            AssertFitness, FinalProfit = proof(World,
-                                              FinalIndividue,
-                                              ValidationDataset)
-            print("Testing Strategy:\n")
-            if AssertFitness or FinalProfit > 50:
-                FinalIndividueSettings = GlobalTools.constructPhenotype(
-                    FinalIndividue)
-
-                Show = json.dumps(FinalIndividueSettings, indent=2)
-                resultInterface.logInfo("~" * 18)
-
-                resultInterface.logInfo(" %.3f final profit ~~~~" % FinalProfit)
-                print("Settings for Gekko config.js:")
-                print(Show)
-                print("Settings for Gekko --ui webpage")
-                resultInterface.logInfo(resultInterface.pasteSettingsToUI(FinalIndividueSettings))
-
-                print("\nRemember to check MAX and MIN values for each parameter.")
-                print("\tresults may improve with extended ranges.")
-
-            else:
-                print("Strategy Fails.")
+    showResults(World)
 
 
 
-            print("")
+
+    print("")
     print("\t\t.RUN ENDS.")
 
 

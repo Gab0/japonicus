@@ -56,6 +56,12 @@ If your Gekko UI http port is not :3000, adjust it;
 
 Backtesting is parallel, running a pool of five workers, adjustable.
 
+### Results
+
+For genetic algorithm `-g`, results are visible at the end of last epoch, as dict and Gekko UI-friendly format.
+Results can also be visible in middle epoches.. check generations.evaluateSettingsPeriodically @ Settings.py to set that interval.
+
+On bayesian method `-b`, current best setings are visible at every step, ending the same way GA does.
 
 ### Gekko Strategies
 

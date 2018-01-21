@@ -35,9 +35,10 @@ def getSettings(specific=None):
         },
         # genetic algorithm settings
         'generations': {
-            'showIndividualEvaluationInfo': True, # Verbose single evaluation results;
+            'showIndividualEvaluationInfo': False, # Verbose single evaluation results;
             'POP_SIZE': 30, # Initial population size, per locale 
             'NBEPOCH': 400, # number of epochs to run
+            'evaluateSettingsPeriodically': 100, # show current best settings on every X epochs. (or False)
             'deltaDays': 60, # time window size on days of candlesticks for each evaluation
             'NBCandlestickData': 4, # Number of candlestick data loaded simultaneously in each locale; slower EPOCHS, theoretical better evolution;
             'cxpb': 0.3, # Probabilty of crossover 
