@@ -56,10 +56,14 @@ If your Gekko UI http port is not :3000, adjust it;
 
 Backtesting is parallel, running a pool of five workers, adjustable.
 
+Bayesian optimization is a quick method to get and idea of some strat settings, while Genetic Algorithm is a rather detailed parallel GA method that takes a long run time, on standard settings, to try to get a very good setting set on chosen strat.
+
+Remember to review/set parameter ranges for chosen strategy name on `configStrategies.py`.
+
 ### Results
 
 For genetic algorithm `-g`, results are visible at the end of last epoch, as dict and Gekko UI-friendly format.
-Results can also be visible in middle epoches.. check generations.evaluateSettingsPeriodically @ Settings.py to set that interval.
+Results can also be visible in middle epoches.. check `generations.evaluateSettingsPeriodically` @ `Settings.py` to set that interval.
 
 On bayesian method `-b`, current best setings are visible at every step, ending the same way GA does.
 
@@ -138,6 +142,6 @@ japonicus will choose a random item of the list to fetch candles and scansets.
 ### Future
 
 Genetic Algorithms are a good way to fetch a good set of settings to run a strategy
-on gekko. But the real gamechanger is the strategy itself. The ideal evolution method
-would be a Genetic Programming that modifies the strat logic itself. This somewhat
-corresponds to -i option of japonicus, still barebones.
+on gekko. But the real gamechanger on gekko is the strategy itself. The ideal evolution method
+would be a Genetic Programming that modifies strategy logic. This somewhat
+corresponds to `-i` option of japonicus, still barebones yet - only 'sums' indicators.
