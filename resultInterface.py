@@ -3,6 +3,7 @@
 import os
 import datetime
 import random
+import json
 import pandas as pd
 from deap import tools
 import numpy as np
@@ -11,12 +12,15 @@ import promoterz
 from Settings import getSettings
 
 def showResults(World):
+    ValidationDataset =\
+        promoterz.evaluation.gekko.globalEvaluationDataset(World.EnvironmentParameters,
+                                                           World.genconf.deltaDays, 12)
     for LOCALE in World.locales:
         LOCALE.population = [ ind for ind in LOCALE.population if ind.fitness.valid ]
-        B=genconf.finaltest['NBBESTINDS']
+        B=World.genconf.finaltest['NBBESTINDS']
         BestIndividues = tools.selBest(LOCALE.population,B)
 
-        Z=genconf.finaltest['NBADDITIONALINDS']
+        Z=World.genconf.finaltest['NBADDITIONALINDS']
         print("Selecting %i+%i individues, random test;" % (B,Z))
         AdditionalIndividues = promoterz.evolutionHooks.Tournament(LOCALE.population, Z, Z*2)
 
@@ -28,7 +32,7 @@ def showResults(World):
 
         print("%i selected;" % len(FinalIndividues))
         for FinalIndividue in FinalIndividues:
-            proof = resultInterface.stratSettingsProofOfViability
+            proof = stratSettingsProofOfViability
             AssertFitness, FinalProfit = proof(World,
                                               FinalIndividue,
                                               ValidationDataset)
@@ -37,17 +41,17 @@ def showResults(World):
                 print("Following strategy is viable.")
             else:
                 print("Strategy Fails.")
-            FinalIndividueSettings = GlobalTools.constructPhenotype(
+            FinalIndividueSettings = World.tools.constructPhenotype(
                     FinalIndividue)
 
             Show = json.dumps(FinalIndividueSettings, indent=2)
-            resultInterface.logInfo("~" * 18)
+            logInfo("~" * 18)
             
-            resultInterface.logInfo(" %.3f final profit ~~~~" % FinalProfit)
-            print("Settings for Gekko config.js:")
+            logInfo(" %.3f final profit ~~~~" % FinalProfit)
+            print(" -- Settings for Gekko config.js -- ")
             print(Show)
-            print("Settings for Gekko --ui webpage")
-            resultInterface.logInfo(resultInterface.pasteSettingsToUI(FinalIndividueSettings))
+            print(" -- Settings for Gekko --ui webpage -- ")
+            logInfo(pasteSettingsToUI(FinalIndividueSettings))
             
             print("\nRemember to check MAX and MIN values for each parameter.")
             print("\tresults may improve with extended ranges.")

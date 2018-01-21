@@ -38,7 +38,8 @@ def bEvaluate(constructPhenotype, candleSize, Database,
     return SCORE
 
 
-def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOCALE=2, web=None):
+def gekko_generations(TargetParameters, GenerationMethod,
+                      EvaluationMode, NB_LOCALE=2, web=None):
 
     GenerationMethod = promoterz.functions.selectRepresentationMethod(GenerationMethod)
 
@@ -64,7 +65,7 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
 
 
     RemoteHosts = promoterz.evaluation.gekko.loadHostsFile(globalconf.RemoteAWS)
-    globalconf.GekkoURLs+=RemoteHosts
+    globalconf.GekkoURLs += RemoteHosts
     if RemoteHosts:
         print("Connected Remote Hosts:\n%s" % ('\n').join(RemoteHosts))
         if EvaluationMode == 'indicator':
@@ -101,16 +102,15 @@ def gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, NB_LOC
 
     while World.EPOCH < World.genconf.NBEPOCH:
         World.runEPOCH()
-        if genconf.evaluateSettingsPeriodically and not World.EPOCH % genconf.evaluateSettingsPeriodically:
-            showResults(World)
-    # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
-    #FinalBestScores.append(Stats['max'])
+        if genconf.evaluateSettingsPeriodically:
+            if not World.EPOCH % genconf.evaluateSettingsPeriodically:
+                resultInterface.showResults(World)
+
+    # RUN ENDS. SELECT INDIVIDUE, LOG ANDo PRINT STUFF;
+    # FinalBestScores.append(Stats['max'])
     print(World.EnvironmentParameters)
-    ValidationDataset =\
-        promoterz.evaluation.gekko.globalEvaluationDataset(World.EnvironmentParameters,
-                                                           genconf.deltaDays, 12)
     # After running EPOCHs, select best candidates;
-    showResults(World)
+    resultInterface.showResults(World)
 
 
 

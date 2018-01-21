@@ -3,7 +3,6 @@ This is an implementation of genetic algorithm evolution to develop strategies f
 It generates random configs & evolve them by backtesting on a Gekko session via the REST API of gekko's user interface. <br>
 Genetic algorithm and quick bayesian optimization are evolution choices.
 
-
 ### Setup
 Japonicus works on `python>=3.6`!
 Install gekko, then clone this repo and install dependencies:
@@ -13,6 +12,7 @@ $ cd gekko_japonicus
 $ sudo pip install -r requirements.txt
     # make sure pip session runs for python3.6 --> $sudo pip3 install -r requirements.txt
 ```
+
 ### Usage
 
 ```

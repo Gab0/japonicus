@@ -38,22 +38,29 @@ def getSettings(specific=None):
             'showIndividualEvaluationInfo': False, # Verbose single evaluation results;
             'POP_SIZE': 30, # Initial population size, per locale 
             'NBEPOCH': 400, # number of epochs to run
-            'evaluateSettingsPeriodically': 5, # show current best settings on every X epochs. (or False)
+            'evaluateSettingsPeriodically': 20, # show current best settings on every X epochs. (or False)
             'deltaDays': 60, # time window size on days of candlesticks for each evaluation
             'NBCandlestickData': 4, # Number of candlestick data loaded simultaneously in each locale; slower EPOCHS, theoretical better evolution;
+            # -- Genetic Algorithm Parameters
             'cxpb': 0.3, # Probabilty of crossover 
             'mutpb': 0.7,# Probability of mutation;
             '_lambda': 7,# size of offspring generated per epoch;
+
+            'PRoFIGA_beta': 0.005, # weight of PRoFIGA calculations on variability of population size
+            'ageBoundaries': (9, 19), # minimum age to die, age when everyone dies (on EPOCHS)
+
+            'candleSize': 30, # candle size for gekko backtest, in minutes
+
+
             'DRP': 70,# Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
             'ParallelBacktests': 5,
-            'PRoFIGA_beta': 0.005, # weight of PRoFIGA calculations on variability of population size
-            'ageBoundaries': (9, 19), # minimum age to die, age where everyone dies (on EPOCHS)
-            'candleSize': 30, # candle size for gekko backtest, in minutes
+
+            # -- Gekko Dataset Settings
+            # leave the ! on the ignored entry as convenient;
+            'dataset_source': None,
              # dataset_source can be set to None so it searches from any source;
-             # leave the ! on the ignored entry as convenient;
-            '!dataset_source': None,
-            'dataset_source': { # in case of specifying exchange-currency-asset, rename this removing the '!', and del the original key above.
+            '!dataset_source': { # in case of specifying exchange-currency-asset, rename this removing the '!', and del the original key above.
                 "exchange": "kraken",
                 "currency": 'USD',
                 "asset": 'LTC'
