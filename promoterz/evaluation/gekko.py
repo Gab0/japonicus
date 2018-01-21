@@ -67,9 +67,9 @@ def getAvailableDataset(exchange_source=None):
 
     if len(scanset) == 0:
         if exchange_source:
-            raise "scanset not available: %s" % exchange_source
+            raise RuntimeError("scanset not available: %s\n\tscanset found: %s" % (exchange_source, DataSetPack))
         else:
-            raise "no scanset available! check Gekko candle database."
+            raise RuntimeError("no scanset available! check Gekko candle database.")
 
     for EXCHANGE in scanset:
         ranges = EXCHANGE['ranges']
