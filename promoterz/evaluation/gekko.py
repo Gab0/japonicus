@@ -100,9 +100,15 @@ def loadHostsFile(HostsFilePath):
 
     return remoteGekkos
 
-def runBacktest(GekkoInstanceUrl, TradeSetting, Database, DateRange, candleSize=10, gekko_config=None):
-    gekko_config = createConfig(TradeSetting, Database, DateRange, candleSize, gekko_config)
-    url = GekkoInstanceUrl+'/api/backtest'
+def runBacktest(GekkoInstanceUrl, TradeSetting,
+                Database, DateRange, candleSize=10,
+                gekko_config=None, Debug=False):
+
+    gekko_config = createConfig(TradeSetting, Database,
+                                DateRange, candleSize,
+                                gekko_config, Debug)
+
+    url = GekkoInstanceUrl + '/api/backtest'
     result = httpPost(url, gekko_config)
     # sometime report is False(not dict)
     if type(result['report']) is bool:
@@ -110,7 +116,7 @@ def runBacktest(GekkoInstanceUrl, TradeSetting, Database, DateRange, candleSize=
         print(DateRange)
 
         # That fail is so rare that has no impact.. still happens randomly;
-        return {'relativeProfit':0, 'market':0, 'trades':0, 'sharpe':0} # fake backtest report
+        return {'relativeProfit': 0, 'market': 0, 'trades': 0, 'sharpe': 0} # fake backtest report
 
 
     #rProfit = result['report']['relativeProfit']
@@ -167,16 +173,16 @@ def firePaperTrader(GekkoInstanceUrl, TradeSetting, Exchange, Currency, Asset):
     RESULT = httpPost(URL,CONFIG)
     print(RESULT)
     
-def createConfig(TradeSetting, Database, DateRange, candleSize=10, gekko_config=None):
+def createConfig(TradeSetting, Database,
+                 DateRange, candleSize=10,
+                 gekko_config=None, Debug=False):
 
     TradeMethod = list(TradeSetting.keys())[0]
-    true = True
-    false= False
 
     CONFIG = {
         "gekkoConfig": {
-            "debug":false,
-            "info":false,
+            "debug": Debug,
+            "info": Debug,
             "watch": Database,
             "paperTrader": {
                 "fee": 0.25, # declare deprecated 'fee' so keeps working w/ old gekko;
@@ -188,11 +194,11 @@ def createConfig(TradeSetting, Database, DateRange, candleSize=10, gekko_config=
                     "asset":1,
                     "currency":100
                 },
-                "reportRoundtrips":true,
-                "enabled":true
+                "reportRoundtrips":True,
+                "enabled":True
             },
             "tradingAdvisor": {
-                "enabled":true,
+                "enabled":True,
                 "method": TradeMethod,
                 "candleSize": candleSize, # candleSize: smaller = heavier computation + better possible results;
                 "historySize":10
@@ -203,16 +209,16 @@ def createConfig(TradeSetting, Database, DateRange, candleSize=10, gekko_config=
              },
              "performanceAnalyzer": {
                  "riskFreeReturn":2,
-                 "enabled":true
+                 "enabled":True
              },
-            "valid":true
+            "valid":True
         },
             "data": {
                 "candleProps": ["id", "start", "open", "high", "low", "close", "vwp", "volume", "trades"],
-                "indicatorResults":true,
-                "report":true,
-                "roundtrips":false,
-                "trades":true
+                "indicatorResults":True,
+                "report":True,
+                "roundtrips":False,
+                "trades":True
             }
     }
     if gekko_config == None:
@@ -251,14 +257,15 @@ def getCandles(DateRange, size=100):
     return RESULT
 
 
-def Evaluate(candleSize, Database, DateRange, phenotype, GekkoInstanceUrl):
+def Evaluate(genconf, Database, DateRange, phenotype, GekkoInstanceUrl):
     # IndividualToSettings(IND, STRAT) is a function that depends on GA algorithm,
     # so should be provided;
 
     result = [ runBacktest(GekkoInstanceUrl,
                            phenotype, Database,
                            DR,
-                           candleSize=candleSize) for DR in DateRange ]
+                           candleSize=genconf.candleSize,
+                           Debug=genconf.gekkoDebug) for DR in DateRange ]
 
     RelativeProfits = [ R['relativeProfit']-R['market'] for R in result]
     avgTrades = sum( [R['trades'] for R in result] ) / len(DateRange)

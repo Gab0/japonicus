@@ -14,10 +14,11 @@ from Settings import getSettings
 def showResults(World):
     ValidationDataset =\
         promoterz.evaluation.gekko.globalEvaluationDataset(World.EnvironmentParameters,
-                                                           World.genconf.deltaDays, 12)
+                                                           World.genconf.deltaDays,
+                                                           World.genconf.proofSize)
     for LOCALE in World.locales:
         LOCALE.population = [ ind for ind in LOCALE.population if ind.fitness.valid ]
-        B=World.genconf.finaltest['NBBESTINDS']
+        B = World.genconf.finaltest['NBBESTINDS']
         BestIndividues = tools.selBest(LOCALE.population,B)
 
         Z=World.genconf.finaltest['NBADDITIONALINDS']
@@ -64,14 +65,18 @@ def stratSettingsProofOfViability(World, Individual, GlobalDataset):
         AllProofs.append(q)
         print('Testing monthly profit %.3f \t nbTrades: %.1f' % (q, m))
 
-    iValue = 100
-    for W in AllProofs:
-        iValue += iValue * (W/100)
-    check = [x for x in AllProofs if x > 0]
+    testMoney = 100
+    for value in AllProofs:
+        testMoney +=  (value/100*testMoney)
+
+    check = [ x for x in AllProofs if x > 0 ]
     Valid = sum(check) == len(check)
-    print("Annual profit %.3f%%" % (iValue-100))
-    return Valid, iValue
- 
+
+    testMoney = testMoney - 100
+
+    print("Annual profit %.3f%%" % (testMoney))
+    return Valid, testMoney
+
 def pasteSettingsToUI(Settings):
     text = []
     toParameter = lambda name, value: "%s = %f" % (name,value)

@@ -21,19 +21,21 @@ StrategyFileManager = None
 
 # TEMPORARY ASSIGNMENT OF EVAL FUNCTIONS; SO THINGS REMAIN SANE (SANE?);
 def aEvaluate(StrategyFileManager, constructPhenotype,
-              candleSize, Database, DateRange, Individual, gekkoUrl):
+              genconf, Database, DateRange, Individual, gekkoUrl):
     phenotype = constructPhenotype(Individual)
     StratName = StrategyFileManager.checkStrategy(phenotype)
     phenotype = {StratName:phenotype}
-    SCORE = promoterz.evaluation.gekko.Evaluate(candleSize, Database, 
+
+    SCORE = promoterz.evaluation.gekko.Evaluate(genconf, Database, 
                                                 DateRange, phenotype, gekkoUrl)
     return SCORE
 
-def bEvaluate(constructPhenotype, candleSize, Database,
+def bEvaluate(constructPhenotype, genconf, Database,
               DateRange, Individual, gekkoUrl):
     phenotype = constructPhenotype(Individual)
     phenotype = {Individual.Strategy: phenotype}
-    SCORE = promoterz.evaluation.gekko.Evaluate(candleSize, Database,
+
+    SCORE = promoterz.evaluation.gekko.Evaluate(genconf, Database,
                                                 DateRange, phenotype, gekkoUrl)
     return SCORE
 
@@ -81,7 +83,7 @@ def gekko_generations(TargetParameters, GenerationMethod,
 
 
     GlobalTools.register('Evaluate', Evaluate,
-                         GlobalTools.constructPhenotype, genconf.candleSize, datasetSpecifications)
+                         GlobalTools.constructPhenotype, genconf, datasetSpecifications)
 
 
 

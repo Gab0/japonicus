@@ -35,10 +35,11 @@ def getSettings(specific=None):
         },
         # genetic algorithm settings
         'generations': {
+            'gekkoDebug': True,
             'showIndividualEvaluationInfo': False, # Verbose single evaluation results;
             'POP_SIZE': 30, # Initial population size, per locale 
             'NBEPOCH': 400, # number of epochs to run
-            'evaluateSettingsPeriodically': 20, # show current best settings on every X epochs. (or False)
+            'evaluateSettingsPeriodically': 2, # show current best settings on every X epochs. (or False)
             'deltaDays': 60, # time window size on days of candlesticks for each evaluation
             'NBCandlestickData': 4, # Number of candlestick data loaded simultaneously in each locale; slower EPOCHS, theoretical better evolution;
             # -- Genetic Algorithm Parameters
@@ -49,8 +50,9 @@ def getSettings(specific=None):
             'PRoFIGA_beta': 0.005, # weight of PRoFIGA calculations on variability of population size
             'ageBoundaries': (9, 19), # minimum age to die, age when everyone dies (on EPOCHS)
 
-            'candleSize': 30, # candle size for gekko backtest, in minutes
+            'candleSize': 15, # candle size for gekko backtest, in minutes
 
+            'proofSize': 12,
 
             'DRP': 70,# Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
