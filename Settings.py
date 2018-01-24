@@ -32,7 +32,7 @@ def getSettings(specific=None):
 
             # Hosts list of remote machines running gekko, to distribute evaluation load;
             # option values: path to HOSTS file list OR False;
-            'RemoteAWS': '../AmazonSetup/hosts'
+            'RemoteAWS': '../AmazonSetup/hosts',
 
             # Your gekko local URL - CHECK THIS!
             'GekkoURLs': [ 'http://localhost:3000' ]
@@ -45,11 +45,23 @@ def getSettings(specific=None):
             # Verbose single evaluation results;
             'showIndividualEvaluationInfo': False,
 
-            'POP_SIZE': 30, # Initial population size, per locale 
-            'NBEPOCH': 400, # number of epochs to run
-            'evaluateSettingsPeriodically': 20, # show current best settings on every X epochs. (or False)
-            'deltaDays': 60, # time window size on days of candlesticks for each evaluation
-            'NBCandlestickData': 4, # Number of candlestick data loaded simultaneously in each locale; slower EPOCHS, theoretical better evolution;
+            # Initial population size, per locale
+            'POP_SIZE': 30, 
+
+            # number of epochs to run
+            'NBEPOCH': 400,
+
+            # show current best settings on every X epochs. (or False)
+            'evaluateSettingsPeriodically': 20,
+
+            # time window size on days of candlesticks for each evaluation
+            'deltaDays': 60,
+
+            # Number of candlestick data loaded simultaneously in each locale;
+            # slower EPOCHS, theoretical better evolution;
+            'NBCandlestickData': 4,
+
+
             # -- Genetic Algorithm Parameters
             'cxpb': 0.3, # Probabilty of crossover 
             'mutpb': 0.7,# Probability of mutation;
