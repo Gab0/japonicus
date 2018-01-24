@@ -29,14 +29,22 @@ def getSettings(specific=None):
             'configFilename': 'example-config.js',
             'save_dir': "output",
             'log_name': 'evolution_gen.csv',
-            'RemoteAWS': '../AmazonSetup/hosts', # Hosts list of remote machines running gekko, to distribute evaluation load; BETA.
-                                                # option values: path to HOSTS file list OR False;
+
+            # Hosts list of remote machines running gekko, to distribute evaluation load;
+            # option values: path to HOSTS file list OR False;
+            'RemoteAWS': '../AmazonSetup/hosts'
+
+            # Your gekko local URL - CHECK THIS!
             'GekkoURLs': [ 'http://localhost:3000' ]
         },
         # genetic algorithm settings
         'generations': {
+            # show gekko verbose (strat info) - gekko must start with -d flag;
             'gekkoDebug': True,
-            'showIndividualEvaluationInfo': False, # Verbose single evaluation results;
+
+            # Verbose single evaluation results;
+            'showIndividualEvaluationInfo': False,
+
             'POP_SIZE': 30, # Initial population size, per locale 
             'NBEPOCH': 400, # number of epochs to run
             'evaluateSettingsPeriodically': 20, # show current best settings on every X epochs. (or False)

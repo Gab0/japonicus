@@ -21,7 +21,8 @@ def showResults(World):
         B = World.genconf.finaltest['NBBESTINDS']
         BestIndividues = tools.selBest(LOCALE.population,B)
 
-        Z=World.genconf.finaltest['NBADDITIONALINDS']
+        Z = min(World.genconf.finaltest['NBADDITIONALINDS'], len(LOCALE.population)-B)
+        Z = min(0, Z)
         print("Selecting %i+%i individues, random test;" % (B,Z))
         AdditionalIndividues = promoterz.evolutionHooks.Tournament(LOCALE.population, Z, Z*2)
 
@@ -60,7 +61,8 @@ def showResults(World):
 
 def stratSettingsProofOfViability(World, Individual, GlobalDataset):
     AllProofs = []
-    Results = World.parallel.evaluateBackend([GlobalDataset], 0, [Individual])
+    GlobalDataset = [[x] for x in GlobalDataset]
+    Results = World.parallel.evaluateBackend(GlobalDataset, 0, [Individual])
 
     for W in Results[0]:
         ((q, s), m) = W
