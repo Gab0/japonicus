@@ -39,7 +39,7 @@ def getSettings(specific=None):
             'showIndividualEvaluationInfo': False, # Verbose single evaluation results;
             'POP_SIZE': 30, # Initial population size, per locale 
             'NBEPOCH': 400, # number of epochs to run
-            'evaluateSettingsPeriodically': 2, # show current best settings on every X epochs. (or False)
+            'evaluateSettingsPeriodically': 20, # show current best settings on every X epochs. (or False)
             'deltaDays': 60, # time window size on days of candlesticks for each evaluation
             'NBCandlestickData': 4, # Number of candlestick data loaded simultaneously in each locale; slower EPOCHS, theoretical better evolution;
             # -- Genetic Algorithm Parameters

@@ -92,8 +92,6 @@ Known good gekko strategies to run with this:
 Some strategies for which japonicus got settings covered:
 
 https://github.com/Gab0/gekko-supertrend-strategy/ by dodo33. 
-This branch is modified for GA usage, including a port of ATR indicator from TA-Lib to native gekko.
-Seems to get good results.
 
 ### Remote Amazon EC2 Cluster
 
