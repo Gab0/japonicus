@@ -22,15 +22,13 @@ def getURL(path):
 epochToString = lambda D: datetime.datetime.utcfromtimestamp(D).strftime(DateFormat)
 
 def initializeGekko(): # not used yet.
-    CMD = ['node', gekkoDIR + '/gekko', '--ui']
+    CMD = [ 'node', gekkoDIR + '/gekko', '--ui' ]
     D = Popen(CMD, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
 def httpPost(URL, data={}):
     try:
-
         Request = requests.post(URL, json=data)
         Response = json.loads(Request.text)
-
     except ConnectionRefusedError:
         print("Error: Gekko comm error! Check your local Gekko instance.")
         exit()
@@ -39,9 +37,8 @@ def httpPost(URL, data={}):
         print(URL)
         print(data)
         raise e
-
     return Response
-    
+
 def getAllScanset():
     globalconf = getSettings('Global')
     base = random.choice(globalconf.GekkoURLs)
@@ -82,16 +79,15 @@ def getAvailableDataset(exchange_source=None):
     best_exchange = exchange_longest_spans.index(max(exchange_longest_spans))
 
     chosenScansetRange = scanset[ best_exchange]['ranges'][scanset[best_exchange]['max_span_index'] ]
-        
+
     specKeys = ['exchange', 'currency', 'asset']
-    
+
     chosenScansetSpecifications = {K:scanset[best_exchange][K] for K in scanset[best_exchange] if K in specKeys}
 
-    
     return chosenScansetSpecifications, chosenScansetRange
 
 def loadHostsFile(HostsFilePath):
-    remoteGekkos=[]
+    remoteGekkos = []
     if os.path.isfile(HostsFilePath):
         H = open(HostsFilePath).read().split('\n')
         for W in H:
@@ -116,7 +112,10 @@ def runBacktest(GekkoInstanceUrl, TradeSetting,
         print(DateRange)
 
         # That fail is so rare that has no impact.. still happens randomly;
-        return {'relativeProfit': 0, 'market': 0, 'trades': 0, 'sharpe': 0} # fake backtest report
+        return { 'relativeProfit': 0,
+                 'market': 0,
+                 'trades': 0,
+                 'sharpe': 0 } # fake backtest report
 
 
     #rProfit = result['report']['relativeProfit']
@@ -125,11 +124,10 @@ def runBacktest(GekkoInstanceUrl, TradeSetting,
     return result['report']
 
 def firePaperTrader(GekkoInstanceUrl, TradeSetting, Exchange, Currency, Asset):
-    
+
     TradeMethod = list(TradeSetting.keys())[0]
     true = True
     false= False
-
 
     CONFIG = {
         "market":{
@@ -169,10 +167,10 @@ def firePaperTrader(GekkoInstanceUrl, TradeSetting, Exchange, Currency, Asset):
             "enabled":true},
         "valid":true
     }
-    
+
     RESULT = httpPost(URL,CONFIG)
     print(RESULT)
-    
+
 def createConfig(TradeSetting, Database,
                  DateRange, candleSize=10,
                  gekko_config=None, Debug=False):
@@ -224,7 +222,6 @@ def createConfig(TradeSetting, Database,
     if gekko_config == None:
         gekko_config = CONFIG
     return gekko_config
-
 
 def getCandles(DateRange, size=100):
     globalconf = getSettings('Global')
@@ -289,7 +286,6 @@ def getDateRange(Limits, deltaDays=3):
     return DateRange
 
 def getRandomDateRange(Limits, deltaDays):
-
     FLms = Limits['from']
     TLms = Limits['to']
     deltams=deltaDays * 24 * 60 * 60
@@ -297,7 +293,7 @@ def getRandomDateRange(Limits, deltaDays):
     if deltams > (TLms - FLms):
         print("Fatal: deltaDays on Settings.py set to a value bigger than current dataset.\n Edit Settings file to fit your chosen candlestick data.")
         exit()
-        
+
     Starting= random.randint(FLms,TLms-deltams)
     DateRange = {
         "from": "%s" % epochToString(Starting),

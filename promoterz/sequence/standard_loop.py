@@ -5,33 +5,34 @@ import random
 from deap import algorithms
 import promoterz
 from .. import statistics, evolutionHooks
+
 def standard_loop(World, locale):
     # --assertions are most for debugging purposes; they should not trigger
     assert(len(locale.population))
-    
+
     locale.extraStats = {}
-    
+
     # --validate individuals;
     locale.population=promoterz.validation.validatePopulation(
         World.tools.constructPhenotype,
         World.TargetParameters,
         locale.population)
-    
+
     # --remove equal citizens before evaluation for efficency
-    nonevaluated = [ind for ind in locale.population if not ind.fitness.valid]
+    nonevaluated = [ ind for ind in locale.population if not ind.fitness.valid ]
     Lu = len(nonevaluated)
     print("first unevaluated: %i" % len(nonevaluated))
     remains = locale.extratools.populationPD(nonevaluated, 1.0)
     Lr = len(remains)
-    
+
     print("%i individues removed due to equality" % (Lu-Lr))
-   
+
     locale.population = [ ind for ind in locale.population if ind.fitness.valid ] + remains
 
-          
+
     # --evaluate individuals;
     locale.extraStats['nb_evaluated'], locale.extraStats['avgTrades'] = World.parallel.evaluatePopulation(locale)
-    
+
     assert(len(locale.population))
     # --send best individue to HallOfFame;
     if not locale.EPOCH % 15:

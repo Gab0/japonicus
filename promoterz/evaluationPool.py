@@ -1,6 +1,7 @@
 #!/bin/python
 import time
 import random
+import itertools
 from multiprocessing import Pool, Process, Pipe, TimeoutError
 from multiprocessing.pool import ThreadPool
 
@@ -26,7 +27,10 @@ class EvaluationPool():
 
     def evaluateBackend(self, DateRange, I, inds):
         stime = time.time()
-        Q = [ (DateRange, ind, self.Urls[I]) for ind in inds ]
+
+        dateInds = itertools.product(DateRange,inds)
+
+        Q = [ (DateRange, Ind, self.Urls[I]) for DateRange, Ind in dateInds ]
         P = Pool(self.poolsizes[I])
         fitnesses = P.starmap(self.EvaluationTool, Q )
 
@@ -42,7 +46,7 @@ class EvaluationPool():
 
         props=self.distributeIndividuals(individues_to_simulate)
 
-        args = [ [locale.DateRange, I, props[I]]\
+        args = [ [ [ locale.DateRange ], I, props[I]]\
                  for I in range(len(self.Urls))]
         pool = ThreadPool(len(self.Urls))
 

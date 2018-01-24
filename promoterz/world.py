@@ -10,13 +10,14 @@ class World():
                  TargetParameters, NB_LOCALE=3, EnvironmentParameters=None, web=None):
         self.tools = GlobalTools
         self.loops = loops
-        self.EPOCH = 0 
+        self.EPOCH = 0
         self.locales = []
-        self.size = [500,500]
+        self.size = [ 500, 500 ]
         self.maxdistance = calculateDistance([0,0], self.size)
         self.localeID=1
         self.TargetParameters = TargetParameters
         self.genconf=genconf
+
         self.EnvironmentParameters=EnvironmentParameters
         self.runEPOCH = partial(world_EPOCH, self)
         self.parallel = promoterz.evaluationPool.EvaluationPool(self.tools.Evaluate,

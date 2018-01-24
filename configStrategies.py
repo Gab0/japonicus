@@ -16,6 +16,10 @@ cS = {
         "TSI.long": (10,42),
         "persistence": (1,10)
     },
+    "Supertrend": {
+        "atrEma":(1,10),
+        "bandFactor": (1,10)
+        },
     "PPOLRC":{
         "PPO.short": (3,12),
         "PPO.long": (15,35),

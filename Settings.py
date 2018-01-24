@@ -79,8 +79,10 @@ def getSettings(specific=None):
                 'profit': 1.0,
                 'sharpe': 0.1}
         },
+
         # bayesian optimization settings
         'bayesian': {
+            'gekkoDebug': False,
             'deltaDays': 21,
             'testDays': 21,
             'num_rounds': 10,

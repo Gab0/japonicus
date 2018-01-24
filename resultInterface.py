@@ -60,8 +60,9 @@ def showResults(World):
 
 def stratSettingsProofOfViability(World, Individual, GlobalDataset):
     AllProofs = []
-    for W in GlobalDataset:
-        (q, s), m = World.tools.Evaluate([W], Individual, 'http://localhost:3000')
+    Results = World.parallel.evaluateBackend(GlobalDataset, 0, [Individual])
+    for W in Results:
+        (q, x), m = W
         AllProofs.append(q)
         print('Testing monthly profit %.3f \t nbTrades: %.1f' % (q, m))
 

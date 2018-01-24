@@ -20,7 +20,9 @@ import chart
 
 dict_merge = lambda a,b: a.update(b) or a
 gsettings = getSettings()['Global']
+# Fix the shit below!
 settings = getSettings()['bayesian']
+bayesSettings = getSettings('bayesian')
 
 Strategy = settings["Strategy"]
 StratConfig = getSettings()["strategies"][Strategy]
@@ -48,9 +50,9 @@ def Evaluate(Strategy, parameters):
 
     DateRange = gekkoWrapper.getRandomDateRange(DatasetRange, deltaDays=settings['deltaDays'])
     params = expandGekkoStrategyParameters(parameters, Strategy)
-    
-    BacktestResult = gekkoWrapper.Evaluate(30, watch,
-                                           [DateRange], params, "http://localhost:3000")
+
+    BacktestResult = gekkoWrapper.Evaluate(bayesSettings, watch,
+                                           [DateRange], params, gsettings['GekkoURLs'][0])
     BalancedProfit = BacktestResult[0][0]
     return BalancedProfit
 
