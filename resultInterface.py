@@ -60,7 +60,7 @@ def showResults(World):
 
 def stratSettingsProofOfViability(World, Individual, GlobalDataset):
     AllProofs = []
-    Results = World.parallel.evaluateBackend(GlobalDataset, 0, [Individual])
+    Results = World.parallel.evaluateBackend([GlobalDataset], 0, [Individual])
     for W in Results:
         (q, x), m = W
         AllProofs.append(q)

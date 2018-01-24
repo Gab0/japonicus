@@ -28,9 +28,9 @@ class EvaluationPool():
     def evaluateBackend(self, DateRange, I, inds):
         stime = time.time()
 
-        dateInds = itertools.product(DateRange,inds)
-
-        Q = [ (DateRange, Ind, self.Urls[I]) for DateRange, Ind in dateInds ]
+        dateInds = list(itertools.product(DateRange,inds))
+        # print(list(dateInds))
+        Q = [ (dateRange, Ind, self.Urls[I]) for dateRange, Ind in dateInds ]
         P = Pool(self.poolsizes[I])
         fitnesses = P.starmap(self.EvaluationTool, Q )
 
