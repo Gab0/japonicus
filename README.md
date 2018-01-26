@@ -91,18 +91,18 @@ Some custom strategies for which japonicus got settings covered:
 
 https://github.com/Gab0/gekko-supertrend-strategy/ by dodo33. Original strat uses TA-Lib ATR indicator.
 Modified on this fork for usability with GA. Remember to put the native indicator `ATR.js`on correspondent folder. 
-Results:
+<br>Results:<br>
 Unusable strategy - Gab0
 
 #### User Feedback
 
 You all users of japonicus should create issues about your japonicus runs.
-If some strat seems to be viable, send feedback so users can have a better point of entry for their own runs.
+If some strat seems to be viable, send feedback so users can have a better point of entry for their own runs.<br>
 Should be like `Supertrend strat: very good, tried to broaden parameter ranges, etc`.
 
 ### Special usage methods
 
-## Remote Amazon EC2 Cluster
+#### Remote Amazon EC2 Cluster
 
 Japonicus can send backtest requests across the internet to several machines running Gekko.
 This method can greatly cut EPOCH times.
@@ -130,7 +130,7 @@ steps to put your GA online on clusters;
 
 ```
 
-## Docker Compose
+#### Docker Compose
 
 You can include japonicus to gekko image by adding the following snippet to gekkos docker-compose file
 
@@ -153,7 +153,7 @@ and by setting the `GekkoURLs` config to the container gekko name
 
 japonicus will choose a random item of the list to fetch candles and scansets.
 
-### Future
+# Future
 
 Genetic Algorithms are a good way to fetch a good set of settings to run a strategy
 on gekko. But the real gamechanger on gekko is the strategy itself. The ideal evolution method
