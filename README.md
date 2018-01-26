@@ -3,7 +3,7 @@ This is an implementation of genetic algorithm evolution to develop strategies f
 It generates random configs & evolve them by backtesting on a Gekko session via the REST API of gekko's user interface. <br>
 Genetic algorithm and quick bayesian optimization are evolution choices.
 
-### Setup
+## Setup
 Japonicus works on `python>=3.6`!
 Install gekko, then clone this repo and install dependencies:
 ```
@@ -84,16 +84,25 @@ meaningfun results.
 
 Custom strategies should be added to configStrat.py, by strategy name.
 
-Known good gekko strategies to run with this:
- - PPO+TSI strat
 
-## Notable Strategies
+#### Notable Strategies
 
-Some strategies for which japonicus got settings covered:
+Some custom strategies for which japonicus got settings covered:
 
-https://github.com/Gab0/gekko-supertrend-strategy/ by dodo33. 
+https://github.com/Gab0/gekko-supertrend-strategy/ by dodo33. Original strat uses TA-Lib ATR indicator.
+Modified on this fork for usability with GA. Remember to put the native indicator `ATR.js`on correspondent folder. 
+Results:
+Unusable strategy - Gab0
 
-### Remote Amazon EC2 Cluster
+#### User Feedback
+
+You all users of japonicus should create issues about your japonicus runs.
+If some strat seems to be viable, send feedback so users can have a better point of entry for their own runs.
+Should be like `Supertrend strat: very good, tried to broaden parameter ranges, etc`.
+
+### Special usage methods
+
+## Remote Amazon EC2 Cluster
 
 Japonicus can send backtest requests across the internet to several machines running Gekko.
 This method can greatly cut EPOCH times.
@@ -121,7 +130,7 @@ steps to put your GA online on clusters;
 
 ```
 
-### Docker Compose
+## Docker Compose
 
 You can include japonicus to gekko image by adding the following snippet to gekkos docker-compose file
 
@@ -150,3 +159,13 @@ Genetic Algorithms are a good way to fetch a good set of settings to run a strat
 on gekko. But the real gamechanger on gekko is the strategy itself. The ideal evolution method
 would be a Genetic Programming that modifies strategy logic. This somewhat
 corresponds to `-i` option of japonicus, still barebones yet - only 'sums' indicators.
+
+I'm doing an effort to port the most usable indicator from TA-Lib to native gekko, for faster computing and better usability on genetic algorithms.
+Anyone interested on this work or that would like to suggest an important indicator should message me or send pull requests etc. Those are important for `-i` method improvement.
+
+
+Indicators roadmap:
+~~- Bollinger Bands~~
+~~- Average True Range~~
+- Parabolic Stop and Reverse
+- 
