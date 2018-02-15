@@ -63,7 +63,7 @@ def getSettings(specific=None):
 
             # Number of candlestick data loaded simultaneously in each locale;
             # slower EPOCHS, theoretical better evolution;
-            'NBCandlestickData': 1,
+            'ParallelCandlestickDataset': 1,
 
 
             # -- Genetic Algorithm Parameters

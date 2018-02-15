@@ -36,7 +36,7 @@ class Locale():
             World.EnvironmentParameters, World.genconf.deltaDays)
         
         self.DateRange = [ getDateRange()\
-                           for x in range(World.genconf.NBCandlestickData) ]
+                           for x in range(World.genconf.ParallelCandlestickDataset) ]
 
         self.stats = promoterz.statistics.getStatisticsMeter()
 
