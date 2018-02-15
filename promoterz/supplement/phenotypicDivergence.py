@@ -8,7 +8,7 @@ def checkPhenotypicDivergence(constructPhenotype, indA, indB):
 
     cmp = [indA, indB]
     cmp = [constructPhenotype(x) for x in cmp]
-    cmp = [utils.flattenParameters(x) for x in cmp]
+    cmp = [parameterOperations.flattenParameters(x) for x in cmp]
 
     score = 0
     for w in cmp[0].keys():
