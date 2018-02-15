@@ -1,5 +1,10 @@
 #!/bin/python
 
+import sys
+if not sys.version_info.major >= 3 or not sys.version_info.minor >= 6:
+   exit('check your python version before running japonicus. Python>=3.6 is required.')
+
+
 from time import sleep
 from random import choice, randrange
 from subprocess import Popen, PIPE
