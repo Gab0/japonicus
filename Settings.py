@@ -106,19 +106,34 @@ def getSettings(specific=None):
 
         # bayesian optimization settings
         'bayesian': {
+            # show gekko verbose (strat info) - gekko must start with -d flag;
             'gekkoDebug': False,
+
+
+            # time window size on days of candlesticks for each evaluation
             'deltaDays': 21,
             'testDays': 21,
+
+            # number of evaluation rounds
             'num_rounds': 10,
+
+            # seed for randomziation of values
             'random_state': 2017,
+
+            # number of iterations on each round
             'num_iter': 50,
+
+            # number of random values to start bayes evaluation
             'init_points': 9,
+
             'parallel': False,
-            'Strategy': 'PPO',
             'show_chart': False,
             'save': True,
+
+            # candleSize & historySize on Gekko, for all evals
             'candleSize': 30,
             'historySize': 10,
+
             'watch':{
                 "exchange": "poloniex",
                 "currency": 'USDT',

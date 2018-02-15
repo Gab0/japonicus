@@ -21,7 +21,7 @@ class World():
         self.EnvironmentParameters=EnvironmentParameters
         self.runEPOCH = partial(world_EPOCH, self)
         self.parallel = promoterz.evaluationPool.EvaluationPool(self.tools.Evaluate,
-                                                                globalconf.GekkoURLs, 4, genconf.showIndividualEvaluationInfo)
+                                                                globalconf.GekkoURLs, genconf.ParallelBacktests, genconf.showIndividualEvaluationInfo)
         self.web=web
 
         for l in range(NB_LOCALE):
