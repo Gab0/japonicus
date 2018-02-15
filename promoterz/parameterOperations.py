@@ -1,4 +1,5 @@
 #!/bin/python
+
 def flattenParameters(Parameters):
     result = {}
     def iter(D, path=[]):
@@ -29,3 +30,14 @@ def expandNestedParameters(Parameters):
         else:
             _Parameters[K] = Parameters[K]
     return _Parameters
+
+def parameterValuesToRangeOfValues(TargetParameters, Spread):
+
+    for parameter in TargetParameters.keys():
+        P = TargetParameters[parameter]
+        if type(P) != tuple:
+            spread_change = Spread * P / 200
+            TargetParameters[parameter] = (P - spread_change, P + spread_change)
+
+
+    return TargetParameters

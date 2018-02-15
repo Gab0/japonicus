@@ -4,6 +4,54 @@ NEG = lambda v: (-v[1], -v[0])
 cS = {
     # Define range of values for strat settings;
     #for all evolution methods;
+    
+"RSIBULLBEAR" : {
+
+# SMA Trends
+"SMA_long": (700,1400),
+"SMA_short": (40,60),
+
+# BULL
+"BULL_RSI": (5,18),
+"BULL_RSI_high":  (60,100),
+"BULL_RSI_low" : (40,80),
+
+# BEAR
+"BEAR_RSI": (8,27),
+"BEAR_RSI_high": (35,70),
+"BEAR_RSI_low" : (10,30)
+},
+
+"Bestone" :{
+    "customMACDSettings": {
+        "optInFastPeriod": (3,10),
+        "optInSlowPeriod": (20,50),
+        "optInSignalPeriod": (5,15)
+    },
+
+    "customEMAshortSettings": {
+        "optInTimePeriod": (5,15)
+    },
+
+    "customEMAlongSettings": {
+        "optInTimePeriod": (15,26)
+    },
+
+    "customSTOCHSettings": {
+        "optInFastKPeriod": (6, 14),
+        "optInSlowKPeriod": (2,5),
+        "optInSlowKMAType": (1,1),
+        "optInSlowDPeriod": (2,5),
+        "optInSlowDMAType": (1,1)
+    },
+
+    "customRSISettings": {
+        "optInTimePeriod": (7,20)
+    }
+
+},
+
+    
     "PPOTSI":{
         "PPO.short": (3,16),
         "PPO.long": (12,35),

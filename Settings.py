@@ -17,7 +17,7 @@ class _settings:
         iterate(self,entries)
         '''
         self.__dict__.update(entries)
-        
+
     def getstrat(self, name):
         return self.strategies[name]
 
@@ -44,6 +44,10 @@ def getSettings(specific=None):
 
             # Verbose single evaluation results;
             'showIndividualEvaluationInfo': False,
+
+            # if parameter is set to value rather than tuple limits at settings, make the value
+            # a tuple based on chosen spread value (percents); value: 10 --spread=50-->  value: (5,15)
+            'parameter_spread' : 50,
 
             # Initial population size, per locale
             'POP_SIZE': 30, 

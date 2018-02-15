@@ -41,7 +41,7 @@ watch, DatasetRange = gekkoWrapper.getAvailableDataset(watch)
 def expandGekkoStrategyParameters(IND, Strategy):
     config = {}
 
-    IND = promoterz.utils.expandNestedParameters(IND)
+    IND = promoterz.parameterOperations.expandNestedParameters(IND)
 
     config[Strategy] = IND
     return config

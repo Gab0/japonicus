@@ -156,16 +156,18 @@ japonicus will choose a random item of the list to fetch candles and scansets.
 # Future
 
 Genetic Algorithms are a good way to fetch a good set of settings to run a strategy
-on gekko. But the real gamechanger on gekko is the strategy itself. The ideal evolution method
+on gekko. But the real gamechanger is the strategy itself. The ideal evolution method
 would be a Genetic Programming that modifies strategy logic. This somewhat
 corresponds to `-i` option of japonicus, still barebones yet - only 'sums' indicators.
 
 I'm doing an effort to port the most usable indicator from TA-Lib to native gekko, for faster computing and better usability on genetic algorithms.
 Anyone interested on this work or that would like to suggest an important indicator should message me or send pull requests etc. Those are important for `-i` method improvement.
 
+<br>
 
-Indicators roadmap:
-~~- Bollinger Bands~~
-~~- Average True Range~~
-- Parabolic Stop and Reverse
-- 
+
+Indicators roadmap: <br>
+~~- Bollinger Bands~~<br>
+~~- Average True Range~~<br>
+- Parabolic Stop and Reverse<br>
+- Directional Movement Concept <br>

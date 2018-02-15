@@ -1,7 +1,7 @@
 #!/bin/python
 
 from deap import tools
-from .. import utils
+from .. import parameterOperations
 import random
 
 def checkPhenotypicDivergence(constructPhenotype, indA, indB):

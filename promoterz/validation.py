@@ -1,5 +1,5 @@
 #!/bin/python
-from .utils import flattenParameters
+from .parameterOperations import flattenParameters
 
 def checkPhenotypeParameterIntegrity(TargetParameters, phenotype):
     cmp = [TargetParameters, phenotype]

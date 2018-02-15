@@ -5,7 +5,7 @@ from deap import tools
 from copy import deepcopy
 import random
 
-from .. import utils
+from .. import parameterOperations
 
 from . import Creator
 
@@ -32,7 +32,7 @@ def constructPhenotype(stratSettings, chrconf, Individue):
 
                 Settings[ParameterName] = Value
 
-    _Settings = utils.expandNestedParameters(Settings)
+    _Settings = parameterOperations.expandNestedParameters(Settings)
 
     return _Settings
 

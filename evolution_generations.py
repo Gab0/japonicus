@@ -53,6 +53,8 @@ def gekko_generations(TargetParameters, GenerationMethod,
         StrategyFileManager = stratego.gekko_strategy.StrategyFileManager(globalconf.gekkoPath)
         Evaluate = partial(aEvaluate, StrategyFileManager)
         Strategy = None
+
+    # --for standard methods;
     else:
         Evaluate = bEvaluate
         Strategy = EvaluationMode
@@ -61,8 +63,8 @@ def gekko_generations(TargetParameters, GenerationMethod,
 
     print("evaluated parameters ranges:")
 
-    TargetParameters = promoterz.utils.flattenParameters(TargetParameters)
-
+    TargetParameters = promoterz.parameterOperations.flattenParameters(TargetParameters)
+    TargetParameters = promoterz.parameterOperations.parameterValuesToRangeOfValues(TargetParameters, genconf.parameter_spread)
     GlobalTools = GenerationMethod.getToolbox(Strategy, genconf, TargetParameters)
 
 

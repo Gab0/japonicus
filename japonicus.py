@@ -20,6 +20,7 @@ settings = getSettings()
 
 gekko_server = None
 web_server = None
+
 TITLE ="""\tGEKKO
      ██╗ █████╗ ██████╗  ██████╗ ███╗   ██╗██╗ ██████╗██╗   ██╗███████╗
      ██║██╔══██╗██╔══██╗██╔═══██╗████╗  ██║██║██╔════╝██║   ██║██╔════╝
@@ -55,7 +56,7 @@ try:
    print(TITLE)
 except UnicodeEncodeError:
    print("\nJAPONICUS\n")
-   
+
 print('\t' * 8 + 'v%.2f' % VERSION)
 print()
 print("The profits reported here are the profit beyond market price change;\n"+\
@@ -100,7 +101,7 @@ if options.genetic_algorithm:
 
 elif options.bayesian_optimization:
    import evolution_bayes
-   
+
    for s in range(options.repeater):
       evolution_bayes.gekko_bayesian(options.strategy)
 
