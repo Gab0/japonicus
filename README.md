@@ -5,6 +5,7 @@ Genetic algorithm and quick bayesian optimization are evolution choices.
 
 ## Setup
 Japonicus works on `python>=3.6`!
+#### General
 Install gekko, then clone this repo and install dependencies:
 ```
 $ git clone https://git.com/Gab0/japonicus.git
@@ -13,7 +14,7 @@ $ sudo pip install -r requirements.txt
     # make sure pip session runs for python3.6 --> $sudo pip3 install -r requirements.txt
 ```
 
-## Setup Linux Mint 18.3 (propably working at Ubuntu 16.04)
+#### Full stack on Linux Mint 18.3 (propably same on Ubuntu 16.04)
 ```
 sudo add-apt-repository ppa:jonathonf/python-3.6
 sudo apt update
@@ -29,7 +30,6 @@ git clone https://github.com/Gab0/japonicus.git
 cd japonicus
 sudo pip3.6 install -r requirements.txt
 ```
-Please confirm if this method is working!
 
 ### Usage
 
