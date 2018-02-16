@@ -14,7 +14,7 @@ cS = {
 
 # BULL
 "BULL_RSI": 10,
-"BULL_RSI_high":  80
+"BULL_RSI_high":  80,
 "BULL_RSI_low" : 60,
 
 # BEAR
@@ -31,7 +31,7 @@ cS = {
 
 # BULL
 "BULL_RSI": 10,
-"BULL_RSI_high":  80
+"BULL_RSI_high":  80,
 "BULL_RSI_low" : 60,
 
 # BEAR
