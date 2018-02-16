@@ -53,7 +53,7 @@ def showResults(World):
             print(" -- Settings for Gekko config.js -- ")
             print(Show)
             print(" -- Settings for Gekko --ui webpage -- ")
-            logInfo(pasteSettingsToUI(FinalIndividueSettings))
+            logInfo(parametersToTOML(FinalIndividueSettings))
             
             print("\nRemember to check MAX and MIN values for each parameter.")
             print("\tresults may improve with extended ranges.")
@@ -81,7 +81,7 @@ def stratSettingsProofOfViability(World, Individual, GlobalDataset):
     print("Annual profit %.3f%%" % (testMoney))
     return Valid, testMoney
 
-def pasteSettingsToUI(Settings):
+def parametersToTOML(Settings):
     text = []
     toParameter = lambda name, value: "%s = %f" % (name,value)
 

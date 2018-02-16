@@ -2,24 +2,47 @@
 
 NEG = lambda v: (-v[1], -v[0])
 cS = {
-    # Define range of values for strat settings;
-    #for all evolution methods;
+    # Define values for strat settings for strategies to be used
+    # on japonicus;
+    # Each value can be a tuple of limits or just a base value.
     
-"RSIBULLBEAR" : {
+"RSI_BULL_BEAR" : {
 
 # SMA Trends
-"SMA_long": (700,1400),
-"SMA_short": (40,60),
+"SMA_long": 1000,
+"SMA_short": 50,
 
 # BULL
-"BULL_RSI": (5,18),
-"BULL_RSI_high":  (60,100),
-"BULL_RSI_low" : (40,80),
+"BULL_RSI": 10,
+"BULL_RSI_high":  80
+"BULL_RSI_low" : 60,
 
 # BEAR
-"BEAR_RSI": (8,27),
-"BEAR_RSI_high": (35,70),
-"BEAR_RSI_low" : (10,30)
+"BEAR_RSI": 15,
+"BEAR_RSI_high": 50,
+"BEAR_RSI_low" : 20
+},
+
+"RSI_BULL_BEAR_ADX" : {
+
+# SMA Trends
+"SMA_long": 1000,
+"SMA_short": 50,
+
+# BULL
+"BULL_RSI": 10,
+"BULL_RSI_high":  80
+"BULL_RSI_low" : 60,
+
+# BEAR
+"BEAR_RSI": 15,
+"BEAR_RSI_high": 50,
+"BEAR_RSI_low" : 20,
+
+# ADX
+"ADX": 3,
+"ADX_high": 70,
+"ADX_low": 50
 },
 
 "Bestone" :{
