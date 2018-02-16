@@ -3,32 +3,40 @@ This is an implementation of genetic algorithm evolution to develop strategies f
 It generates random configs & evolve them by backtesting on a Gekko session via the REST API of gekko's user interface. <br>
 Genetic algorithm and quick bayesian optimization are evolution choices.
 
+### What is japonicus and what it does
+A genetic algorithm & bayesian evolution tool designed to evolve the parameters of strategies to be used on gekko trading bot.
+So you make a good strat, or get one from the internetz. Make sure its good, because this is not about miracles.
+If you get good profit on strat standard settings or some random settings you made up, japonicus can find some setting set that
+improves the strategy, on some specific market/currency or overall.
+
 ## Setup
 Japonicus works on `python>=3.6`!
+
 #### General
-Install gekko, then clone this repo and install dependencies:
 ```
+> Install gekko, then clone this repo and install dependencies:
+
 $ git clone https://git.com/Gab0/japonicus.git
 $ cd japonicus
 $ sudo pip install -r requirements.txt
-    # make sure pip session runs for python3.6 --> $sudo pip3 install -r requirements.txt
+   > make sure pip session runs for python3.6 --> $sudo pip3 install -r requirements.txt
 ```
 
 #### Full stack on Linux Mint 18.3 (propably same on Ubuntu 16.04)
 ```
-sudo add-apt-repository ppa:jonathonf/python-3.6
-sudo apt update
-sudo apt install python3.6
-sudo apt install python3.6-dev
-sudo apt install python3.6-tk
-wget https://bootstrap.pypa.io/get-pip.py
-sudo python3.6 get-pip.py
-cd /usr/lib/python3/dist-packages 
-sudo cp apt_pkg.cpython-35m-x86_64-linux-gnu.so apt_pkg.so (where 35m-x86_64 put your version)
-cd /home/f/gekko/
-git clone https://github.com/Gab0/japonicus.git
-cd japonicus
-sudo pip3.6 install -r requirements.txt
+$ sudo add-apt-repository ppa:jonathonf/python-3.6
+$ sudo apt update
+$ sudo apt install python3.6
+$ sudo apt install python3.6-dev
+$ sudo apt install python3.6-tk
+$ wget https://bootstrap.pypa.io/get-pip.py
+$ sudo python3.6 get-pip.py
+$ cd /usr/lib/python3/dist-packages 
+$ sudo cp apt_pkg.cpython-35m-x86_64-linux-gnu.so apt_pkg.so (where 35m-x86_64 put your version)
+$ cd /home/f/gekko/
+$ git clone https://github.com/Gab0/japonicus.git
+$ cd japonicus
+$ sudo pip3.6 install -r requirements.txt
 ```
 
 ### Usage
@@ -80,10 +88,10 @@ Remember to review/set parameter ranges for chosen strategy name on `configStrat
 
 ### Results
 
-For genetic algorithm `-g`, results are visible at the end of last epoch, as dict and Gekko UI-friendly format.
+For genetic algorithm `-g`, results are visible at the end of last epoch, as dict and Gekko UI-friendly format (TOML).
 Results can also be visible in middle epoches.. check `generations.evaluateSettingsPeriodically` @ `Settings.py` to set that interval.
 
-On bayesian method `-b`, current best setings are visible at every step, ending the same way GA does.
+On bayesian method `-b`, current best setings are visible at every step, ending on the same info as `-g`.
 
 ### Gekko Strategies
 
@@ -109,8 +117,10 @@ Some custom strategies for which japonicus got settings covered:
 
 https://github.com/Gab0/gekko-supertrend-strategy/ by dodo33. Original strat uses TA-Lib ATR indicator.
 Modified on this fork for usability with GA. Remember to put the native indicator `ATR.js`on correspondent folder. 
-<br>Results:<br>
-Unusable strategy - Gab0
+That strategy does not get very good results.
+
+https://github.com/tommiehansen/gekko_tools by tommiehansen. A couple of multiple indicator strategies, they use
+tulind so backtests can take awhile, but HEY thats some good strats of high trading rate and high profit.
 
 #### User Feedback
 
