@@ -13,6 +13,24 @@ $ sudo pip install -r requirements.txt
     # make sure pip session runs for python3.6 --> $sudo pip3 install -r requirements.txt
 ```
 
+## Setup Linux Mint 18.3 (propably working at Ubuntu 16.04)
+```
+sudo add-apt-repository ppa:jonathonf/python-3.6
+sudo apt update
+sudo apt install python3.6
+sudo apt install python3.6-dev
+sudo apt install python3.6-tk
+wget https://bootstrap.pypa.io/get-pip.py
+sudo python3.6 get-pip.py
+cd /usr/lib/python3/dist-packages 
+sudo cp apt_pkg.cpython-35m-x86_64-linux-gnu.so apt_pkg.so (where 35m-x86_64 put your version)
+cd /home/f/gekko/
+git clone https://github.com/Gab0/japonicus.git
+cd japonicus
+sudo pip3.6 install -r requirements.txt
+```
+Please confirm if this method is working!
+
 ### Usage
 
 ```
