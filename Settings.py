@@ -59,7 +59,7 @@ def getSettings(specific=None):
             'evaluateSettingsPeriodically': 20,
 
             # time window size on days of candlesticks for each evaluation
-            'deltaDays': 3,
+            'deltaDays': 60,
 
             # Number of candlestick data loaded simultaneously in each locale;
             # slower EPOCHS, theoretical better evolution;
@@ -111,7 +111,7 @@ def getSettings(specific=None):
 
 
             # time window size on days of candlesticks for each evaluation
-            'deltaDays': 3,
+            'deltaDays': 60,
 
             # number of evaluation rounds
             'num_rounds': 10,
