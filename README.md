@@ -39,7 +39,7 @@ $ cd japonicus
 $ sudo pip3.6 install -r requirements.txt
 ```
 
-### Usage
+## Usage
 
 ```
 Open two terminals;
@@ -86,7 +86,7 @@ Bayesian optimization is a quick method to get and idea of some strat settings, 
 
 Remember to review/set parameter ranges for chosen strategy name on `configStrategies.py`.
 
-### Results
+## Results
 
 For genetic algorithm `-g`, results are visible at the end of last epoch, as dict and Gekko UI-friendly format (TOML).
 Results can also be visible in middle epoches.. check `generations.evaluateSettingsPeriodically` @ `Settings.py` to set that interval.
@@ -192,7 +192,6 @@ I'm doing an effort to port the most usable indicator from TA-Lib to native gekk
 Anyone interested on this work or that would like to suggest an important indicator should message me or send pull requests etc. Those are important for `-i` method improvement.
 
 <br>
-
 
 Indicators roadmap: <br>
 ~~- Bollinger Bands~~<br>
