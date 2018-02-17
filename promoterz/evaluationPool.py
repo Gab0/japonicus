@@ -16,7 +16,7 @@ class EvaluationPool():
 
         self.lasttimes = [0 for x in Urls]
         self.lasttimesperind = [0 for x in Urls]
-        self.poolsizes = [5 for x in Urls]
+        self.poolsizes = [poolsize for x in Urls]
         self.individual_info = individual_info
 
     def ejectURL(self, Index):
