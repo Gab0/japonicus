@@ -18,14 +18,18 @@ from Settings import getSettings
 import promoterz.evaluation.gekko as gekkoWrapper
 import chart
 
+from japonicus_options import options, args
 dict_merge = lambda a,b: a.update(b) or a
+
 gsettings = getSettings()['Global']
+
 # Fix the shit below!
 settings = getSettings()['bayesian']
-bayesSettings = getSettings('bayesian')
+bayesconf = getSettings('bayesian')
 
-Strategy = settings["Strategy"]
-StratConfig = getSettings()["strategies"][Strategy]
+Strategy = options.strategy
+TargetParameters = getSettings()["strategies"][Strategy]
+TargetParameters = promoterz.parameterOperations.parameterValuesToRangeOfValues(TargetParameters, bayesconf.parameter_spread)
 
 percentiles = np.array([0.25, 0.5, 0.75])
 all_val = []
@@ -51,7 +55,7 @@ def Evaluate(Strategy, parameters):
     DateRange = gekkoWrapper.getRandomDateRange(DatasetRange, deltaDays=settings['deltaDays'])
     params = expandGekkoStrategyParameters(parameters, Strategy)
 
-    BacktestResult = gekkoWrapper.Evaluate(bayesSettings, watch,
+    BacktestResult = gekkoWrapper.Evaluate(bayesconf, watch,
                                            [DateRange], params, gsettings['GekkoURLs'][0])
     BalancedProfit = BacktestResult[0][0]
     return BalancedProfit
@@ -103,7 +107,7 @@ def gekko_bayesian(indicator=None):
     if indicator == None:
         Strategy = settings['Strategy']
     print("Starting search %s parameters" % Strategy)
-    bo = BayesianOptimization(gekko_search, copy.deepcopy(StratConfig))
+    bo = BayesianOptimization(gekko_search, copy.deepcopy(TargetParameters))
 
     # 1st Evaluate
     print("")
@@ -152,6 +156,8 @@ def gekko_bayesian(indicator=None):
     print("// 3rd Evaluted: %f" % s3)
     print("// "+'-'*50)
     print("config.%s = {%s};" % (Strategy, json.dumps(resultjson, indent=2)[1:-1]))
+    print('\n\n')
+    print(resultInterface.parametersToTOML(resultjson))
     print("// "+'-'*50)
 
 

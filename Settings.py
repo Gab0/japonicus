@@ -59,7 +59,7 @@ def getSettings(specific=None):
             'evaluateSettingsPeriodically': 20,
 
             # time window size on days of candlesticks for each evaluation
-            'deltaDays': 60,
+            'deltaDays': 3,
 
             # Number of candlestick data loaded simultaneously in each locale;
             # slower EPOCHS, theoretical better evolution;
@@ -111,8 +111,7 @@ def getSettings(specific=None):
 
 
             # time window size on days of candlesticks for each evaluation
-            'deltaDays': 21,
-            'testDays': 21,
+            'deltaDays': 3,
 
             # number of evaluation rounds
             'num_rounds': 10,
@@ -129,6 +128,8 @@ def getSettings(specific=None):
             'parallel': False,
             'show_chart': False,
             'save': True,
+            
+            'parameter_spread': 100,
 
             # candleSize & historySize on Gekko, for all evals
             'candleSize': 30,
