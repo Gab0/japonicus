@@ -13,10 +13,11 @@ from Settings import getSettings
 
 def showResults(World):
     ValidationDateranges = []
-    ValidationSpecifications = World.EnvironmentParameters[1].specifications
+    useSecondary = 1 if World.EnvironmentParameters[1] else 0
+    ValidationSpecifications = World.EnvironmentParameters[useSecondary].specifications
     for NB in range(World.genconf.proofSize):
         Daterange = promoterz.evaluation.gekko.getRandomDateRange(
-            World.EnvironmentParameters[1].daterange,
+            World.EnvironmentParameters[useSecondary].daterange,
             World.genconf.deltaDays )
         ValidationDateranges.append(Daterange)
 

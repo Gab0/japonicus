@@ -50,13 +50,13 @@ def getSettings(specific=None):
             'parameter_spread' : 60,
 
             # Initial population size, per locale
-            'POP_SIZE': 15, 
+            'POP_SIZE': 30, 
 
             # number of epochs to run
             'NBEPOCH': 400,
 
             # show current best settings on every X epochs. (or False)
-            'evaluateSettingsPeriodically': 2,
+            'evaluateSettingsPeriodically': 20,
 
             # time window size on days of candlesticks for each evaluation
             'deltaDays': 60,
