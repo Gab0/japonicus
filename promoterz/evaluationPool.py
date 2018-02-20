@@ -14,9 +14,9 @@ class EvaluationPool():
 
         self.Urls = Urls
 
-        self.lasttimes = [0 for x in Urls]
-        self.lasttimesperind = [0 for x in Urls]
-        self.poolsizes = [poolsize for x in Urls]
+        self.lasttimes = [ 0 for x in Urls ]
+        self.lasttimesperind = [ 0 for x in Urls ]
+        self.poolsizes = [ poolsize for x in Urls ]
         self.individual_info = individual_info
 
     def ejectURL(self, Index):
@@ -25,29 +25,33 @@ class EvaluationPool():
         self.lasttimesperind.pop(Index)
         self.poolsizes.pop(Index)
 
-    def evaluateBackend(self, DateRange, I, inds):
+    def evaluateBackend(self, datasetSpecification, DateRange, I, inds):
         stime = time.time()
 
         dateInds = list(itertools.product(DateRange,inds))
-        # print(list(dateInds))
-        Q = [ (dateRange, Ind, self.Urls[I]) for dateRange, Ind in dateInds ]
+
+        #print(list(dateInds))
+        Q = [ (datasetSpecification, dateRange, Ind, self.Urls[I]) for dateRange, Ind in dateInds ]
         P = Pool(self.poolsizes[I])
         fitnesses = P.starmap(self.EvaluationTool, Q )
 
         P.close()
         P.join()
 
-        delta_time=time.time()-stime
+        delta_time = time.time() - stime
         return fitnesses, delta_time
 
+
     def evaluatePopulation(self, locale):
-        individues_to_simulate = [ind for ind in locale.population\
-                                  if not ind.fitness.valid]
+        individues_to_simulate = [ ind for ind in locale.population\
+                                   if not ind.fitness.valid ]
 
-        props=self.distributeIndividuals(individues_to_simulate)
+        props = self.distributeIndividuals(individues_to_simulate)
 
-        args = [ [ [ locale.DateRange ], I, props[I]]\
-                 for I in range(len(self.Urls))]
+        args = [ [  locale.World.EnvironmentParameters[0].specifications,
+                    [ locale.DateRange ], I, props[I]]\
+                 for I in range(len(self.Urls)) ]
+
         pool = ThreadPool(len(self.Urls))
 
         results=[]
@@ -56,6 +60,7 @@ class EvaluationPool():
 
         pool.close()
         TimedOut=[]
+
         for A in range(len(results)):
             try:
                 perindTime = 3 * self.lasttimesperind[A] if self.lasttimesperind[A] else 12
@@ -67,6 +72,7 @@ class EvaluationPool():
                 args[A][1] = 0 # Set to evaluate @ local machine
                 results[A] = self.evaluateBackend(*args[A])
                 TimedOut.append(A)
+
         pool.join()
 
         TotalNumberOfTrades = 0
@@ -86,7 +92,7 @@ class EvaluationPool():
 
         for T in TimedOut:
             self.ejectURL(T)
-            
+
         N = len(individues_to_simulate)
         averageTrades = TotalNumberOfTrades/ max(1,N)
 

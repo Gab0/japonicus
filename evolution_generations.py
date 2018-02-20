@@ -6,6 +6,7 @@ import promoterz
 from copy import deepcopy
 
 import resultInterface
+import interface
 
 import promoterz.sequence.standard_loop
 
@@ -18,6 +19,10 @@ import stratego
 from functools import partial
 StrategyFileManager = None
 
+class CandlestickDataset():
+    def __init__(self, specifications, datarange):
+        self.daterange = datarange
+        self.specifications = specifications
 
 # TEMPORARY ASSIGNMENT OF EVAL FUNCTIONS; SO THINGS REMAIN SANE (SANE?);
 def aEvaluate(StrategyFileManager, constructPhenotype,
@@ -32,6 +37,7 @@ def aEvaluate(StrategyFileManager, constructPhenotype,
 
 def bEvaluate(constructPhenotype, genconf, Database,
               DateRange, Individual, gekkoUrl):
+
     phenotype = constructPhenotype(Individual)
     phenotype = {Individual.Strategy: phenotype}
 
@@ -64,12 +70,15 @@ def gekko_generations(TargetParameters, GenerationMethod,
     print("evaluated parameters ranges:")
 
     TargetParameters = promoterz.parameterOperations.flattenParameters(TargetParameters)
-    TargetParameters = promoterz.parameterOperations.parameterValuesToRangeOfValues(TargetParameters, genconf.parameter_spread)
-    GlobalTools = GenerationMethod.getToolbox(Strategy, genconf, TargetParameters)
+    TargetParameters = promoterz.parameterOperations.parameterValuesToRangeOfValues(
+        TargetParameters,
+        genconf.parameter_spread)
 
+    GlobalTools = GenerationMethod.getToolbox(Strategy, genconf, TargetParameters)
 
     RemoteHosts = promoterz.evaluation.gekko.loadHostsFile(globalconf.RemoteAWS)
     globalconf.GekkoURLs += RemoteHosts
+
     if RemoteHosts:
         print("Connected Remote Hosts:\n%s" % ('\n').join(RemoteHosts))
         if EvaluationMode == 'indicator':
@@ -78,44 +87,54 @@ def gekko_generations(TargetParameters, GenerationMethod,
     for k in TargetParameters.keys():
         print( "%s%s%s" % (k, " " * (30-len(k)), TargetParameters[k]) )
 
-    datasetSpecifications, availableDataRange = promoterz.evaluation.gekko.getAvailableDataset(
+    # --GRAB PRIMARY (EVOLUTION) DATASET
+    D = promoterz.evaluation.gekko.selectCandlestickData(
             exchange_source=genconf.dataset_source)
+    evolutionDataset = CandlestickDataset(*D)
+
+    # --GRAB SECONDARY (EVALUATION) DATASET
+    try:
+        D = promoterz.evaluation.gekko.selectCandlestickData(
+        exchange_source = genconf.eval_dataset_source,
+        avoidCurrency = evolutionDataset.specifications['asset'] )
+        evaluationDataset = CandlestickDataset(*D)
+    except RuntimeError:
+        evaluationDataset = None
+        print("Evaluation dataset not found.")
 
 
 
+    # --SHOW DATASET INFO;
+    interface.showDatasetInfo("evolution",
+                              evolutionDataset)
 
+    if evaluationDataset:
+        interface.showDatasetInfo("evaluation",
+                                  evaluationDataset)
+
+    # --INITIALIZE WORLD WITH CANDLESTICK DATASET INFO;
     GlobalTools.register('Evaluate', Evaluate,
-                         GlobalTools.constructPhenotype, genconf, datasetSpecifications)
+                         GlobalTools.constructPhenotype, genconf )
 
-
-
-
-    showdatadaterange = [ promoterz.evaluation.gekko.epochToString(availableDataRange[x])\
-                    for x in ['from', 'to'] ]
-
-    print()
-    print("using candlestick dataset %s to %s" %     (showdatadaterange[0],
-                                                      showdatadaterange[1]))
-
-    print()
 
     loops = [ promoterz.sequence.standard_loop.standard_loop ]
     World = promoterz.world.World(GlobalTools, loops,
-                                  genconf, globalconf,  TargetParameters, NB_LOCALE,
-                                  EnvironmentParameters=availableDataRange, web=web)
+                                  genconf, globalconf, TargetParameters, NB_LOCALE,
+                                  EnvironmentParameters=[ evolutionDataset,
+                                                          evaluationDataset ], web=web)
 
+    # --RUN EPOCHES;
     while World.EPOCH < World.genconf.NBEPOCH:
         World.runEPOCH()
         if genconf.evaluateSettingsPeriodically:
             if not World.EPOCH % genconf.evaluateSettingsPeriodically:
                 resultInterface.showResults(World)
 
-    # RUN ENDS. SELECT INDIVIDUE, LOG ANDo PRINT STUFF;
+    # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
     # FinalBestScores.append(Stats['max'])
     print(World.EnvironmentParameters)
     # After running EPOCHs, select best candidates;
     resultInterface.showResults(World)
-
 
 
 

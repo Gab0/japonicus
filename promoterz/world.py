@@ -8,6 +8,7 @@ from functools import partial
 class World():
     def __init__(self, GlobalTools, loops, genconf, globalconf,
                  TargetParameters, NB_LOCALE=3, EnvironmentParameters=None, web=None):
+
         self.tools = GlobalTools
         self.loops = loops
         self.EPOCH = 0

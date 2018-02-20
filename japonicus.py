@@ -4,6 +4,8 @@ import sys
 if not sys.version_info.major >= 3 or not sys.version_info.minor >= 6:
    exit('check your python version before running japonicus. Python>=3.6 is required.')
 
+import signal
+signal.signal(signal.SIGINT, lambda x,y: sys.exit(0))
 
 from time import sleep
 from random import choice, randrange
@@ -22,6 +24,7 @@ import promoterz
 from version import VERSION
 settings = getSettings()
 #from evolution_bayes import gekko_bayesian
+
 
 gekko_server = None
 web_server = None
@@ -79,7 +82,7 @@ if options.genetic_algorithm:
             TargetParameters[K] = AllIndicators[K]
          elif AllIndicators[K]['active']:
             TargetParameters[K] = AllIndicators[K]
-            TargetParameters[K]['active'] = (0,1)
+            TargetParameters[K]['active'] = (0, 1)
       if not TargetParameters:
          exit("Bad configIndicators!")
 

@@ -147,7 +147,7 @@ def mutate(ind, mutpb=0.001, mutagg=12):
 
     return ind,
 
-def clone(Chr):
+def clone(Chr): #!!review this
     cut_point = random.randrange(-len(Chr), len(Chr))
     if not cut_point:
         cut_point = 1

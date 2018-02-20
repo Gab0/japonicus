@@ -47,28 +47,29 @@ def getSettings(specific=None):
 
             # if parameter is set to value rather than tuple limits at settings, make the value
             # a tuple based on chosen spread value (percents); value: 10 --spread=50-->  value: (5,15)
-            'parameter_spread' : 50,
+            'parameter_spread' : 60,
 
             # Initial population size, per locale
-            'POP_SIZE': 30, 
+            'POP_SIZE': 15, 
 
             # number of epochs to run
             'NBEPOCH': 400,
 
             # show current best settings on every X epochs. (or False)
-            'evaluateSettingsPeriodically': 20,
+            'evaluateSettingsPeriodically': 2,
 
             # time window size on days of candlesticks for each evaluation
-            'deltaDays': 3,
+            'deltaDays': 60,
 
             # Number of candlestick data loaded simultaneously in each locale;
             # slower EPOCHS, theoretical better evolution;
+            # seems broken. values other than 1 makes evolution worse.
             'ParallelCandlestickDataset': 1,
 
 
             # -- Genetic Algorithm Parameters
-            'cxpb': 0.3, # Probabilty of crossover 
-            'mutpb': 0.7,# Probability of mutation;
+            'cxpb': 0.6, # Probabilty of crossover 
+            'mutpb': 0.03,# Probability of mutation;
             '_lambda': 7,# size of offspring generated per epoch;
 
             'PRoFIGA_beta': 0.005, # weight of PRoFIGA calculations on variability of population size
@@ -80,7 +81,7 @@ def getSettings(specific=None):
 
             'DRP': 70,# Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
-            'ParallelBacktests': 5,
+            'ParallelBacktests': 6,
 
             # -- Gekko Dataset Settings
             # leave the ! on the ignored entry as convenient;
@@ -91,6 +92,8 @@ def getSettings(specific=None):
                 "currency": 'USD',
                 "asset": 'LTC'
             },
+            'eval_dataset_source': None,
+
             'finaltest': {
                 'NBBESTINDS': 1,
                 'NBADDITIONALINDS': 4,
@@ -111,7 +114,7 @@ def getSettings(specific=None):
 
 
             # time window size on days of candlesticks for each evaluation
-            'deltaDays': 3,
+            'deltaDays': 60,
 
             # number of evaluation rounds
             'num_rounds': 10,

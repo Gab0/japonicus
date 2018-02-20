@@ -12,10 +12,15 @@ import promoterz
 from Settings import getSettings
 
 def showResults(World):
-    ValidationDataset =\
-        promoterz.evaluation.gekko.globalEvaluationDataset(World.EnvironmentParameters,
-                                                           World.genconf.deltaDays,
-                                                           World.genconf.proofSize)
+    ValidationDateranges = []
+    ValidationSpecifications = World.EnvironmentParameters[1].specifications
+    for NB in range(World.genconf.proofSize):
+        Daterange = promoterz.evaluation.gekko.getRandomDateRange(
+            World.EnvironmentParameters[1].daterange,
+            World.genconf.deltaDays )
+        ValidationDateranges.append(Daterange)
+
+
     for LOCALE in World.locales:
         LOCALE.population = [ ind for ind in LOCALE.population if ind.fitness.valid ]
         B = World.genconf.finaltest['NBBESTINDS']
@@ -33,11 +38,13 @@ def showResults(World):
         FinalIndividues = BestIndividues + AdditionalIndividues
 
         print("%i selected;" % len(FinalIndividues))
+
         for FinalIndividue in FinalIndividues:
             proof = stratSettingsProofOfViability
             AssertFitness, FinalProfit = proof(World,
                                               FinalIndividue,
-                                              ValidationDataset)
+                                               ValidationSpecifications,
+                                               ValidationDateranges)
             print("Testing Strategy:\n")
             if AssertFitness or FinalProfit > 50:
                 print("Following strategy is viable.")
@@ -46,23 +53,39 @@ def showResults(World):
             FinalIndividueSettings = World.tools.constructPhenotype(
                     FinalIndividue)
 
+            # --EVALUATION DATASET TEST AND REPORT;
+            if World.EnvironmentParameters[1]:
+                Dataset = World.EnvironmentParameters[1]
+                print(Dataset.__dict__)
+                evaluationDaterange = promoterz.evaluation.gekko.getRandomDateRange(
+                    Dataset.daterange, 0)
+                print(evaluationDaterange)
+                secondaryResults = World.parallel.evaluateBackend(
+                    Dataset.specifications,
+                    [ [evaluationDaterange]] , 0, [FinalIndividue])
+                print()
+                print(secondaryResults)
+                print("Relative profit on evaluation dataset: %.3f " % secondaryResults[0][0][0][0])
+            else:
+                print("Evaluation dataset is disabled.")
+
             Show = json.dumps(FinalIndividueSettings, indent=2)
             logInfo("~" * 18)
-            
+
             logInfo(" %.3f final profit ~~~~" % FinalProfit)
             print(" -- Settings for Gekko config.js -- ")
             print(Show)
             print(" -- Settings for Gekko --ui webpage -- ")
             logInfo(parametersToTOML(FinalIndividueSettings))
-            
+
             print("\nRemember to check MAX and MIN values for each parameter.")
             print("\tresults may improve with extended ranges.")
 
 
-def stratSettingsProofOfViability(World, Individual, GlobalDataset):
+def stratSettingsProofOfViability(World, Individual, specification, Dateranges):
     AllProofs = []
-    GlobalDataset = [[x] for x in GlobalDataset]
-    Results = World.parallel.evaluateBackend(GlobalDataset, 0, [Individual])
+    Dateranges = [[x] for x in Dateranges]
+    Results = World.parallel.evaluateBackend(specification, Dateranges, 0, [Individual])
 
     for W in Results[0]:
         ((q, s), m) = W

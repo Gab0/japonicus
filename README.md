@@ -198,3 +198,5 @@ Indicators roadmap: <br>
 ~~- Average True Range~~<br>
 - Parabolic Stop and Reverse<br>
 - Directional Movement Concept <br>
+- ADX <br>
+- Ichimoku clouds

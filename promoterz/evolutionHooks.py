@@ -9,6 +9,7 @@ import promoterz.supplement.age
 import promoterz.supplement.PRoFIGA
 import promoterz.supplement.phenotypicDivergence
 
+import itertools
 
 # population as last positional argument, to blend with toolbox;
 def immigrateHoF(HallOfFame, population):
@@ -34,32 +35,33 @@ def filterAwayWorst(population, N=5):
 def filterAwayThreshold(locale, Threshold, minimum):
     remove = [ind for ind in locale.population if ind.fitness.values[0] <= Threshold]
     
-    locale.population = [ind for ind in locale.population if ind.fitness.values[0] > Threshold]
+    locale.population = [ ind for ind in locale.population if ind.fitness.values[0] > Threshold ]
     NBreturn = max(0, min(minimum-len(locale.population), minimum))
     if NBreturn and remove:
         for k in range(NBreturn):
             locale.population.append(random.choice(remove))
 
 def evaluatePopulation(locale):
-    individues_to_simulate = [ind for ind in locale.population if not ind.fitness.valid]
+    individues_to_simulate = [ ind for ind in locale.population if not ind.fitness.valid ]
+
     fitnesses = locale.World.parallel.starmap(locale.extratools.Evaluate,
                                               zip(individues_to_simulate))
 
     for i, fit in zip(range(len(individues_to_simulate)), fitnesses):
         individues_to_simulate[i].fitness.values = fit
+
     return len(individues_to_simulate)
 
 def getLocaleEvolutionToolbox(World, locale):
     toolbox = base.Toolbox()
+
     toolbox.register("ImmigrateHoF", immigrateHoF, locale.HallOfFame)
     toolbox.register("ImmigrateRandom", immigrateRandom, World.tools.population)
-
 
     toolbox.register("filterThreshold", filterAwayThreshold, locale)
     toolbox.register('ageZero', promoterz.supplement.age.ageZero)
     toolbox.register('populationAges', promoterz.supplement.age.populationAges,
                      World.genconf.ageBoundaries)
-
 
     toolbox.register('populationPD',
     promoterz.supplement.phenotypicDivergence.populationPhenotypicDivergence,
@@ -84,6 +86,7 @@ def getGlobalToolbox(representationModule):
     toolbox.register("population", tools.initRepeat, list, toolbox.newind)
 
     toolbox.register("constructPhenotype", representationModule.constructPhenotype)
+
     return toolbox
 
 def getFitness(individual):
@@ -92,7 +95,7 @@ def getFitness(individual):
 #selectCriteria = lambda x: sum(x.fitness.wvalues)
 def selectCriteria(ind):
     p = ind.fitness.wvalues[0]
-    s = (1+ind.fitness.wvalues[1])
+    s = (1 + ind.fitness.wvalues[1])
 
     R = p * s
     if p < 0 and s < 0:

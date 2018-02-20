@@ -48,17 +48,22 @@ def getAllScanset():
 
     return RESP['datasets']
 
-def getAvailableDataset(exchange_source=None):
+def selectCandlestickData(exchange_source=None, avoidCurrency=None):
 
     DataSetPack = getAllScanset()
+
+    specKeys = ['exchange', 'currency', 'asset']
 
     scanset = []
     for s in DataSetPack:
         Valid = True
-        for k in "exchange currency asset".split(" "):
+        for k in specKeys:
             if exchange_source and s[k] != exchange_source[k]:
                 Valid = False
-                continue
+
+        if avoidCurrency and s["asset"] == avoidCurrency:
+            Valid = False
+
         if Valid:
             scanset.append(s)
 
@@ -70,7 +75,7 @@ def getAvailableDataset(exchange_source=None):
 
     for EXCHANGE in scanset:
         ranges = EXCHANGE['ranges']
-        range_spans = [x['to']-x['from'] for x in ranges]
+        range_spans = [ x['to'] - x['from'] for x in ranges ]
         LONGEST = range_spans.index(max(range_spans))
         EXCHANGE['max_span'] = range_spans[LONGEST]
         EXCHANGE['max_span_index'] = LONGEST
@@ -78,11 +83,10 @@ def getAvailableDataset(exchange_source=None):
     exchange_longest_spans = [ x['max_span'] for x in scanset ]
     best_exchange = exchange_longest_spans.index(max(exchange_longest_spans))
 
-    chosenScansetRange = scanset[ best_exchange]['ranges'][scanset[best_exchange]['max_span_index'] ]
+    chosenScansetRange = scanset[best_exchange]['ranges'][scanset[best_exchange]['max_span_index'] ]
 
-    specKeys = ['exchange', 'currency', 'asset']
 
-    chosenScansetSpecifications = {K:scanset[best_exchange][K] for K in scanset[best_exchange] if K in specKeys}
+    chosenScansetSpecifications = { K:scanset[best_exchange][K] for K in scanset[best_exchange] if K in specKeys }
 
     return chosenScansetSpecifications, chosenScansetRange
 
@@ -294,22 +298,16 @@ def getRandomDateRange(Limits, deltaDays):
         print("Fatal: deltaDays on Settings.py set to a value bigger than current dataset.\n Edit Settings file to fit your chosen candlestick data.")
         exit()
 
-    Starting= random.randint(FLms,TLms-deltams)
+    Start = random.randint(FLms,TLms-deltams) if deltaDays else FLms
+    End = (Start + deltams) if deltaDays else TLms
+
     DateRange = {
-        "from": "%s" % epochToString(Starting),
-        "to": "%s" % epochToString(Starting+deltams)
+        "from": "%s" % epochToString(Start),
+        "to": "%s" % epochToString(End)
     }
 
     return DateRange
 
 epochToString = lambda D: datetime.datetime.utcfromtimestamp(D).strftime("%Y-%m-%d %H:%M:%S")
-
-def globalEvaluationDataset(DatasetLimits, deltaDays, NB):
-    Dataset = []
-    for W in range(NB):
-        DateRange = getRandomDateRange(DatasetLimits, deltaDays)
-        Dataset.append(DateRange)
-
-    return Dataset
 
 

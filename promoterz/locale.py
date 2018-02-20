@@ -18,7 +18,6 @@ class Locale():
         self.extratools = promoterz.evolutionHooks.getLocaleEvolutionToolbox(
             World, self)
 
-
         # GENERATION METHOD SELECTION;
         # to easily employ various GA algorithms,
         # this base EPOCH processor loads a GenerationMethod file,
@@ -32,12 +31,16 @@ class Locale():
         # --initial population
         self.population = World.tools.population(World.genconf.POP_SIZE)
 
+        # --!!!!!LOCALE SHOULD NOT BE GEKKO-SPECIFIC;
         getDateRange = lambda: promoterz.evaluation.gekko.getRandomDateRange(
-            World.EnvironmentParameters, World.genconf.deltaDays)
-        
+            World.EnvironmentParameters[0].daterange,
+            World.genconf.deltaDays )
+
         self.DateRange = [ getDateRange()\
                            for x in range(World.genconf.ParallelCandlestickDataset) ]
 
+
+        # --INIT STATISTICS;
         self.stats = promoterz.statistics.getStatisticsMeter()
 
         self.InitialBestScores, self.FinalBestScores = [], []
