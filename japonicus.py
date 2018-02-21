@@ -70,7 +70,23 @@ print()
 print("The profits reported here are the profit beyond market price change;\n"+\
       "\ti.e. shown profit =  <backtest profit> - <market profit in evaluated candlestick period>;")
 
+# --SELECT STRATEGY;
+if options.random_strategy:
+   Strategy = ""
+   GekkoStrategyFolder = listdir(settings['Global']['gekkoPath']+'/strategies')
+   while Strategy+'.js' not in GekkoStrategyFolder:
+      if Strategy:
+         print("Strategy %s descripted on settings but not found on strat folder."\
+               % Strategy)
+      Strategy = choice(list(settings['strategies'].keys()))
+      print("> %s" % Strategy)
 
+elif options.strategy:
+   Strategy = options.strategy
+else:
+   exit("No strategy specified! Use --strat or go --help")
+
+# --LAUNCH GENETIC ALGORITHM;
 if options.genetic_algorithm:
    GenerationMethod = 'chromosome' if options.chromosome_mode else 'oldschool'
    if options.indicator_mode:
@@ -87,31 +103,19 @@ if options.genetic_algorithm:
          exit("Bad configIndicators!")
 
    else:
-      if options.random_strategy:
-         Strategy = ""
-         GekkoStrategyFolder = listdir(settings['Global']['gekkoPath']+'/strategies')
-         while Strategy+'.js' not in GekkoStrategyFolder:
-            if Strategy:
-               print("Strategy %s descripted on settings but not found on strat folder."\
-                     % Strategy)
-            Strategy = choice(list(settings['strategies'].keys()))
-            print("> %s" % Strategy)
 
-      elif options.strategy:
-         Strategy = options.strategy
-      else:
-         exit("No strategy specified! Use --strat or go --help")
       EvaluationMode = Strategy
       TargetParameters = getSettings()['strategies'][Strategy]
 
    for s in range(options.repeater):
       gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, web=APP)
 
+# --LAUNCH BAYESIAN OPTIMIZATION;
 elif options.bayesian_optimization:
    import evolution_bayes
 
    for s in range(options.repeater):
-      evolution_bayes.gekko_bayesian(options.strategy)
+      evolution_bayes.gekko_bayesian(Strategy)
 
 deltatime = datetime.datetime.now() - markzero_time
 print("Run took %i seconds." % deltatime.seconds)

@@ -27,10 +27,7 @@ gsettings = getSettings()['Global']
 settings = getSettings()['bayesian']
 bayesconf = getSettings('bayesian')
 
-Strategy = options.strategy
-TargetParameters = getSettings()["strategies"][Strategy]
-TargetParameters = promoterz.parameterOperations.parameterValuesToRangeOfValues(TargetParameters, bayesconf.parameter_spread)
-
+Strategy = None
 percentiles = np.array([0.25, 0.5, 0.75])
 all_val = []
 stats = []
@@ -39,7 +36,7 @@ historySize = 0
 
 watch = settings["watch"]
 
-watch, DatasetRange = gekkoWrapper.getAvailableDataset(watch)
+watch, DatasetRange = gekkoWrapper.selectCandlestickData(watch)
 
 
 def expandGekkoStrategyParameters(IND, Strategy):
@@ -97,15 +94,14 @@ def flatten_dict(d):
 
     return dict(items())
 
-def gekko_bayesian(indicator=None):
+def gekko_bayesian(strategy):
     print("")
     global Strategy
-    Strategy = indicator
+    Strategy = strategy
 
-
-
-    if indicator == None:
-        Strategy = settings['Strategy']
+    TargetParameters = getSettings()["strategies"][Strategy]
+    TargetParameters = promoterz.parameterOperations.parameterValuesToRangeOfValues(TargetParameters, bayesconf.parameter_spread)
+    
     print("Starting search %s parameters" % Strategy)
     bo = BayesianOptimization(gekko_search, copy.deepcopy(TargetParameters))
 
