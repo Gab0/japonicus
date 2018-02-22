@@ -25,7 +25,7 @@ def getSettings(specific=None):
     HOME = os.getenv("HOME")
     s = {
         'Global': {
-            'gekkoPath': HOME+'/Gekko',
+            'gekkoPath': HOME+'/gekko',
             'configFilename': 'example-config.js',
             'save_dir': "output",
             'log_name': 'evolution_gen.csv',
@@ -53,7 +53,7 @@ def getSettings(specific=None):
             'POP_SIZE': 30, 
 
             # number of epochs to run
-            'NBEPOCH': 400,
+            'NBEPOCH': 1600,
 
             # show current best settings on every X epochs. (or False)
             'evaluateSettingsPeriodically': 20,
@@ -69,7 +69,7 @@ def getSettings(specific=None):
 
             # -- Genetic Algorithm Parameters
             'cxpb': 0.6, # Probabilty of crossover 
-            'mutpb': 0.03,# Probability of mutation;
+            'mutpb': 0.2,# Probability of mutation;
             '_lambda': 7,# size of offspring generated per epoch;
 
             'PRoFIGA_beta': 0.005, # weight of PRoFIGA calculations on variability of population size

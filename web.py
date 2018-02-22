@@ -19,7 +19,7 @@ settings = Settings.getSettings()['bayesian']
 
 def load_evolution_logs(filename=None):
     FileList = os.listdir(gsettings["save_dir"])
-    columns = ['id', 'avg', 'std', 'min', 'max', 'dateRange']
+    columns = ['id', 'avg', 'std', 'min', 'max', 'dateRange', 'evaluationScore']
     filename = os.path.join(gsettings["save_dir"], filename)
     df = pd.read_csv(filename, names=columns)
     return df
@@ -52,8 +52,8 @@ def update_graph(GraphName):
                 'text': DR
             })
 
-    colorSequence = [ (188,189,34),(100,11,182),(186,3,34),(45,111,45) ]
-    statNames = ['avg', 'std', 'min', 'max']
+    colorSequence = [ (188,189,34),(100,11,182),(186,3,34),(45,111,45), (66,66,66) ]
+    statNames = [ 'avg', 'std', 'min', 'max', 'evaluationScore' ]
 
     DATA = [{'x': df['id'], 'y': df[statNames[S]],
              'type': 'line', 'name': statisticsNames[statNames[S]],

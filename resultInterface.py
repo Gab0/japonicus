@@ -66,7 +66,9 @@ def showResults(World):
                     [ [evaluationDaterange]] , 0, [FinalIndividue])
                 print()
                 print(secondaryResults)
-                print("Relative profit on evaluation dataset: %.3f " % secondaryResults[0][0][0][0])
+                score = secondaryResults[0][0][0][0]
+                print("Relative profit on evaluation dataset: %.3f " % score)
+                LOCALE.extraStats['evaluationScore'] = score
             else:
                 print("Evaluation dataset is disabled.")
 
