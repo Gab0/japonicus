@@ -21,6 +21,20 @@ config.watch = {
   asset: 'BTC',
 
  }
+
+config.adapter = 'sqlite';
+
+config.sqlite = {
+  path: 'plugins/sqlite',
+
+  dataDirectory: 'history',
+  version: 0.1,
+
+  journalMode: 'WAL', // setting this to 'DEL' may prevent db locking on windows
+
+  dependencies: []
+}
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                       CONFIGURING IMPORTING
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -31,6 +45,8 @@ config.importer = {
     from: "2017-01-01 00:00:00"
   }
 }
+
+
 
 // set this to true if you understand that Gekko will
 // invest according to how you configured the indicators.
