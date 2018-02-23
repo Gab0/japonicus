@@ -17,6 +17,7 @@ from deap import base
 from Settings import getSettings
 import stratego
 from functools import partial
+
 StrategyFileManager = None
 
 class CandlestickDataset():
@@ -49,6 +50,7 @@ def bEvaluate(constructPhenotype, genconf, Database,
 def gekko_generations(TargetParameters, GenerationMethod,
                       EvaluationMode, NB_LOCALE=2, web=None):
 
+    Logger = promoterz.logger.Logger()
     GenerationMethod = promoterz.functions.selectRepresentationMethod(GenerationMethod)
 
     genconf=getSettings('generations')
@@ -65,7 +67,7 @@ def gekko_generations(TargetParameters, GenerationMethod,
         Evaluate = bEvaluate
         Strategy = EvaluationMode
 
-    print("Evolving %s strategy;\n" % Strategy)
+    Logger.log("Evolving %s strategy;\n" % Strategy)
 
     print("evaluated parameters ranges:")
 
@@ -85,7 +87,7 @@ def gekko_generations(TargetParameters, GenerationMethod,
             exit('Indicator mode is yet not compatible with multiple hosts.')
 
     for k in TargetParameters.keys():
-        print( "%s%s%s" % (k, " " * (30-len(k)), TargetParameters[k]) )
+        Logger.log( "%s%s%s" % (k, " " * (30-len(k)), TargetParameters[k]) )
 
     # --GRAB PRIMARY (EVOLUTION) DATASET
     D = promoterz.evaluation.gekko.selectCandlestickData(
@@ -122,7 +124,7 @@ def gekko_generations(TargetParameters, GenerationMethod,
                                   genconf, globalconf, TargetParameters, NB_LOCALE,
                                   EnvironmentParameters=[ evolutionDataset,
                                                           evaluationDataset ], web=web)
-
+    World.logger = Logger
     # --RUN EPOCHES;
     while World.EPOCH < World.genconf.NBEPOCH:
         World.runEPOCH()

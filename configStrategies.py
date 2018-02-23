@@ -5,6 +5,16 @@ cS = {
     # Define values for strat settings for strategies to be used
     # on japonicus;
     # Each value can be a tuple of limits or just a base value.
+    "rsi_bbands": {
+
+"NbDevUp": 2,
+"NbDevDn": 2,
+"TimePeriod": 9,
+"rsi_high": 60,
+"rsi_low": 20,
+"min_hold": 5,
+"swing_trade": 0.5
+},
     
 "RSI_BULL_BEAR" : {
 

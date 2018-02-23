@@ -67,7 +67,7 @@ def showResults(World):
                 print()
                 print(secondaryResults)
                 score = secondaryResults[0][0][0][0]
-                print("Relative profit on evaluation dataset: %.3f " % score)
+                World.logger.log("Relative profit on evaluation dataset: %.3f " % score)
                 LOCALE.extraStats['evaluationScore'] = score
             else:
                 print("Evaluation dataset is disabled.")
@@ -77,7 +77,7 @@ def showResults(World):
 
             logInfo(" %.3f final profit ~~~~" % FinalProfit)
             print(" -- Settings for Gekko config.js -- ")
-            print(Show)
+            World.logger.log(Show)
             print(" -- Settings for Gekko --ui webpage -- ")
             logInfo(parametersToTOML(FinalIndividueSettings))
 
@@ -93,7 +93,7 @@ def stratSettingsProofOfViability(World, Individual, specification, Dateranges):
     for W in Results[0]:
         ((q, s), m) = W
         AllProofs.append(q)
-        print('Testing monthly profit %.3f \t nbTrades: %.1f' % (q, m))
+        World.logger.log('Testing monthly profit %.3f \t nbTrades: %.1f' % (q, m))
 
     testMoney = 100
     for value in AllProofs:
@@ -104,7 +104,7 @@ def stratSettingsProofOfViability(World, Individual, specification, Dateranges):
 
     testMoney = testMoney - 100
 
-    print("Annual profit %.3f%%" % (testMoney))
+    World.logger.log("Annual profit %.3f%%" % (testMoney))
     return Valid, testMoney
 
 def parametersToTOML(Settings):
