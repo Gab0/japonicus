@@ -53,7 +53,7 @@ def getSettings(specific=None):
             'POP_SIZE': 30, 
 
             # number of epochs to run
-            'NBEPOCH': 1600,
+            'NBEPOCH': 800,
 
             # show current best settings on every X epochs. (or False)
             'evaluateSettingsPeriodically': 20,
@@ -75,7 +75,7 @@ def getSettings(specific=None):
             'PRoFIGA_beta': 0.005, # weight of PRoFIGA calculations on variability of population size
             'ageBoundaries': (9, 19), # minimum age to die, age when everyone dies (on EPOCHS)
 
-            'candleSize': 15, # candle size for gekko backtest, in minutes
+            'candleSize': 10, # candle size for gekko backtest, in minutes
 
             'proofSize': 12,
 

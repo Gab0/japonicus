@@ -95,14 +95,14 @@ def stratSettingsProofOfViability(World, Individual, specification, Dateranges):
         AllProofs.append(q)
         World.logger.log('Testing monthly profit %.3f \t nbTrades: %.1f' % (q, m))
 
-    testMoney = 100
+    testMoney = 0
     for value in AllProofs:
-        testMoney +=  (value/100*testMoney)
+        testMoney += value
 
     check = [ x for x in AllProofs if x > 0 ]
     Valid = sum(check) == len(check)
 
-    testMoney = testMoney - 100
+    testMoney = testMoney
 
     World.logger.log("Annual profit %.3f%%" % (testMoney))
     return Valid, testMoney
