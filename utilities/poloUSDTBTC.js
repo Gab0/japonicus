@@ -46,7 +46,9 @@ config.importer = {
   }
 }
 
-
+config.candleWriter = {
+	enabled: true,
+}
 
 // set this to true if you understand that Gekko will
 // invest according to how you configured the indicators.
