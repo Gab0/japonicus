@@ -55,6 +55,7 @@ def gekko_generations(TargetParameters, GenerationMethod,
 
     genconf=getSettings('generations')
     globalconf = getSettings('Global')
+    datasetconf = getSettings('dataset')
 
     if EvaluationMode == 'indicator':
         #global StrategyFileManager
@@ -91,13 +92,13 @@ def gekko_generations(TargetParameters, GenerationMethod,
 
     # --GRAB PRIMARY (EVOLUTION) DATASET
     D = promoterz.evaluation.gekko.selectCandlestickData(
-            exchange_source=genconf.dataset_source)
+            exchange_source=datasetconf.dataset_source)
     evolutionDataset = CandlestickDataset(*D)
 
     # --GRAB SECONDARY (EVALUATION) DATASET
     try:
         D = promoterz.evaluation.gekko.selectCandlestickData(
-        exchange_source = genconf.eval_dataset_source,
+        exchange_source = datasetconf.eval_dataset_source,
         avoidCurrency = evolutionDataset.specifications['asset'] )
         evaluationDataset = CandlestickDataset(*D)
     except RuntimeError:

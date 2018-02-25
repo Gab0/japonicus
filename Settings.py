@@ -83,17 +83,6 @@ def getSettings(specific=None):
              # until another time range in dataset is selected;
             'ParallelBacktests': 6,
 
-            # -- Gekko Dataset Settings
-            # leave the ! on the ignored entry as convenient;
-            'dataset_source': None,
-             # dataset_source can be set to None so it searches from any source;
-            '!dataset_source': { # in case of specifying exchange-currency-asset, rename this removing the '!', and del the original key above.
-                "exchange": "kraken",
-                "currency": 'USD',
-                "asset": 'LTC'
-            },
-            'eval_dataset_source': None,
-
             'finaltest': {
                 'NBBESTINDS': 1,
                 'NBADDITIONALINDS': 4,
@@ -144,6 +133,18 @@ def getSettings(specific=None):
                 "asset": 'BTC'
             }
         },
+        'dataset' : {
+            # -- Gekko Dataset Settings
+            # leave the ! on the ignored entry as convenient;
+            'dataset_source': None,
+             # dataset_source can be set to None so it searches from any source;
+            '!dataset_source': { # in case of specifying exchange-currency-asset, rename this removing the '!', and del the original key above.
+                "exchange": "kraken",
+                "currency": 'USD',
+                "asset": 'LTC'
+            },
+            'eval_dataset_source': None,
+            },
         'strategies': cS,
         'indicators': cI
     }
