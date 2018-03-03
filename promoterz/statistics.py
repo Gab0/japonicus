@@ -12,7 +12,8 @@ statisticsNames = {
     'maxsize': 'Max population size',
     'avgTrades': 'Avg trade number',
     'sharpe': 'Avg sharpe ratio',
-    'evaluationScore': "Evaluation Score"
+    'evaluationScore': "Evaluation Score",
+    'evaluationScoreOnSecondary': "Score on Secondary Dataset"
 }
 
 def getStatisticsMeter():

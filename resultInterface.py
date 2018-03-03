@@ -46,6 +46,7 @@ def showResults(World):
                                               FinalIndividue,
                                                ValidationSpecifications,
                                                ValidationDateranges)
+            locale.lastEvaluation = FinalProfit
             print("Testing Strategy:\n")
             if AssertFitness or FinalProfit > 50:
                 print("Following strategy is viable.")
@@ -68,7 +69,7 @@ def showResults(World):
                 print(secondaryResults)
                 score = secondaryResults[0][0][0][0]
                 World.logger.log("Relative profit on evaluation dataset: %.3f " % score)
-                LOCALE.extraStats['evaluationScore'] = score
+                LOCALE.lastEvaluationOnSecondary = score
             else:
                 print("Evaluation dataset is disabled.")
 

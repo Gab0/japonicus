@@ -57,8 +57,9 @@ def update_graph(GraphName, Statistics):
                 'text': DR
             })
 
-    colorSequence = [ (188,189,34),(100,11,182),(186,3,34),(45,111,45), (66,66,66) ]
-    statNames = [ 'avg', 'std', 'min', 'max', 'evaluationScore' ]
+    colorSequence = [ (188,189,34),(100,11,182),(186,3,34),(45,111,45), (66,128,66), (128,66,66) ]
+    statNames = [ 'avg', 'std', 'min', 'max',
+                  'evaluationScore', 'evaluationScoreOnSecondary' ]
 
     DATA = [ {'x': df['id'], 'y': df[statNames[S]],
              'type': 'line', 'name': statisticsNames[statNames[S]],
