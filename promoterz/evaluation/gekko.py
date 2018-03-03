@@ -227,17 +227,13 @@ def createConfig(TradeSetting, Database,
         gekko_config = CONFIG
     return gekko_config
 
-def getCandles(DateRange, size=100):
+def getCandles(DateRange, Dataset, size=100):
     globalconf = getSettings('Global')
     base = random.choice(globalconf.GekkoURLs)
 
     URL = base + "/api/getCandles"
     CONFIG = {
-        "watch": {
-            "exchange": "poloniex",
-            "currency": "BTC",
-            "asset": "ETH"
-            },
+        "watch": Dataset.specifications,
         "daterange": DateRange,
         "adapter": "sqlite",
         "sqlite": {

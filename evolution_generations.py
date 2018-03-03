@@ -18,13 +18,9 @@ from Settings import getSettings
 import stratego
 from functools import partial
 
+from datasetOperations import *
+
 StrategyFileManager = None
-
-class CandlestickDataset():
-    def __init__(self, specifications, datarange):
-        self.daterange = datarange
-        self.specifications = specifications
-
 # TEMPORARY ASSIGNMENT OF EVAL FUNCTIONS; SO THINGS REMAIN SANE (SANE?);
 def aEvaluate(StrategyFileManager, constructPhenotype,
               genconf, Database, DateRange, Individual, gekkoUrl):
@@ -56,10 +52,11 @@ def gekko_generations(TargetParameters, GenerationMethod,
     genconf=getSettings('generations')
     globalconf = getSettings('Global')
     datasetconf = getSettings('dataset')
-
+    indicatorconf = getSettings()['indicators']
     if EvaluationMode == 'indicator':
         #global StrategyFileManager
-        StrategyFileManager = stratego.gekko_strategy.StrategyFileManager(globalconf.gekkoPath)
+        StrategyFileManager = stratego.gekko_strategy.StrategyFileManager(
+            globalconf.gekkoPath, indicatorconf)
         Evaluate = partial(aEvaluate, StrategyFileManager)
         Strategy = None
 
@@ -94,13 +91,14 @@ def gekko_generations(TargetParameters, GenerationMethod,
     D = promoterz.evaluation.gekko.selectCandlestickData(
             exchange_source=datasetconf.dataset_source)
     evolutionDataset = CandlestickDataset(*D)
-
+    evolutionDataset.restrain(datasetconf.dataset_span)
     # --GRAB SECONDARY (EVALUATION) DATASET
     try:
         D = promoterz.evaluation.gekko.selectCandlestickData(
         exchange_source = datasetconf.eval_dataset_source,
         avoidCurrency = evolutionDataset.specifications['asset'] )
         evaluationDataset = CandlestickDataset(*D)
+        evaluationDataset.restrain(datasetconf.eval_dataset_span)
     except RuntimeError:
         evaluationDataset = None
         print("Evaluation dataset not found.")

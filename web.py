@@ -19,24 +19,29 @@ settings = Settings.getSettings()['bayesian']
 
 def load_evolution_logs(filename=None):
     FileList = os.listdir(gsettings["save_dir"])
-    columns = ['id', 'avg', 'std', 'min', 'max', 'dateRange', 'evaluationScore']
+
     filename = os.path.join(gsettings["save_dir"], filename)
     df = pd.read_csv(filename, names=columns)
     return df
 
-def update_graph(GraphName):
+def update_graph(GraphName, Statistics):
     print('Loading')
     ID = [s for s in GraphName if s.isdigit()]
+    '''
     try:
         df = load_evolution_logs(filename="evolution_gen_Locale%s.csv" % ''.join(ID))
         
     except:
         print("Failure to read evolution data.")
         return None
+    '''
+
+    df = pd.DataFrame(Statistics)
+
     annotations = []
     for W in range(len(df['dateRange'])):
         DR = df['dateRange'][W]
-        if DR != 'None':
+        if DR != None:
             annotations.append({
                 'xref':'axis',
                 'yref':'paper',
@@ -55,10 +60,10 @@ def update_graph(GraphName):
     colorSequence = [ (188,189,34),(100,11,182),(186,3,34),(45,111,45), (66,66,66) ]
     statNames = [ 'avg', 'std', 'min', 'max', 'evaluationScore' ]
 
-    DATA = [{'x': df['id'], 'y': df[statNames[S]],
+    DATA = [ {'x': df['id'], 'y': df[statNames[S]],
              'type': 'line', 'name': statisticsNames[statNames[S]],
              'line': {'color': 'rgb%s' % str(colorSequence[S]) }
-             } for S in range(len(statNames))]
+             } for S in range(len(statNames)) ]
     fig = {
         'data': [
             {'x':[0, df["id"]], 'y':[0],
@@ -81,7 +86,7 @@ def newGraphic(name):
 def run_server():
     # Setup the app
     server = flask.Flask(__name__)
-    #server.secret_key = os.environ.get('secret_http://localhost:500/key', 'secret')
+
     app = dash.Dash(__name__, server=server, csrf_protect=False)
 
     app.scripts.config.serve_locally = False
@@ -92,7 +97,7 @@ def run_server():
     timeout = 60 * 60  # 1 hour
 
     # Controls
-    
+    app.update_graph = update_graph
     # Layout
     app.GraphicList = [ ]
     app.newGraphic = lambda name: app.GraphicList.append(newGraphic(name))
@@ -145,10 +150,11 @@ def run_server():
         Output('Graphs', 'children'),
         events=[Event('my-interval', 'interval')])
     def updateGraphs():
+        '''
         for F in range(len(app.GraphicList)):
             if app.GraphicList[F].Active:
                 app.GraphicList[F].__setattr__('figure', update_graph(app.GraphicList[F].id))
-            
+        '''
         return app.GraphicList
 
 

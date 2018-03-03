@@ -11,7 +11,7 @@ class Locale():
         self.name = name
         self.EPOCH=0
         self.position = position
-        self.EvolutionStatistics={}
+        self.EvolutionStatistics=[]
 
         self.HallOfFame = tools.HallOfFame(30)
 
@@ -39,6 +39,8 @@ class Locale():
         self.DateRange = [ getDateRange()\
                            for x in range(World.genconf.ParallelCandlestickDataset) ]
 
+        self.lastEvaluation = None
+        self.lastEvaluationOnSecondary = None
 
         # --INIT STATISTICS;
         self.stats = promoterz.statistics.getStatisticsMeter()

@@ -83,16 +83,16 @@ if options.random_strategy:
 
 elif options.strategy:
    Strategy = options.strategy
-else:
+elif not options.skeleton:
    exit("No strategy specified! Use --strat or go --help")
 
 # --LAUNCH GENETIC ALGORITHM;
 if options.genetic_algorithm:
    GenerationMethod = 'chromosome' if options.chromosome_mode else 'oldschool'
-   if options.indicator_mode:
+   if options.skeleton:
       EvaluationMode = 'indicator'
       AllIndicators = getSettings()['indicators']
-      TargetParameters=  {}
+      TargetParameters=  getSettings()['skeletons'][options.skeleton]
       for K in AllIndicators.keys():
          if type(AllIndicators[K]) != dict:
             TargetParameters[K] = AllIndicators[K]
@@ -103,7 +103,6 @@ if options.genetic_algorithm:
          exit("Bad configIndicators!")
 
    else:
-
       EvaluationMode = Strategy
       TargetParameters = getSettings()['strategies'][Strategy]
 

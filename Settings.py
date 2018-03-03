@@ -141,12 +141,24 @@ def getSettings(specific=None):
             '!dataset_source': { # in case of specifying exchange-currency-asset, rename this removing the '!', and del the original key above.
                 "exchange": "kraken",
                 "currency": 'USD',
-                "asset": 'LTC'
+                "asset": 'LTC',
             },
             'eval_dataset_source': None,
+
+            # span in days from the end of dataset to the beggining. Or zero.
+            # (to restrain length);
+            'dataset_span': 0,
+            'eval_dataset_span': 0
+
             },
         'strategies': cS,
-        'indicators': cI
+        'indicators': cI,
+        'skeletons': {
+            'ontrend': {
+                "SMA_long": 1000,
+                "SMA_short": 50
+            }
+        }
     }
 
     if specific != None:

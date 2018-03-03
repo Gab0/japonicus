@@ -1,5 +1,6 @@
 #!/bin/python
 from deap import tools
+import pandas as pd
 import numpy as np
 import os
 statisticsNames = {
@@ -10,7 +11,8 @@ statisticsNames = {
     'size': 'Population size',
     'maxsize': 'Max population size',
     'avgTrades': 'Avg trade number',
-    'sharpe': 'Avg sharpe ratio'
+    'sharpe': 'Avg sharpe ratio',
+    'evaluationScore': "Evaluation Score"
 }
 
 def getStatisticsMeter():
@@ -24,27 +26,9 @@ def getStatisticsMeter():
     return stats
 
 def write_evolution_logs(i, stats, filename="output/evolution_gen.csv"):
-    #print(i, stats)
-    if type(stats) == dict:
-        message = ','.join([str(x) for x in [i,stats['avg'],
-                                             stats['std'],
-                                             stats['min'],
-                                             stats['max'],
-                                             stats['dateRange']]])
-    elif type(stats) == list:
-        message = ','.join([str(x) for x in [i] + stats])
-    else:
-        raise
-    #print(message)
 
-    if i == 0 and os.path.isfile(filename):
-        os.remove(filename)
-    f=open(filename, 'a+')
-    f.write(message+"\n")
-    #print(message)
-    f.close()
-
-
+    df = pd.DataFrame(stats)
+    df.to_csv(filename)
 
 def compileStats(locale):
     # --get proper evolution statistics;
@@ -54,12 +38,18 @@ def compileStats(locale):
     Stats['size'] = len(locale.population)
     Stats['avgTrades'] = locale.extraStats['avgTrades']
     Stats['sharpe'] = np.mean([x.fitness.values[1] for x in locale.population])
-    
-    locale.EvolutionStatistics[locale.EPOCH] = Stats
+
+    Stats['evaluationScoreOnSecondary'] = locale.lastEvaluationOnSecondary
+    Stats['evaluationScore'] = locale.lastEvaluation
+
+    locale.lastEvaluationOnSecondary = None
+    locale.lastEvaluation = None
+
+    Stats['id'] = locale.EPOCH
+    locale.EvolutionStatistics.append(Stats)
     
     LOGPATH ="output/evolution_gen_%s.csv" % locale.name
-    write_evolution_logs(locale.EPOCH,
-                                              Stats, LOGPATH)
+    #write_evolution_logs(locale.EPOCH, locale.EvolutionStatistics, LOGPATH)
     
 def showStats(locale):
     # show information;

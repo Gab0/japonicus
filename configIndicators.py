@@ -1,6 +1,20 @@
-#1/bin/python
+#!/bin/python
+
 
 cI = {
+    "ADX": {
+        "active": True,
+        "period": 14,
+        "thresholds.up": 70,
+        "thresholds.down": 50
+    },
+    "ATR": {
+        "active": True,
+        "period": 14,
+        "thresholds.up": 70,
+        "thresholds.down": 50
+
+    },
     "PPO":{
         "active": True,
         "short": (6,18), # short EMA
@@ -48,5 +62,6 @@ cI = {
         "thresholds.down": (-150,-50), # trend thresholds
         "thresholds.up": (50,150), # trend thresholds
         "thresholds.persistence": (4,10)},
-"persistence": (1,5)
+    
+
 }

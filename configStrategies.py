@@ -5,6 +5,15 @@ cS = {
     # Define values for strat settings for strategies to be used
     # on japonicus;
     # Each value can be a tuple of limits or just a base value.
+    "ontrend" : {
+    "bull_momentum_high": 80,
+    "bull_momentum_low": 60,
+    "bear_momentum_high": 50,
+    "bear_momentuum_low": 20,
+    "sec_high": 70,
+    "sec_low": 50
+
+        },
     "rsi_bbands": {
 
 "NbDevUp": 2,

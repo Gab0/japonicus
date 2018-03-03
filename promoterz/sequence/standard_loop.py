@@ -107,7 +107,7 @@ def standard_loop(World, locale):
     TournamentSize = max(2*LAMBDA, len(locale.population))
     offspring = evolutionHooks.Tournament(locale.population,
                                     LAMBDA, TournamentSize)
-    offspring = [deepcopy(x) for x in offspring] # is deepcopy necessary?
+    offspring = [ deepcopy(x) for x in offspring ] # is deepcopy necessary?
 
     # --modify and integrate offspring;
     offspring = algorithms.varAnd(offspring, World.tools,

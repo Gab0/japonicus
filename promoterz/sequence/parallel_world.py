@@ -11,6 +11,13 @@ def world_EPOCH(World):
     for LOCALE in World.locales:
         LOCALE.run()
 
+        if World.web:
+            for F in range(len(World.web.GraphicList)):
+                if World.web.GraphicList[F].id == LOCALE.name:
+                    World.web.GraphicList[F].__setattr__('figure',
+                                                        World.web.update_graph(LOCALE.name,
+                                                                               LOCALE.EvolutionStatistics))
+
     # --APPLY MIGRATION BETWEEN LOCALES;
     if len(World.locales):
         S, D=False, False
@@ -19,8 +26,8 @@ def world_EPOCH(World):
             distance = calculateDistance(L[0].position, L[1].position)
             distance_weight = distance/World.maxdistance
             if random.random() > distance_weight:
-                World.migration(L[0], L[1], (1,7))
-                World.migration(L[1], L[0], (1,7))
+                World.migration(L[0], L[1], (1, 7))
+                World.migration(L[1], L[0], (1, 7))
 
     # --APPLY LOCALE CREATION;
     if random.random() < 0.01:
@@ -37,6 +44,9 @@ def world_EPOCH(World):
                   
     World.EPOCH+=1
     etime = time.time() - stime
+
+
+        
     print("Epoch runs in %.2f seconds;" % etime)
     if not World.EPOCH % 10:
         print("Backend power %s" % World.parallel.lasttimesperind)

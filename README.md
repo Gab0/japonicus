@@ -193,10 +193,10 @@ Anyone interested on this work or that would like to suggest an important indica
 
 <br>
 
-Indicators roadmap: <br>
+Indicator roadmap: <br>
 ~~- Bollinger Bands~~<br>
 ~~- Average True Range~~<br>
 - Parabolic Stop and Reverse<br>
 - Directional Movement Concept <br>
-- ADX <br>
+~~- ADX~~ <br>
 - Ichimoku clouds
