@@ -50,7 +50,7 @@ $node gekko.js --ui
 $node web/server.js
 
 T.2 -> $cd [japonicus dir]
-       $python japonicus.py [-g|-b] [-c] [-k] [--repeat <X>] [ [-i|-r|--strat <Strategy>] [-w]
+       $python japonicus.py [-g|-b] [-c] [-k] [--repeat <X>] [ [-r|--strat <Strategy>|--skeleton <Skeleton>] [-w]
 
     [main optimization options]
     -g for genetic algorithm;
@@ -62,7 +62,7 @@ T.2 -> $cd [japonicus dir]
     [strategy selector] 
     -r run with random strategy
     --strat choose one strat to run;
-    -i Genetic algorithm create strategies w/ combined indicators on the fly and run 'em.
+    --skeleton Genetic algorithm create strategies w/ combined indicators on the fly and run 'em. 'ontrend' is the only skeleton available.
     
     [repeat runs]    
     --repeat to run genetic algorithm X times; then just check evolution.log;
@@ -121,6 +121,17 @@ That strategy does not get very good results.
 
 https://github.com/tommiehansen/gekko_tools by tommiehansen. A couple of multiple indicator strategies, they use
 tulind so backtests can take awhile, but HEY thats some good strats of high trading rate and high profit.
+
+#### Preparing Strategies
+
+In order to use a strategy you made or found in the depths of the internetz under japonicus, mind the following:
+
+```
+1) Of course the strat shall not have hardcoded settings. All indicators and conditionals should feed directly from this.settings of the strategy.
+2) TA-Lib or TUlind indicators can be used, but are not recommended cause they slow down backtests, going to about halfspeed of native indicators. Try to use native gekko indicators.
+3) PRs of strats that work on japonicus are welcome @ https://github.com/Gab0/gekko-adapted-strategies.
+```
+
 
 #### User Feedback
 
