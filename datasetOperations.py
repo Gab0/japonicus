@@ -10,8 +10,8 @@ class CandlestickDataset():
             return
         deltams = deltaDays * 24 * 60 * 60
 
-        restainedBeggining = self.daterange['to'] - deltams
+        restainedInit = self.daterange['to'] - deltams
 
         self.daterange['from'] = max( self.daterange['from'],
-                                     restrainedBeggining )
+                                     restrainedInit )
 
