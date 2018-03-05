@@ -7,7 +7,8 @@ from functools import partial
 
 class World():
     def __init__(self, GlobalTools, loops, genconf, globalconf,
-                 TargetParameters, NB_LOCALE=3, EnvironmentParameters=None, web=None):
+                 TargetParameters, NB_LOCALE=3,
+                 EnvironmentParameters=None, onInitLocale=None, web=None):
 
         self.tools = GlobalTools
         self.loops = loops
@@ -25,6 +26,7 @@ class World():
                                                                 globalconf.GekkoURLs,
                                                                 genconf.ParallelBacktests,
                                                                 genconf.showIndividualEvaluationInfo)
+        self.onInitLocale = onInitLocale
         self.web=web
 
         for l in range(NB_LOCALE):
@@ -37,8 +39,12 @@ class World():
         position = [random.randrange(0, self.size[x]) for x in range(2)]
         L = promoterz.locale.Locale(self, name, position,
                                     random.choice(self.loops))
+
+        if self.onInitLocale:
+            self.onInitLocale(self, L)
         if self.web:
             self.web.newGraphic(name)
+
         self.locales.append(L)
 
     def migration(self, source, target, number_range):

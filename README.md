@@ -203,11 +203,30 @@ I'm doing an effort to port the most usable indicator from TA-Lib to native gekk
 Anyone interested on this work or that would like to suggest an important indicator should message me or send pull requests etc. Those are important for `-i` method improvement.
 
 <br>
+```
+Indicator roadmap: 
+~~Bollinger Bands~~DONE
+~~Average True Range~~DONE
+Parabolic Stop and Reverse 
+Directional Movement Concept 
+~~ADX~~DONE
+Ichimoku clouds
+```
 
-Indicator roadmap: <br>
-~~- Bollinger Bands~~<br>
-~~- Average True Range~~<br>
-- Parabolic Stop and Reverse<br>
-- Directional Movement Concept <br>
-~~- ADX~~ <br>
-- Ichimoku clouds
+# Changelog
+
+```
+Changelogs 
+v.53
+
+- Major aesthetics rework on code itself; now we can even have collaborators.
+- Pretty run logs @ logs folder;
+- Interchangeable backtest result interpretation (promoterz.evaluation.gekko:25)
+- gekko API is now organized - backtest & dadataset functions separated.
+- Genetic Algorithm settings controllable via command line. Check --help.
+- Web interface more stable
+
+v.51
+- Started tracking updates on changelog;
+
+```

@@ -3,6 +3,7 @@ from deap import tools
 import pandas as pd
 import numpy as np
 import os
+
 statisticsNames = {
     'avg': 'Average profit',
     'std': 'Profit variation',
@@ -26,10 +27,7 @@ def getStatisticsMeter():
 
     return stats
 
-def write_evolution_logs(i, stats, filename="output/evolution_gen.csv"):
 
-    df = pd.DataFrame(stats)
-    df.to_csv(filename)
 
 def compileStats(locale):
     # --get proper evolution statistics;
@@ -50,7 +48,8 @@ def compileStats(locale):
     locale.EvolutionStatistics.append(Stats)
     
     LOGPATH ="output/evolution_gen_%s.csv" % locale.name
-    #write_evolution_logs(locale.EPOCH, locale.EvolutionStatistics, LOGPATH)
+    locale.World.logger.write_evolution_logs(locale.EPOCH,
+                                             locale.EvolutionStatistics, locale.name)
     
 def showStats(locale):
     # show information;

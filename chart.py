@@ -8,7 +8,7 @@ import matplotlib.finance as mpf
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 #from plotInfo import plotEvolutionSummary
 
-import promoterz.evaluation.gekko as gekkoWrapper
+import evaluation
 import Settings
 import sqlite_scanner
 import resultInterface
@@ -224,10 +224,10 @@ def show_chart():
     filename = settings['configFilename']
     configjs = Settings.get_configjs(filename)
     watch = settings["watch"]
-    dateset = gekkoWrapper.getAvailableDataset(watch)
+    dateset = evaluation.gekko.dataset.getAvailableDataset(watch)
     daterange = resultInterface.getRandomDateRange(dateset, deltaDays=deltaDays)
     res = evolution_bayes.EvaluateRaw(watch, daterange, configjs[strategy], strategy)
-    #res = gekkoWrapper.httpPost(URL, gekkoConfig)
+    #res = evaluation.gekko.API.httpPost(URL, gekkoConfig)
 
     show_candles(res, configjs[strategy])
 

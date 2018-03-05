@@ -13,10 +13,15 @@ from multiprocessing import Pool
 import multiprocessing as mp
 
 from promoterz.statistics import write_evolution_logs
+
 import promoterz
+import evaluation
+
 from Settings import getSettings
-import promoterz.evaluation.gekko as gekkoWrapper
-import chart
+
+import evaluation
+
+import resultInterface
 
 from japonicus_options import options, args
 dict_merge = lambda a,b: a.update(b) or a
@@ -36,7 +41,7 @@ historySize = 0
 
 watch = settings["watch"]
 
-watch, DatasetRange = gekkoWrapper.selectCandlestickData(watch)
+watch, DatasetRange = evaluation.gekko.dataset.selectCandlestickData(watch)
 
 
 def expandGekkoStrategyParameters(IND, Strategy):
@@ -49,10 +54,10 @@ def expandGekkoStrategyParameters(IND, Strategy):
 
 def Evaluate(Strategy, parameters):
 
-    DateRange = gekkoWrapper.getRandomDateRange(DatasetRange, deltaDays=settings['deltaDays'])
+    DateRange = evaluation.gekko.dataset.getRandomDateRange(DatasetRange, deltaDays=settings['deltaDays'])
     params = expandGekkoStrategyParameters(parameters, Strategy)
 
-    BacktestResult = gekkoWrapper.Evaluate(bayesconf, watch,
+    BacktestResult = evaluation.gekko.backtest.Evaluate(bayesconf, watch,
                                            [DateRange], params, gsettings['GekkoURLs'][0])
     BalancedProfit = BacktestResult[0][0]
     return BalancedProfit

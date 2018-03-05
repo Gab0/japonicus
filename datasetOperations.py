@@ -1,5 +1,7 @@
 #!/bin/python
 
+import evaluation
+
 class CandlestickDataset():
     def __init__(self, specifications, daterange):
         self.daterange = daterange
@@ -15,3 +17,12 @@ class CandlestickDataset():
         self.daterange['from'] = max( self.daterange['from'],
                                      restrainedInit )
 
+def getLocaleDateRange(World, locale):
+    getDateRange = lambda: evaluation.gekko.dataset.getRandomDateRange(
+        World.EnvironmentParameters[0].daterange,
+    World.genconf.deltaDays )
+
+    DateRange = [ getDateRange()\
+                       for x in range(World.genconf.ParallelCandlestickDataset) ]
+
+    return DateRange

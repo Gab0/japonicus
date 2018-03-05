@@ -9,14 +9,17 @@ from deap import tools
 import numpy as np
 
 import promoterz
+import evaluation
+
 from Settings import getSettings
 
 def showResults(World):
     ValidationDateranges = []
     useSecondary = 1 if World.EnvironmentParameters[1] else 0
     ValidationSpecifications = World.EnvironmentParameters[useSecondary].specifications
+
     for NB in range(World.genconf.proofSize):
-        Daterange = promoterz.evaluation.gekko.getRandomDateRange(
+        Daterange = evaluation.gekko.dataset.getRandomDateRange(
             World.EnvironmentParameters[useSecondary].daterange,
             World.genconf.deltaDays )
         ValidationDateranges.append(Daterange)
@@ -46,7 +49,7 @@ def showResults(World):
                                               FinalIndividue,
                                                ValidationSpecifications,
                                                ValidationDateranges)
-            locale.lastEvaluation = FinalProfit
+            LOCALE.lastEvaluation = FinalProfit
             print("Testing Strategy:\n")
             if AssertFitness or FinalProfit > 50:
                 print("Following strategy is viable.")
@@ -59,7 +62,7 @@ def showResults(World):
             if World.EnvironmentParameters[1]:
                 Dataset = World.EnvironmentParameters[1]
                 print(Dataset.__dict__)
-                evaluationDaterange = promoterz.evaluation.gekko.getRandomDateRange(
+                evaluationDaterange = evaluation.gekko.dataset.getRandomDateRange(
                     Dataset.daterange, 0)
                 print(evaluationDaterange)
                 secondaryResults = World.parallel.evaluateBackend(
@@ -133,14 +136,6 @@ def parametersToTOML(Settings):
 
 def loadGekkoConfig():
     pass
-
-def logInfo(message, filename="evolution_gen.log"):
-    gsettings = getSettings()['Global']
-    filename = os.path.join(gsettings['save_dir'], filename)
-    F=open(filename, 'a+')
-    F.write(message)
-    print(message)
-    F.close()
 
 def getFromDict(DataDict, Indexes):
     return reduce(operator.getitem, Indexes, DataDict)

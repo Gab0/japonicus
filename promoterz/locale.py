@@ -31,13 +31,6 @@ class Locale():
         # --initial population
         self.population = World.tools.population(World.genconf.POP_SIZE)
 
-        # --!!!!!LOCALE SHOULD NOT BE GEKKO-SPECIFIC;
-        getDateRange = lambda: promoterz.evaluation.gekko.getRandomDateRange(
-            World.EnvironmentParameters[0].daterange,
-            World.genconf.deltaDays )
-
-        self.DateRange = [ getDateRange()\
-                           for x in range(World.genconf.ParallelCandlestickDataset) ]
 
         self.lastEvaluation = None
         self.lastEvaluationOnSecondary = None
