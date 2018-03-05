@@ -77,13 +77,13 @@ def showResults(World):
                 print("Evaluation dataset is disabled.")
 
             Show = json.dumps(FinalIndividueSettings, indent=2)
-            logInfo("~" * 18)
+            print("~" * 18)
 
-            logInfo(" %.3f final profit ~~~~" % FinalProfit)
+            World.logger.log(" %.3f final profit ~~~~" % FinalProfit)
             print(" -- Settings for Gekko config.js -- ")
             World.logger.log(Show)
             print(" -- Settings for Gekko --ui webpage -- ")
-            logInfo(parametersToTOML(FinalIndividueSettings))
+            print(parametersToTOML(FinalIndividueSettings))
 
             print("\nRemember to check MAX and MIN values for each parameter.")
             print("\tresults may improve with extended ranges.")
