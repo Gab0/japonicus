@@ -50,7 +50,7 @@ def showResults(World):
                                                ValidationSpecifications,
                                                ValidationDateranges)
             LOCALE.lastEvaluation = FinalProfit
-            print("Testing Strategy:\n")
+            World.logger.log("Testing Strategy of %s @ EPOCH %i:\n" % (LOCALE.name, LOCALE.EPOCH))
             if AssertFitness or FinalProfit > 50:
                 print("Following strategy is viable.")
             else:
@@ -83,7 +83,7 @@ def showResults(World):
             print(" -- Settings for Gekko config.js -- ")
             World.logger.log(Show)
             print(" -- Settings for Gekko --ui webpage -- ")
-            print(parametersToTOML(FinalIndividueSettings))
+            World.logger.log(parametersToTOML(FinalIndividueSettings))
 
             print("\nRemember to check MAX and MIN values for each parameter.")
             print("\tresults may improve with extended ranges.")

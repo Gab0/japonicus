@@ -42,7 +42,7 @@ cS = {
 "BEAR_RSI_low" : 20
 },
 
-"RSI_BULL_BEAR_ADX" : {
+"RSI_BULL_BEAR_ADXold" : {
 
 # SMA Trends
 "SMA_long": 1000,
@@ -63,7 +63,34 @@ cS = {
 "ADX_high": 70,
 "ADX_low": 50
 },
+    
+"RSI_BULL_BEAR_ADX" : {
 
+# SMA Trends
+"SMA_long": 1000,
+"SMA_short": 50,
+
+# BULL
+"BULL_RSI": 10,
+"BULL_RSI_high":  80,
+"BULL_RSI_low" : 60,
+
+# BEAR
+"BEAR_RSI": 15,
+"BEAR_RSI_high": 50,
+"BEAR_RSI_low" : 20,
+
+# ADX
+"ADX": 3,
+"ADX_high": 70,
+"ADX_low": 50,
+
+"BULL_MOD_high": 5,
+"BULL_MOD_low": -5,
+"BEAR_MOD_high": 15,
+"BEAR_MOD_low": -5
+},
+    
 "Bestone" :{
     "customMACDSettings": {
         "optInFastPeriod": (3,10),

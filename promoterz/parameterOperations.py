@@ -37,6 +37,8 @@ def parameterValuesToRangeOfValues(TargetParameters, Spread):
         P = TargetParameters[parameter]
         if type(P) != tuple:
             spread_change = Spread * P / 200
+            if P < 0:
+                spread_change = -spread_change
             TargetParameters[parameter] = (P - spread_change, P + spread_change)
 
 

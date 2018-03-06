@@ -9,7 +9,11 @@ def world_EPOCH(World):
                                              World.genconf.NBEPOCH))
     stime = time.time()
     for LOCALE in World.locales:
-        LOCALE.run()
+        try:
+            LOCALE.run()
+        except AssertionError:
+            World.explodeLocale(LOCALE)
+            
 
         if World.web:
             for F in range(len(World.web.GraphicList)):
