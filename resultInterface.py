@@ -31,8 +31,8 @@ def showResults(World):
         BestIndividues = tools.selBest(LOCALE.population,B)
 
         Z = min(World.genconf.finaltest['NBADDITIONALINDS'], len(LOCALE.population)-B)
-        Z = min(0, Z)
-        print("Selecting %i+%i individues, random test;" % (B,Z))
+        Z = max(0, Z)
+
         AdditionalIndividues = promoterz.evolutionHooks.Tournament(LOCALE.population, Z, Z*2)
 
         print("%i selected;" % len(AdditionalIndividues))
@@ -43,36 +43,51 @@ def showResults(World):
 
         print("%i selected;" % len(FinalIndividues))
 
+        print("Selecting %i+%i individues, random test;" % (B,Z))
         for FinalIndividue in FinalIndividues:
+            GlobalLogEntry = {}
             proof = stratSettingsProofOfViability
-            AssertFitness, FinalProfit = proof(World,
+            AssertFitness, FinalProfit, Results = proof(World,
                                               FinalIndividue,
                                                ValidationSpecifications,
                                                ValidationDateranges)
             LOCALE.lastEvaluation = FinalProfit
-            World.logger.log("Testing Strategy of %s @ EPOCH %i:\n" % (LOCALE.name, LOCALE.EPOCH))
+            GlobalLogEntry['evaluation'] = FinalProfit
+            World.logger.log("Testing Strategy of %s @ EPOCH %i:\n" % (
+                LOCALE.name, LOCALE.EPOCH))
+
             if AssertFitness or FinalProfit > 50:
                 print("Following strategy is viable.")
             else:
                 print("Strategy Fails.")
+                if not World.globalconf.showFailedStrategies:
+                    continue
+
+            for Result in Results:
+                World.logger.log('Testing monthly profit %.3f \t nbTrades: %.1f' % (
+                    Result['relativeProfit'], Result['trades']))
+
             FinalIndividueSettings = World.tools.constructPhenotype(
                     FinalIndividue)
 
             # --EVALUATION DATASET TEST AND REPORT;
             if World.EnvironmentParameters[1]:
                 Dataset = World.EnvironmentParameters[1]
-                print(Dataset.__dict__)
+
                 evaluationDaterange = evaluation.gekko.dataset.getRandomDateRange(
                     Dataset.daterange, 0)
-                print(evaluationDaterange)
+
                 secondaryResults = World.parallel.evaluateBackend(
                     Dataset.specifications,
-                    [ [evaluationDaterange]] , 0, [FinalIndividue])
+                    [ [evaluationDaterange] ] , 0, [FinalIndividue])
                 print()
-                print(secondaryResults)
-                score = secondaryResults[0][0][0][0]
+
+                #print(secondaryResults)
+                score = secondaryResults[0][0]['relativeProfit']
                 World.logger.log("Relative profit on evaluation dataset: %.3f " % score)
                 LOCALE.lastEvaluationOnSecondary = score
+
+                GlobalLogEntry['secondary'] = score
             else:
                 print("Evaluation dataset is disabled.")
 
@@ -87,29 +102,29 @@ def showResults(World):
 
             print("\nRemember to check MAX and MIN values for each parameter.")
             print("\tresults may improve with extended ranges.")
+            World.EvaluationStatistics.append(GlobalLogEntry)
 
+    World.logger.Summary = ""
+    World.logger.log(pandas.DataFrame(World.EvaluationStatistics), target="Summary")
+    World.logger.updateFile()
 
 def stratSettingsProofOfViability(World, Individual, specification, Dateranges):
     AllProofs = []
-    Dateranges = [[x] for x in Dateranges]
+    Dateranges = [ [x] for x in Dateranges ]
     Results = World.parallel.evaluateBackend(specification, Dateranges, 0, [Individual])
 
     for W in Results[0]:
-        ((q, s), m) = W
-        AllProofs.append(q)
-        World.logger.log('Testing monthly profit %.3f \t nbTrades: %.1f' % (q, m))
+        AllProofs.append(W['relativeProfit'])
 
     testMoney = 0
     for value in AllProofs:
         testMoney += value
 
     check = [ x for x in AllProofs if x > 0 ]
-    Valid = sum(check) == len(check)
-
-    testMoney = testMoney
+    Valid = sum(check) == len(AllProofs)
 
     World.logger.log("Annual profit %.3f%%" % (testMoney))
-    return Valid, testMoney
+    return Valid, testMoney, Results[0]
 
 def parametersToTOML(Settings):
     text = []
