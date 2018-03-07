@@ -2,9 +2,18 @@
 
 from .API import httpPost
 
-interpreteBacktestProfitv1 = lambda backtest: backtest['relativeProfit'] - backtest['market']
+
+def interpreteBacktestProfitv1(backtest):
+    return backtest['relativeProfit']
+
 def interpreteBacktestProfitv2(backtest):
     return backtest['relativeProfit'] - backtest['market']
+
+def interpreteBacktestProfitv3(backtest):
+    if backtest['relativeProfit'] < 0 and backtest['market'] < 0:
+        return backtest['relativeProfit']
+    else:
+        return backtest['relativeProfit'] - backtest['market']
 
 
 
@@ -46,8 +55,12 @@ def Evaluate(genconf, Database, DateRange, phenotype, GekkoInstanceUrl):
                            candleSize=genconf.candleSize,
                            Debug=genconf.gekkoDebug) for DR in DateRange ]
 
+    interpreter = { 'v1': interpreteBacktestProfitv1,
+                    'v2': interpreteBacktestProfitv2,
+                    'v3': interpreteBacktestProfitv3 }
+
     # --INTERPRETE BACKTEST RESULT;
-    RelativeProfits = [ interpreteBacktestProfitv2(R) for R in result ]
+    RelativeProfits = [ interpreter[genconf.interpreteBacktestProfit](R) for R in result ]
 
     avgTrades = sum( [R['trades'] for R in result] ) / len(DateRange)
     mRelativeProfit = sum(RelativeProfits)/len(RelativeProfits)
@@ -55,7 +68,9 @@ def Evaluate(genconf, Database, DateRange, phenotype, GekkoInstanceUrl):
     avgSharpe = sum ( [R['sharpe'] for R in result if R['sharpe']]) / len(DateRange)
 
 
-    return (mRelativeProfit, avgSharpe), avgTrades
+    return { 'relativeProfit': mRelativeProfit,
+             'sharpe': avgSharpe,
+             'trades': avgTrades }
 
 def createConfig(TradeSetting, Database,
                  DateRange, candleSize=10,
