@@ -81,7 +81,7 @@ class EvaluationPool():
             for i, fit in zip(range(len(results[PoolIndex][0])), results[PoolIndex][0]):
                 if self.individual_info:
                     print(showIndividue(fit))
-                props[PoolIndex][i].fitness.values = fit['relativeProfit']
+                props[PoolIndex][i].fitness.values = (fit['relativeProfit'], fit['sharpe'])
                 TotalNumberOfTrades += fit['trades']
 
             self.lasttimes[PoolIndex] = results[PoolIndex][1]
