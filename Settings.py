@@ -35,7 +35,8 @@ def getSettings(specific=None):
             'RemoteAWS': '../AmazonSetup/hosts',
 
             # Your gekko local URL - CHECK THIS!
-            'GekkoURLs': [ 'http://localhost:3000' ]
+            'GekkoURLs': [ 'http://localhost:3000' ],
+            'showFailedStrategies': False
         },
         # genetic algorithm settings
         'generations': {
@@ -93,7 +94,12 @@ def getSettings(specific=None):
             },
             'weights': {
                 'profit': 1.0,
-                'sharpe': 0.1}
+                'sharpe': 0.1},
+
+            # mode of profit interpretation: v1, v2 or v3.
+            # please check the first functions at evaluation.gekko.backtest
+            # to understand what is this. has big impact on evolutionary agenda.
+            'interpreteBacktestProfit': 'v3'
         },
 
         # bayesian optimization settings
