@@ -2,6 +2,7 @@
 import json
 import random
 import datetime
+import sys
 
 import promoterz
 import evaluation
@@ -123,6 +124,10 @@ def gekko_generations(TargetParameters, GenerationMethod,
                                       str(datetime.datetime.now())[-6:])
 
     Logger = promoterz.logger.Logger(logfilename)
+
+    # --PRINT RUNTIME ARGS TO LOG HEADER;
+    ARGS = '$python ' + ' '.join(sys.argv)
+    Logger.log(ARGS, target='Header')
 
     # --SHOW PARAMETER INFO;
     if Strategy:
