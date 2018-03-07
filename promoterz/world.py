@@ -18,7 +18,9 @@ class World():
         self.maxdistance = calculateDistance([0,0], self.size)
         self.localeID=1
         self.TargetParameters = TargetParameters
+
         self.genconf=genconf
+        self.globalconf=globalconf
 
         self.EnvironmentParameters=EnvironmentParameters
         self.runEPOCH = partial(world_EPOCH, self)
