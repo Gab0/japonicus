@@ -7,8 +7,6 @@ parser.add_option('-g', '--genetic', dest='genetic_algorithm',
                   action='store_true', default=False)
 parser.add_option('-c', '--chromosome', dest='chromosome_mode',
                   action='store_true', default=False)
-# parser.add_option('-i', '--indicators', dest='indicator_mode',
-#                   action='store_true', default=False)
 parser.add_option('-b', '--bayesian', dest='bayesian_optimization',
                   action='store_true', default=False)
 parser.add_option('-k', '--gekko', dest='spawn_gekko',
@@ -25,6 +23,7 @@ parser.add_option('--skeleton <skeleton>', dest='skeleton', default=None)
 
 genconf = Settings.getSettings()['generations']
 for config in genconf.keys():
-    parser.add_option("--%s <value>" % config, dest=config, type=float, default=None)
+    if type(genconf[config]) not in [dict, list, bool, tuple]:
+        parser.add_option("--%s <value>" % config, dest=config, type=type(genconf[config]), default=None)
 
 options, args = parser.parse_args()
