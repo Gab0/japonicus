@@ -197,14 +197,17 @@ japonicus will choose a random item of the list to fetch candles and scansets.
 Genetic Algorithms are a good way to fetch a good set of settings to run a strategy
 on gekko. But the real gamechanger is the strategy itself. The ideal evolution method
 would be a Genetic Programming that modifies strategy logic. This somewhat
-corresponds to `-i` option of japonicus, still barebones yet - only 'sums' indicators.
+corresponds to `--skeleton` mode of japonicus, which lets the GA select indicators on a base strategy.
 
-I'm doing an effort to port the most usable indicator from TA-Lib to native gekko, for faster computing and better usability on genetic algorithms.
-Anyone interested on this work or that would like to suggest an important indicator should message me or send pull requests etc. Those are important for `-i` method improvement.
+I'm doing an effort to port the most usable indicator from TA-Lib to native gekko, for faster computing and better usability on genetic algorithms. <br>
+Anyone interested on this work or that would like to suggest an important indicator should message me or send pull requests. <br>
+Those are important for `-skeleton` method improvement. <br>
 
-<br>
+
+
 ```
 Indicator roadmap: 
+htpps://github.com/Gab0/gekko-extra-indicators.git
 ~~Bollinger Bands~~DONE
 ~~Average True Range~~DONE
 Parabolic Stop and Reverse 
@@ -217,7 +220,15 @@ Ichimoku clouds
 
 ```
 Changelogs 
-v.53
+v0.54
+
+- Variation of Backtest result interpretation. check Settings.py -> genconf.interpreteBacktestProfit
+- Focus on selecting best individues. Periodic evaluation on more candidates. Bugfixes on that department. 
+- Result interface actually readable.
+- Log better structured, with the summary at the top.
+- Small clarifications on code.
+
+v0.53
 
 - Major aesthetics rework on code itself; now we can even have collaborators.
 - Pretty run logs @ logs folder;
@@ -226,7 +237,7 @@ v.53
 - Genetic Algorithm settings controllable via command line. Check --help.
 - Web interface more stable
 
-v.51
+v0.51
 - Started tracking updates on changelog;
 
 ```
