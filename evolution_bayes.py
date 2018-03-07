@@ -12,7 +12,6 @@ from bayes_opt import BayesianOptimization
 from multiprocessing import Pool
 import multiprocessing as mp
 
-from promoterz.statistics import write_evolution_logs
 
 import promoterz
 import evaluation
@@ -31,7 +30,7 @@ gsettings = getSettings()['Global']
 # Fix the shit below!
 settings = getSettings()['bayesian']
 bayesconf = getSettings('bayesian')
-
+datasetconf = getSettings('dataset')
 Strategy = None
 percentiles = np.array([0.25, 0.5, 0.75])
 all_val = []
@@ -59,7 +58,7 @@ def Evaluate(Strategy, parameters):
 
     BacktestResult = evaluation.gekko.backtest.Evaluate(bayesconf, watch,
                                            [DateRange], params, gsettings['GekkoURLs'][0])
-    BalancedProfit = BacktestResult[0][0]
+    BalancedProfit = BacktestResult['relativeProfit']
     return BalancedProfit
 
 def gekko_search(**parameters):
@@ -85,7 +84,6 @@ def gekko_search(**parameters):
     stats.append([series.count(), mean, series.std(), series.min()] +
          [series.quantile(x) for x in percentiles] + [series.max()])
     all_val.append(mean)
-    write_evolution_logs(len(all_val), stats[-1])
     return mean
 
 def flatten_dict(d):
