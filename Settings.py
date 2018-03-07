@@ -137,7 +137,10 @@ def getSettings(specific=None):
                 "exchange": "poloniex",
                 "currency": 'USDT',
                 "asset": 'BTC'
-            }
+            },
+            
+            'interpreteBacktestProfit': 'v3'
+
         },
         'dataset' : {
             # -- Gekko Dataset Settings
