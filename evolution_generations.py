@@ -60,8 +60,9 @@ def gekko_generations(TargetParameters, GenerationMethod,
 
     # --APPLY COMMAND LINE GENCONF SETTINGS;
     for parameter in genconf.__dict__.keys():
-        if options.__dict__[parameter] != None:
-            genconf.__dict__[parameter] = options.__dict__[parameter]
+        if parameter in options.__dict__.keys():
+            if options.__dict__[parameter] != None:
+                genconf.__dict__[parameter] = options.__dict__[parameter]
 
 
     GenerationMethod = promoterz.functions.selectRepresentationMethod(GenerationMethod)
@@ -127,22 +128,23 @@ def gekko_generations(TargetParameters, GenerationMethod,
     if Strategy:
         Logger.log("Evolving %s strategy;\n" % Strategy)
 
-    Logger.log("evaluated parameters ranges:")
+    Logger.log("evaluated parameters ranges:", target = "Header")
 
     for k in TargetParameters.keys():
-        Logger.log( "%s%s%s" % (k, " " * (30-len(k)), TargetParameters[k]) )
+        Logger.log( "%s%s%s\n" % (k, " " * (30-len(k)),
+                                  TargetParameters[k]), target="Header" )
 
     # --LOG CONFIG INFO;
     configInfo = json.dumps(genconf.__dict__, indent=4)
-    Logger.log(configInfo, show=False)
+    Logger.log(configInfo, target="Header", show=False)
 
     # --SHOW DATASET INFO;
     Logger.log(interface.parseDatasetInfo("evolution",
-                              evolutionDataset))
+                                          evolutionDataset), target="Header")
 
     if evaluationDataset:
         Logger.log(interface.parseDatasetInfo("evaluation",
-                                  evaluationDataset))
+                                              evaluationDataset), target="Header")
 
     # --INITIALIZE WORLD WITH CANDLESTICK DATASET INFO; HERE THE GA KICKS IN;
     GlobalTools.register('Evaluate', Evaluate,
@@ -160,7 +162,9 @@ def gekko_generations(TargetParameters, GenerationMethod,
                                                           evaluationDataset ],
                                   onInitLocale=onInitLocale,web=web)
     World.logger = Logger
-    
+    World.EvaluationStatistics = []
+    World.logger.updateFile()
+
     # --RUN EPOCHES;
     while World.EPOCH < World.genconf.NBEPOCH:
         World.runEPOCH()
