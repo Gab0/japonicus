@@ -1,0 +1,56 @@
+- name: prepare machine software and install Gekko Trading Bot
+  hosts: all
+  remote_user: ec2-user 
+  become_method: sudo
+  tasks:
+
+  - name: update cache
+    become: yes
+    command: "yum update -y"
+
+  - name: Install environment components
+    become: yes
+
+    shell: yum install -y {{item}}
+    with_items:
+    - git
+    - tmux
+
+  - name: get NODEjs
+    become: yes
+    #shell: "curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -" UBUNTU LINUX;
+    shell: "curl -sL https://rpm.nodesource.com/setup_8.x | bash -"
+
+  - name: install NODEjs
+    become: yes
+    command: "yum install -y nodejs"
+
+  - name: clone gekko git repo
+    command: "git clone https://github.com/askmike/gekko"
+    ignore_errors: yes
+    
+  - name: install gekko nodejs libs
+    command: "npm install --only=production"
+    args:
+      chdir: "gekko"
+
+  - name: install problematic nodejs lib
+    become: yes
+    command: "npm install -G sqlite3"
+
+  - name: edit gekko UI config
+    shell: sed -i 's/{{ item }}/0.0.0.0/' gekko/web/vue/UIconfig.js
+    with_items:
+    - 127.0.0.1
+
+  - name: edit gekko UI config pt2
+    command: "sed -i 's/localhost/{{ inventory_hostname }}/' gekko/web/vue/UIconfig.js"
+
+  - copy:
+      src: ~/gekko/history
+      dest: ~/gekko
+
+  - name: run gekko UI
+    command: "tmux new -d -s Gekko 'node gekko.js --ui; detach \\;'"
+    args:
+      chdir: "gekko"
