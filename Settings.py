@@ -1,6 +1,8 @@
 #!/bin/python
 import os
 import js2py
+from pathlib import Path
+
 from configStrategies import cS
 from configIndicators import cI
 
@@ -22,7 +24,7 @@ class _settings:
         return self.strategies[name]
 
 def getSettings(specific=None):
-    HOME = os.getenv("HOME")
+    HOME = str(Path.home())
     s = {
         'Global': {
             'gekkoPath': HOME+'/gekko',
@@ -138,7 +140,7 @@ def getSettings(specific=None):
                 "currency": 'USDT',
                 "asset": 'BTC'
             },
-            
+
             'interpreteBacktestProfit': 'v3'
 
         },
