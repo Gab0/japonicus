@@ -105,7 +105,10 @@ def showResults(World):
             World.EvaluationStatistics.append(GlobalLogEntry)
 
     World.logger.Summary = ""
-    World.logger.log(pandas.DataFrame(World.EvaluationStatistics), target="Summary")
+    GlobalEvolutionSummary = pd.DataFrame(World.EvaluationStatistics)
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        GlobalEvolutionSummary = str(GlobalEvolutionSummary)
+    World.logger.log(GlobalEvolutionSummary, target="Summary", show=False)
     World.logger.updateFile()
 
 def stratSettingsProofOfViability(World, Individual, specification, Dateranges):
