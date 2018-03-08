@@ -26,10 +26,8 @@ settings = getSettings()
 #from evolution_bayes import gekko_bayesian
 
 
-gekko_server = None
-web_server = None
 
-def launchJaponicus():
+def showTitleDisclaimer():
    TITLE ="""\tGEKKO
         ██╗ █████╗ ██████╗  ██████╗ ███╗   ██╗██╗ ██████╗██╗   ██╗███████╗
         ██║██╔══██╗██╔══██╗██╔═══██╗████╗  ██║██║██╔════╝██║   ██║██╔════╝
@@ -37,29 +35,6 @@ def launchJaponicus():
    ██   ██║██╔══██║██╔═══╝ ██║   ██║██║╚██╗██║██║██║     ██║   ██║╚════██║
    ╚█████╔╝██║  ██║██║     ╚██████╔╝██║ ╚████║██║╚██████╗╚██████╔╝███████║
     ╚════╝ ╚═╝  ╚═╝╚═╝      ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═════╝ ╚══════╝"""
-
-   if options.spawn_gekko:
-      if options.genetic_algorithm or options.bayesian_optimization:
-           gekko_args = ['node',
-                        '--max-old-space-size=8192',
-                        settings['Global']['gekkoPath']+'/web/server.js']
-
-           gekko_server = Popen(gekko_args, stdin=PIPE, stdout=PIPE)
-           sleep(2)
-
-   if options.spawn_web:
-      #web_args = ['python', 'web.py']
-      #web_server = Popen(web_args, stdin=PIPE, stdout=PIPE)
-      print("WEBSERVER MODE")
-      APP = web.run_server()
-      P = Thread(target=APP.server.run, kwargs={'debug':False, 'host':'0.0.0.0'})
-      P.start()
-
-      sleep(2)
-   else:
-      APP = None
-
-   markzero_time = datetime.datetime.now()
 
    try:
       print(TITLE)
@@ -70,6 +45,38 @@ def launchJaponicus():
    print()
    print("The profits reported here are the profit beyond market price change;\n"+\
          "\ti.e. shown profit =  <backtest profit> - <market profit in evaluated candlestick period>;")
+
+def launchGekkoChildProcess():
+   gekko_args = ['node',
+                 '--max-old-space-size=8192',
+                 settings['Global']['gekkoPath']+'/web/server.js']
+
+   gekko_server = Popen(gekko_args, stdin=PIPE, stdout=PIPE)
+
+   return gekko_server
+
+def launchWebEvolutionaryInfo():
+   #web_args = ['python', 'web.py']
+   #web_server = Popen(web_args, stdin=PIPE, stdout=PIPE)
+   print("WEBSERVER MODE")
+   webServer = web.run_server()
+   webSeverProcess = Thread(target=webServer.server.run, kwargs={'debug':False, 'host':'0.0.0.0'})
+   webServerProcess.start()
+
+   return webServer
+
+def launchJaponicus():
+
+   if not options.genetic_algorithm or options.bayesian_optimization:
+      exit("Aborted: No operation specified.")
+
+   gekko_server = launchGekkoChildProcess() if options.spawn_gekko else None
+
+   web_server = launchWebEvolutionaryInfo() if options.spawn_web else None
+   sleep(1)
+
+   markzero_time = datetime.datetime.now()
+   showTitleDisclaimer()
 
    # --SELECT STRATEGY;
    if options.random_strategy:
@@ -108,7 +115,7 @@ def launchJaponicus():
          TargetParameters = getSettings()['strategies'][Strategy]
 
       for s in range(options.repeater):
-         gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, web=APP)
+         gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, web=web_server)
 
    # --LAUNCH BAYESIAN OPTIMIZATION;
    elif options.bayesian_optimization:
