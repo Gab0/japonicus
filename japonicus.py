@@ -60,7 +60,7 @@ def launchWebEvolutionaryInfo():
    #web_server = Popen(web_args, stdin=PIPE, stdout=PIPE)
    print("WEBSERVER MODE")
    webServer = web.run_server()
-   webSeverProcess = Thread(target=webServer.server.run, kwargs={'debug':False, 'host':'0.0.0.0'})
+   webServerProcess = Thread(target=webServer.server.run, kwargs={'debug':False, 'host':'0.0.0.0'})
    webServerProcess.start()
 
    return webServer
