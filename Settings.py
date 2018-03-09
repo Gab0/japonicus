@@ -62,7 +62,7 @@ def getSettings(specific=None):
             'evaluateSettingsPeriodically': 20,
 
             # time window size on days of candlesticks for each evaluation
-            'deltaDays': 60,
+            'deltaDays': 90,
 
             # Number of candlestick data loaded simultaneously in each locale;
             # slower EPOCHS, theoretical better evolution;
@@ -71,7 +71,7 @@ def getSettings(specific=None):
 
 
             # -- Genetic Algorithm Parameters
-            'cxpb': 0.6, # Probabilty of crossover 
+            'cxpb': 0.8, # Probabilty of crossover 
             'mutpb': 0.2,# Probability of mutation;
             '_lambda': 7,# size of offspring generated per epoch;
 
