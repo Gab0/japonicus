@@ -41,7 +41,7 @@ cS = {
 "BEAR_RSI_high": 50,
 "BEAR_RSI_low" : 20
 },
-
+    
 "RSI_BULL_BEAR_ADXold" : {
 
 # SMA Trends
