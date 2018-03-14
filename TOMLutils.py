@@ -10,6 +10,7 @@ def preprocessTOMLFile(filepath):
 def TOMLToParameters(TOMLLines):
     Parameters = {}
     subkey = None
+    parseTuple = lambda s: (float(x) for x in s[1:-1].split(','))
     for Line in TOMLLines:
         
         if Line.startswith('#'):
@@ -23,7 +24,9 @@ def TOMLToParameters(TOMLLines):
 
             target = Parameters[subkey] if subkey else Parameters
             L = Line.split(' = ') if ' = ' in Line else Line.split('=')
-            target[L[0]] = float(L[1])
+            
+            target[L[0]] = parseTuple(L[1]) if '(' in L[1] else float(L[1]) 
+            
         else:
             subkey = None
 
