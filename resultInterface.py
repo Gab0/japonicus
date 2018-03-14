@@ -10,6 +10,7 @@ import numpy as np
 
 import promoterz
 import evaluation
+import TOMLutils
 
 from Settings import getSettings
 
@@ -98,7 +99,7 @@ def showResults(World):
             print(" -- Settings for Gekko config.js -- ")
             World.logger.log(Show)
             print(" -- Settings for Gekko --ui webpage -- ")
-            World.logger.log(parametersToTOML(FinalIndividueSettings))
+            World.logger.log(TOMLutils.parametersToTOML(FinalIndividueSettings))
 
             print("\nRemember to check MAX and MIN values for each parameter.")
             print("\tresults may improve with extended ranges.")
@@ -128,29 +129,6 @@ def stratSettingsProofOfViability(World, Individual, specification, Dateranges):
 
     World.logger.log("Annual profit %.3f%%" % (testMoney))
     return Valid, testMoney, Results[0]
-
-def parametersToTOML(Settings):
-    text = []
-    toParameter = lambda name, value: "%s = %f" % (name,value)
-
-    # print("{{ %s }}" % Settings[Strat])
-    def iterate(base):
-
-        Settingskeys = base.keys()
-        Settingskeys = sorted(list(Settingskeys),
-                          key= lambda x: type(base[x]) == dict, reverse=False)
-
-        for W in Settingskeys:
-            Q = base[W]
-            if type(Q) == dict:
-                text.append("[%s]" % W)
-                iterate(Q)
-                text.append('')
-            else:
-                text.append("%s = %s" % (W, Q))
-
-    iterate(Settings)
-    return '\n'.join(text)
 
 def loadGekkoConfig():
     pass
