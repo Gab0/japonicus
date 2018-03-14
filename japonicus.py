@@ -14,6 +14,8 @@ from threading import Thread
 from Settings import getSettings
 from evolution_generations import gekko_generations
 
+import TOMLutils
+
 import datetime
 from os import chdir, path, listdir
 chdir(path.dirname(path.realpath(__file__)))
@@ -60,7 +62,9 @@ def launchWebEvolutionaryInfo():
    #web_server = Popen(web_args, stdin=PIPE, stdout=PIPE)
    print("WEBSERVER MODE")
    webServer = web.run_server()
-   webServerProcess = Thread(target=webServer.server.run, kwargs={'debug':False, 'host':'0.0.0.0'})
+   webServerProcess = Thread(target=webServer.server.run,
+                             kwargs={'debug':False, 'host':'0.0.0.0'})
+
    webServerProcess.start()
 
    return webServer
@@ -112,7 +116,16 @@ def launchJaponicus():
 
       else:
          EvaluationMode = Strategy
-         TargetParameters = getSettings()['strategies'][Strategy]
+         try:
+            TargetParameters = getSettings()['strategies'][Strategy]
+         # -- Yeah, nested exceptions;
+         except KeyError:
+            try:
+               TOMLData = TOMLutils.preprocessTOMLFile("strategy_parameters/%s.toml" % Strategy)
+            except FileNotFoundError:
+               TOMLData = TOMLutils.preprocessTOMLFile(
+                  "%s/config/strategis/%s.toml" % (GekkoDir, Strategy))
+            TargetParameters = TOMLutils.TOMLToParameters(TOMLData)
 
       for s in range(options.repeater):
          gekko_generations(TargetParameters, GenerationMethod, EvaluationMode, web=web_server)
