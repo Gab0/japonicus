@@ -220,6 +220,11 @@ Ichimoku clouds
 
 ```
 Changelogs 
+v0.56 (under construction)
+
+- japonicus settings for strategies can be stored at strategy_parameters folder as .toml files
+
+
 v0.54
 
 - Variation of Backtest result interpretation. check Settings.py -> genconf.interpreteBacktestProfit
