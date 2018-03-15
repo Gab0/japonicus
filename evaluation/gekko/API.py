@@ -1,15 +1,16 @@
 #!/bin/python
-
 import os
 import requests
 import json
 from subprocess import Popen, PIPE
 
-def initializeGekko(): # not used yet.
-    CMD = [ 'node', gekkoDIR + '/gekko', '--ui' ]
+
+def initializeGekko():  # not used yet.
+    CMD = ['node', gekkoDIR + '/gekko', '--ui']
     D = Popen(CMD, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
-def httpPost(URL, data={}):
+
+def httpPost(URL, data= {}):
     try:
         Request = requests.post(URL, json=data)
         Response = json.loads(Request.text)
@@ -21,7 +22,9 @@ def httpPost(URL, data={}):
         print(URL)
         print(data)
         raise e
+
     return Response
+
 
 def loadHostsFile(HostsFilePath):
     remoteGekkos = []
@@ -30,5 +33,4 @@ def loadHostsFile(HostsFilePath):
         for W in H:
             if W and not '=' in W and not '[' in W:
                 remoteGekkos.append("http://%s:3000" % W)
-
     return remoteGekkos

@@ -1,5 +1,4 @@
 #!/bin/python
-
-from . import API
-from . import dataset
-from . import backtest
+from .import API
+from .import dataset
+from .import backtest
