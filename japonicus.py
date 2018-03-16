@@ -40,7 +40,7 @@ def showTitleDisclaimer():
     ╚════╝ ╚═╝  ╚═╝╚═╝      ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═════╝ ╚══════╝"""
     try:
         print(TITLE)
-    except UnicodeEncodeError:
+    except UnicodeEncodeError or SyntaxError:
         print("\nJAPONICUS\n")
     print('\t' * 8 + 'v%.2f' % VERSION)
     print()
