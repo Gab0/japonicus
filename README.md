@@ -1,6 +1,3 @@
-
-
-
 ### What is japonicus and what it does
 This is an implementation of genetic algorithm & bayesian evolution to develop strategies for digital coin trading bot <a href="https://github.com/askmike/gekko">Gekko</a>.
 
