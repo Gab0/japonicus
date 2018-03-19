@@ -25,13 +25,19 @@ This somewhat corresponds to `--skeleton` mode of japonicus, which lets the GA s
 
 # Changelog
 
+The changelog is important for the user as modifications listed can cause bugs on related areas. Even bugfixes. Please report 'em ;)
+
 ```
 Changelogs 
-v0.56 (under construction)
+v0.56 (seems stable)
 
 - japonicus settings for strategies can be stored at strategy_parameters folder as .toml files
 - automated refactor on entire codebase
 - wiki is online, check it for instructions.
+- various bugfixes
+- log & results improvements
+- daterange for locales now on locale logs (.csv)
+- statistics methods remade.
 
 v0.54
 
