@@ -25,7 +25,8 @@ from japonicus_options import options, args
 import web
 import promoterz
 from version import VERSION
-
+import os
+import evaluation
 settings = getSettings()
 
 
@@ -44,10 +45,14 @@ def showTitleDisclaimer():
         print("\nJAPONICUS\n")
     print('\t' * 8 + 'v%.2f' % VERSION)
     print()
-    print(
-        "The profits reported here are the profit beyond market price change;\n" +
-        "\ti.e. shown profit =  <backtest profit> - <market profit in evaluated candlestick period>;"
-    )
+
+    profitDisclaimer = "The profits reported here depends on backtest interpreter function;"
+    interpreterFuncName = getSettings('generations').interpreteBacktestProfit
+    interpreterInfo = evaluation.gekko.backtest.getInterpreterBacktestInfo(interpreterFuncName)
+
+    print( "%s \n\t%s" % ( profitDisclaimer, interpreterInfo ))
+
+    
 
 
 def launchGekkoChildProcess():
@@ -73,8 +78,11 @@ def launchWebEvolutionaryInfo():
 
 
 def launchJaponicus():
-    if not options.genetic_algorithm or options.bayesian_optimization:
+    if not options.genetic_algorithm and not options.bayesian_optimization:
         exit("Aborted: No operation specified.")
+    if not os.path.isfile(settings['Global']['gekkoPath'] + '/gekko.js'):
+        exit("Aborted: gekko.js not found on path specified @Settings.py;")
+
     gekko_server = launchGekkoChildProcess() if options.spawn_gekko else None
     web_server = launchWebEvolutionaryInfo() if options.spawn_web else None
     sleep(1)
