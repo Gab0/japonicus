@@ -23,6 +23,7 @@ def showResults(World):
             World.EnvironmentParameters[useSecondary].daterange, World.genconf.deltaDays
         )
         ValidationDateranges.append(Daterange)
+
     for LOCALE in World.locales:
         LOCALE.population = [ind for ind in LOCALE.population if ind.fitness.valid]
         B = World.genconf.finaltest['NBBESTINDS']
@@ -36,10 +37,10 @@ def showResults(World):
         AdditionalIndividues = [
             x for x in AdditionalIndividues if x not in BestIndividues
         ]
-        FinalIndividues = BestIndividues + AdditionalIndividues
-        print("%i selected;" % len(FinalIndividues))
+        setOfToEvaluateIndividues = BestIndividues + AdditionalIndividues
+        print("%i selected;" % len(setOfToEvaluateIndividues))
         print("Selecting %i+%i individues, random test;" % (B, Z))
-        for FinalIndividue in FinalIndividues:
+        for FinalIndividue in setOfToEvaluateIndividues:
             GlobalLogEntry = {}
             proof = stratSettingsProofOfViability
             AssertFitness, FinalProfit, Results = proof(
@@ -48,13 +49,14 @@ def showResults(World):
             LOCALE.lastEvaluation = FinalProfit
             GlobalLogEntry['evaluation'] = FinalProfit
             World.logger.log(
-                "Testing Strategy of %s @ EPOCH %i:\n" % (LOCALE.name, LOCALE.EPOCH)
+                "\n\n\nTesting Strategy of %s @ EPOCH %i:\n" % (LOCALE.name, LOCALE.EPOCH)
             )
             if AssertFitness or FinalProfit > 50:
-                print("Following strategy is viable.")
+                World.logger.log("Following strategy is viable.")
             else:
-                print("Strategy Fails.")
+                World.logger.log("Strategy Fails.")
                 if not World.globalconf.showFailedStrategies:
+                    World.logger.log("Skipping further tests on current parameters.", show=False)
                     continue
 
             for Result in Results:
@@ -62,6 +64,7 @@ def showResults(World):
                     'Testing monthly profit %.3f \t nbTrades: %.1f' %
                     (Result['relativeProfit'], Result['trades'])
                 )
+            World.logger.log('\nRelative profit on evolution dataset: %.3f\n' % FinalProfit )
             FinalIndividueSettings = World.tools.constructPhenotype(FinalIndividue)
             # --EVALUATION DATASET TEST AND REPORT;
             if World.EnvironmentParameters[1]:
@@ -90,11 +93,11 @@ def showResults(World):
             print("\nRemember to check MAX and MIN values for each parameter.")
             print("\tresults may improve with extended ranges.")
             World.EvaluationStatistics.append(GlobalLogEntry)
-    World.logger.Summary = ""
     GlobalEvolutionSummary = pd.DataFrame(World.EvaluationStatistics)
-    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-        GlobalEvolutionSummary = str(GlobalEvolutionSummary)
-    World.logger.log(GlobalEvolutionSummary, target="Summary", show=False)
+    if not GlobalEvolutionSummary.empty:
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+            GlobalEvolutionSummary = str(GlobalEvolutionSummary)
+            World.logger.log(GlobalEvolutionSummary, target="Summary", show=False, replace=True)
     World.logger.updateFile()
 
 
@@ -107,9 +110,8 @@ def stratSettingsProofOfViability(World, Individual, specification, Dateranges):
     testMoney = 0
     for value in AllProofs:
         testMoney += value
-    check = [x for x in AllProofs if x > 0]
+    check = [ x for x in AllProofs if x > 0 ]
     Valid = sum(check) == len(AllProofs)
-    World.logger.log("Annual profit %.3f%%" % (testMoney))
     return Valid, testMoney, Results[0]
 
 
