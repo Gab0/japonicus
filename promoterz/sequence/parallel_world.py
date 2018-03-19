@@ -34,10 +34,10 @@ def world_EPOCH(World):
     if random.random() < 0.01:
         World.generateLocale()
     # --APPLY LOCALE DESTRUCTION;
-    if random.random() < 0.01:
+    if random.random() < World.genconf.localeExplodeChance:
         World.explodeLocale(random.choice(World.locales))
     for L in range(len(World.locales)):
-        if World.locales[L].EPOCH > 100 and len(World.locales) > 2:
+        if World.locales[L].EPOCH > World.genconf.localeExpirationAge and len(World.locales) > 2:
             World.explodeLocale(World.locales[L])
             break  # if two locales are destroyed @ same time post-locale migrations
 
