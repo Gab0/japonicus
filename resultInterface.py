@@ -51,20 +51,22 @@ def showResults(World):
             World.logger.log(
                 "\n\n\nTesting Strategy of %s @ EPOCH %i:\n" % (LOCALE.name, LOCALE.EPOCH)
             )
-            if AssertFitness or FinalProfit > 50:
-                World.logger.log("Following strategy is viable.")
-            else:
-                World.logger.log("Strategy Fails.")
-                if not World.globalconf.showFailedStrategies:
-                    World.logger.log("Skipping further tests on current parameters.", show=False)
-                    continue
 
             for Result in Results:
                 World.logger.log(
                     'Testing monthly profit %.3f \t nbTrades: %.1f' %
                     (Result['relativeProfit'], Result['trades'])
                 )
-            World.logger.log('\nRelative profit on evolution dataset: %.3f\n' % FinalProfit )
+
+            World.logger.log('\nRelative profit on evolution dataset: %.3f' % FinalProfit )
+            if AssertFitness or FinalProfit > 50:
+                World.logger.log("Current parameters are viable.")
+            else:
+                World.logger.log("Current parameters fails.")
+                if not World.globalconf.showFailedStrategies:
+                    World.logger.log("Skipping further tests on current parameters.", show=False)
+                    continue
+
             FinalIndividueSettings = World.tools.constructPhenotype(FinalIndividue)
             # --EVALUATION DATASET TEST AND REPORT;
             if World.EnvironmentParameters[1]:
