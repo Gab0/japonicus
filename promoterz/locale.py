@@ -2,7 +2,7 @@
 from deap import tools
 from deap import base
 import promoterz
-
+import statistics
 
 class Locale():
 
@@ -29,7 +29,7 @@ class Locale():
         self.lastEvaluation = None
         self.lastEvaluationOnSecondary = None
         # --INIT STATISTICS;
-        self.stats = promoterz.statistics.getStatisticsMeter()
+        self.stats = statistics.getStatisticsMeter()
         self.InitialBestScores, self.FinalBestScores = [], []
         self.POP_SIZE = World.genconf.POP_SIZE
         self.loop = loop
