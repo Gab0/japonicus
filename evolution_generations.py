@@ -149,6 +149,7 @@ def gekko_generations(
     def onInitLocale(World, locale):
         locale.DateRange = getLocaleDateRange(World, locale)
 
+
     loops = [promoterz.sequence.standard_loop.standard_loop]
     World = promoterz.world.World(
         GlobalTools,
