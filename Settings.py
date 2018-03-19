@@ -52,7 +52,7 @@ def getSettings(specific=None):
             'parameter_spread' : 60,
 
             # Initial population size, per locale
-            'POP_SIZE': 30, 
+            'POP_SIZE': 30,
 
             # number of epochs to run
             'NBEPOCH': 800,
@@ -100,7 +100,12 @@ def getSettings(specific=None):
             # mode of profit interpretation: v1, v2 or v3.
             # please check the first functions at evaluation.gekko.backtest
             # to understand what is this. has big impact on evolutionary agenda.
-            'interpreteBacktestProfit': 'v3'
+            'interpreteBacktestProfit': 'v3',
+
+            # after this age in epoches, locale surely explodes i.e. ends.
+            'localeExpirationAge': 100,
+            # chance, on each epoch, of a locale to finish;
+            'localeExplodeChance': 0.05
         },
 
         # bayesian optimization settings
