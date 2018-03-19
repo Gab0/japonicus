@@ -25,7 +25,7 @@ This somewhat corresponds to `--skeleton` mode of japonicus, which lets the GA s
 
 # Changelog
 
-The changelog is important for the user as modifications listed can cause bugs on related areas. Even bugfixes. Please report 'em ;)
+The changelog is important for the user as modifications listed, even bugfixes, can cause bugs on related areas. Please report 'em ;)
 
 ```
 Changelogs 
