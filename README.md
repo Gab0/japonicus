@@ -12,17 +12,15 @@ Check wiki for instructions on setup, workflow, methods, etc.
 
 ## User Feedback
 
-You all users of japonicus should create issues about your japonicus runs.
+You all users of japonicus should report notable runs under an issue.
 If some strat seems to be viable, send feedback so users can have a better point of entry for their own runs.<br>
-Should be like `Supertrend strat: very good, tried to broaden parameter ranges, etc`.
-
 
 ## Future
 
-Genetic Algorithms are a good way to fetch a good set of settings to run a strategy
-on gekko. But the real gamechanger is the strategy itself. The ideal evolution method
-would be a Genetic Programming that modifies strategy logic. This somewhat
-corresponds to `--skeleton` mode of japonicus, which lets the GA select indicators on a base strategy.
+Genetic Algorithms are a good way to fetch a good set of settings to run a strategy on gekko. <br>
+But the real gamechanger is the strategy itself.<br>
+The ideal evolution method would be a Genetic Programming that modifies strategy logic. <br>
+This somewhat corresponds to `--skeleton` mode of japonicus, which lets the GA select indicators on a base strategy.
 
 
 # Changelog
