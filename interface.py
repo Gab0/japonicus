@@ -9,8 +9,10 @@ def showDatasetSpecifications(specs):
 
 
 def dateRangeToText(dateRange):
+    convertDateRange = lambda x: evaluation.gekko.dataset.epochToString(x) \
+                       if type(x) == int else x
     Range = [
-        evaluation.gekko.dataset.epochToString(dateRange[x]) for x in ['from', 'to']
+        convertDateRange(dateRange[x]) for x in ['from', 'to' ]
     ]
     Text = "%s to %s" % (Range[0], Range[1])
     return Text
