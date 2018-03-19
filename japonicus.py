@@ -123,7 +123,7 @@ def launchJaponicus():
                     )
                 except FileNotFoundError:
                     TOMLData = TOMLutils.preprocessTOMLFile(
-                        "%s/config/strategis/%s.toml" % (GekkoDir, Strategy)
+                        "%s/config/strategies/%s.toml" % (GekkoDir, Strategy)
                     )
                 TargetParameters = TOMLutils.TOMLToParameters(TOMLData)
         for s in range(options.repeater):
