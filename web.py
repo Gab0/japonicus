@@ -10,7 +10,7 @@ from dash.dependencies import Input, Output, Event
 import dash_core_components as dcc
 import dash_html_components as html
 from flask_caching import Cache
-from promoterz.statistics import statisticsNames
+from evaluation.gekko.statistics import epochStatisticsNames, periodicStatisticsNames
 import Settings
 
 gsettings = Settings.getSettings()['Global']
@@ -37,6 +37,10 @@ def update_graph(GraphName, Statistics):
     '''
     df = pd.DataFrame(Statistics)
     annotations = []
+
+    sNa = epochStatisticsNames
+    sNb = periodicStatistcsNames
+    statisticNames = { k: sNa.get(k,0) + sNb.get(k,0) for k in set(sNa) | set(sNb) }
     for W in range(len(df['dateRange'])):
         DR = df['dateRange'][W]
         if DR != None:
