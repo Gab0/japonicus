@@ -17,7 +17,13 @@ def interpreteBacktestProfitv3(backtest):
     else:
         return backtest['relativeProfit'] - backtest['market']
 
-
+def getInterpreterBacktestInfo(v):
+    info = {
+        'v1': "<shown profit> = <backtest profit>",
+        'v2': "<shown profit> = <backtest profit> - <market profit>",
+        'v3': "\nif <backtest profit> > 0: <shown profit> = <backtest profit> - <market profit> \nelse <shown profit> = <backtest profit> "
+}
+    return "interpreter %s: " % v + info[v]
 def runBacktest(
     GekkoInstanceUrl,
     TradeSetting,
