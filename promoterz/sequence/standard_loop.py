@@ -4,13 +4,15 @@ from copy import deepcopy
 import random
 from deap import algorithms
 import promoterz
-from . .import statistics, evolutionHooks
+import statistics
+from .. import evolutionHooks
 
 
 def standard_loop(World, locale):
     # --assertions are most for debugging purposes; they should not trigger
     assert (len(locale.population))
     locale.extraStats = {}
+
     # --validate individuals;
     locale.population = promoterz.validation.validatePopulation(
         World.tools.constructPhenotype, World.TargetParameters, locale.population
