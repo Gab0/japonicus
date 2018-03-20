@@ -38,9 +38,10 @@ def update_graph(GraphName, Statistics):
     df = pd.DataFrame(Statistics)
     annotations = []
 
-    sNa = epochStatisticsNames
-    sNb = periodicStatistcsNames
-    statisticNames = { k: sNa.get(k,0) + sNb.get(k,0) for k in set(sNa) | set(sNb) }
+    statisticsNames = {}
+    statisticsNames.update(epochStatisticsNames)
+    statisticsNames.update(periodicStatisticsNames)
+    
     for W in range(len(df['dateRange'])):
         DR = df['dateRange'][W]
         if DR != None:
