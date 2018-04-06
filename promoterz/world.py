@@ -15,7 +15,6 @@ class World():
         genconf,
         globalconf,
         TargetParameters,
-        NB_LOCALE=3,
         EnvironmentParameters=None,
         onInitLocale=None,
         web=None,
@@ -40,7 +39,7 @@ class World():
         )
         self.onInitLocale = onInitLocale
         self.web = web
-        for l in range(NB_LOCALE):
+        for l in range(genconf.NBLOCALE):
             self.generateLocale()
 
     def generateLocale(self):
