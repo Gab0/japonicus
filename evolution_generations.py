@@ -18,13 +18,12 @@ from deap import tools
 from deap import algorithms
 from deap import base
 
-from Settings import getSettings
+from Settings import getSettings, makeSettings
 import stratego
 from functools import partial
 
 from datasetOperations import *
 
-from japonicus_options import options, args
 
 StrategyFileManager = None
 
@@ -58,13 +57,12 @@ def bEvaluate(constructPhenotype, genconf, Database, DateRange, Individual, gekk
 
 
 def gekko_generations(
-    TargetParameters, GenerationMethod, EvaluationMode, NB_LOCALE=2, web=None
-):
+        TargetParameters, GenerationMethod, EvaluationMode, settings, options, web=None):
     # --LOAD SETTINGS;
-    genconf = getSettings('generations')
-    globalconf = getSettings('Global')
-    datasetconf = getSettings('dataset')
-    indicatorconf = getSettings()['indicators']
+    genconf = makeSettings(settings['generations'])
+    globalconf = makeSettings(settings['Global'])
+    datasetconf = makeSettings(settings['dataset'])
+    indicatorconf = makeSettings(settings['indicators'])
     # --APPLY COMMAND LINE GENCONF SETTINGS;
     for parameter in genconf.__dict__.keys():
         if parameter in options.__dict__.keys():
@@ -157,7 +155,6 @@ def gekko_generations(
         genconf,
         globalconf,
         TargetParameters,
-        NB_LOCALE,
         EnvironmentParameters=[evolutionDataset, evaluationDataset],
         onInitLocale=onInitLocale,
         web=web,
