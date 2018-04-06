@@ -21,7 +21,7 @@ from os import chdir, path, listdir
 
 chdir(path.dirname(path.realpath(__file__)))
 
-from japonicus_options import options, args
+from japonicus_options import parser
 import web
 import promoterz
 from version import VERSION
@@ -50,9 +50,7 @@ def showTitleDisclaimer():
     interpreterFuncName = getSettings('generations').interpreteBacktestProfit
     interpreterInfo = evaluation.gekko.backtest.getInterpreterBacktestInfo(interpreterFuncName)
 
-    print( "%s \n\t%s" % ( profitDisclaimer, interpreterInfo ))
-
-    
+    print("%s \n\t%s" % ( profitDisclaimer, interpreterInfo ))
 
 
 def launchGekkoChildProcess():
@@ -77,12 +75,30 @@ def launchWebEvolutionaryInfo():
     return webServer
 
 
-def launchJaponicus():
+def launchJaponicus(parser):
+
+    settings = getSettings()
+    # PARSE GENCONF & DATASET COMMANDLINE ARGUMENTS;
+    parser = promoterz.metaPromoterz.generateCommandLineArguments(
+        parser,
+        settings['generations'])
+    parser = promoterz.metaPromoterz.generateCommandLineArguments(
+        parser,
+        settings['dataset'])
+    options, args = parser.parse_args()
+    settings['generations'] = promoterz.metaPromoterz.applyCommandLineOptionsToSettings(
+        options,
+        settings['generations']
+    )
+    settings['dataset'] = promoterz.metaPromoterz.applyCommandLineOptionsToSettings(
+        options,
+        settings['dataset'])
+    # ABORT WHEN ILLEGAL OPTIONS ARE SET;
     if not options.genetic_algorithm and not options.bayesian_optimization:
         exit("Aborted: No operation specified.")
     if not os.path.isfile(settings['Global']['gekkoPath'] + '/gekko.js'):
         exit("Aborted: gekko.js not found on path specified @Settings.py;")
-
+    # ADDITIONAL MODES;
     gekko_server = launchGekkoChildProcess() if options.spawn_gekko else None
     web_server = launchWebEvolutionaryInfo() if options.spawn_web else None
     sleep(1)
@@ -136,7 +152,8 @@ def launchJaponicus():
                 TargetParameters = TOMLutils.TOMLToParameters(TOMLData)
         for s in range(options.repeater):
             gekko_generations(
-                TargetParameters, GenerationMethod, EvaluationMode, web=web_server
+                TargetParameters, GenerationMethod,
+                EvaluationMode, settings, options, web=web_server
             )
     # --LAUNCH BAYESIAN OPTIMIZATION;
     elif options.bayesian_optimization:
@@ -151,4 +168,4 @@ def launchJaponicus():
 
 
 if __name__ == "__main__":
-    launchJaponicus()
+    launchJaponicus(parser)
