@@ -1,4 +1,4 @@
-FROM python:3
+FROM gekko
 # builds on top of Gekko's docker image, so build it, named gekko ;
 
 ENV LANG en_US.UTF-8
