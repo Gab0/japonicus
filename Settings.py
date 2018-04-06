@@ -6,8 +6,9 @@ from pathlib import Path
 from configStrategies import cS
 from configIndicators import cI
 
-class _settings:
-    def __init__(self, **entries):
+
+class makeSettings():
+    def __init__(self, entries):
         '''
         print(entries)
         def iterate(self, DATA):
@@ -22,6 +23,7 @@ class _settings:
 
     def getstrat(self, name):
         return self.strategies[name]
+
 
 def getSettings(specific=None):
     HOME = str(Path.home())
@@ -56,7 +58,8 @@ def getSettings(specific=None):
 
             # number of epochs to run
             'NBEPOCH': 800,
-
+            # number of locales on parallel GA;
+            'NBLOCALE':3,
             # show current best settings on every X epochs. (or False)
             'evaluateSettingsPeriodically': 20,
 
@@ -178,9 +181,9 @@ def getSettings(specific=None):
 
     if specific != None:
         if not specific:
-            return _settings(**s)
+            return makeSettings(s)
         else:
-            return _settings(**s[specific])
+            return makeSettings(s[specific])
 
     return s
 
