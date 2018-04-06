@@ -30,7 +30,7 @@ def update_graph(GraphName, Statistics):
     '''
     try:
         df = load_evolution_logs(filename="evolution_gen_Locale%s.csv" % ''.join(ID))
-        
+
     except:
         print("Failure to read evolution data.")
         return None
@@ -41,7 +41,7 @@ def update_graph(GraphName, Statistics):
     statisticsNames = {}
     statisticsNames.update(epochStatisticsNames)
     statisticsNames.update(periodicStatisticsNames)
-    
+
     for W in range(len(df['dateRange'])):
         DR = df['dateRange'][W]
         if DR != None:
