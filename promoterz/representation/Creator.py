@@ -1,5 +1,5 @@
 #!/bin/python
-from deap import creator
+from .import deapCreator as creator
 from deap import base
 
 
