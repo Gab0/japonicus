@@ -1,6 +1,6 @@
 #!/bin/python
 import evaluation
-
+import random
 
 class CandlestickDataset():
 
@@ -18,10 +18,16 @@ class CandlestickDataset():
 
 
 def getLocaleDateRange(World, locale):
-    getDateRange = lambda: evaluation.gekko.dataset.getRandomDateRange(
-        World.EnvironmentParameters[0].daterange, World.genconf.deltaDays
-    )
-    DateRange = [
-        getDateRange() for x in range(World.genconf.ParallelCandlestickDataset)
-    ]
-    return DateRange
+    def getDateRange(dataset):
+        return evaluation.gekko.dataset.getRandomDateRange(
+            dataset.daterange, World.genconf.deltaDays
+        )
+    Dataset = []
+
+    for D in range(World.genconf.ParallelCandlestickDataset):
+        BaseDataset = random.choice(World.EnvironmentParameters[0])
+        newDataset = CandlestickDataset(BaseDataset.specifications,
+                                        getDateRange(BaseDataset))
+        Dataset.append(newDataset)
+
+    return Dataset
