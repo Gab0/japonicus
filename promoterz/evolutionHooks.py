@@ -36,15 +36,23 @@ def filterAwayWorst(population, N=5):
     return population
 
 
-def filterAwayThreshold(locale, Threshold, minimum):
-    remove = [ind for ind in locale.population if ind.fitness.values[0] <= Threshold]
-    locale.population = [
+def filterAwayThreshold(locale, Threshold, min_nb_inds):
+    Function = lambda ind: ind.fitness.values[0] > Threshold
+    populationFilter(locale, Function, min_nb_inds)
+
+
+def populationFilter(locale, Function, min_nb_inds):
+    
+    newPopulation = [
         ind for ind in locale.population if ind.fitness.values[0] > Threshold
     ]
+    removed = [ind for ind in locale.population if ind not in newPopulation]
     NBreturn = max(0, min(minimum - len(locale.population), minimum))
-    if NBreturn and remove:
+    if NBreturn and removed:
         for k in range(NBreturn):
-            locale.population.append(random.choice(remove))
+            newPopulation.append(removed.pop(random.randrange(0, len(removed))))
+
+    locale.population = newPopulation
 
 
 def evaluatePopulation(locale):
