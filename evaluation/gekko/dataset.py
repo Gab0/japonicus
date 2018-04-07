@@ -95,10 +95,14 @@ def getRandomDateRange(Limits, deltaDays):
         exit()
     Start = random.randint(FLms, TLms - deltams) if deltaDays else FLms
     End = (Start + deltams) if deltaDays else TLms
-    DateRange = {"from": "%s" % epochToString(Start), "to": "%s" % epochToString(End)}
+    DateRange = {
+        "from": "%s" % epochToString(Start),
+        "to": "%s" % epochToString(End)
+    }
     return DateRange
 
 
-epochToString = lambda D: datetime.datetime.utcfromtimestamp(D).strftime(
-    "%Y-%m-%d %H:%M:%S"
-)
+def epochToString(D):
+    return datetime.datetime.utcfromtimestamp(D).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
