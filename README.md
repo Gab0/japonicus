@@ -29,6 +29,14 @@ The changelog is important for the user as modifications listed, even bugfixes, 
 
 ```
 Changelogs 
+v0.58
+
+- runs in Windows (not confirmed)
+- Settings parameters can be passed on command line (check the --help)
+- Multiple evolution datasets can be passed. `@Settings.py:dataset ->
+  dataset_source is the first, add dataset_source1; dataset_source2 and so forth
+for multiple datasets.`
+
 v0.56 (seems stable)
 
 - japonicus settings for strategies can be stored at strategy_parameters folder as .toml files
