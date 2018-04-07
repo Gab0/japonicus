@@ -22,7 +22,7 @@ from Settings import getSettings, makeSettings
 import stratego
 from functools import partial
 
-from datasetOperations import *
+from evaluation.gekko.datasetOperations import *
 
 
 StrategyFileManager = None
@@ -33,8 +33,7 @@ def aEvaluate(
     StrategyFileManager,
     constructPhenotype,
     genconf,
-    Database,
-    DateRange,
+    Datasets,
     Individual,
     gekkoUrl,
 ):
@@ -42,16 +41,16 @@ def aEvaluate(
     StratName = StrategyFileManager.checkStrategy(phenotype)
     phenotype = {StratName: phenotype}
     SCORE = evaluation.gekko.backtest.Evaluate(
-        genconf, Database, DateRange, phenotype, gekkoUrl
+        genconf, Datasets, phenotype, gekkoUrl
     )
     return SCORE
 
 
-def bEvaluate(constructPhenotype, genconf, Database, DateRange, Individual, gekkoUrl):
+def bEvaluate(constructPhenotype, genconf, Datasets, Individual, gekkoUrl):
     phenotype = constructPhenotype(Individual)
     phenotype = {Individual.Strategy: phenotype}
     SCORE = evaluation.gekko.backtest.Evaluate(
-        genconf, Database, DateRange, phenotype, gekkoUrl
+        genconf, Datasets, phenotype, gekkoUrl
     )
     return SCORE
 
@@ -91,17 +90,29 @@ def gekko_generations(
         print("Connected Remote Hosts:\n%s" % ('\n').join(RemoteHosts))
         if EvaluationMode == 'indicator':
             exit('Indicator mode is yet not compatible with multiple hosts.')
-    # --GRAB PRIMARY (EVOLUTION) DATASET
-    D = evaluation.gekko.dataset.selectCandlestickData(
-        exchange_source=datasetconf.dataset_source
-    )
-    evolutionDataset = CandlestickDataset(*D)
-    evolutionDataset.restrain(datasetconf.dataset_span)
+    # CHECK HOW MANY EVOLUTION DATASETS ARE SPECIFIED AT SETTINGS;
+    evolutionDatasetNames = ['dataset_source']
+    evolutionDataset = []
+    for DS in range(1, 100):
+        datasetConfigName = 'dataset_source%i' % DS
+        if datasetConfigName in datasetconf.__dict__.keys():
+            evolutionDatasetList.append(datasetConfigName)
+    # --GRAB PRIMARY (EVOLUTION) DATASETS
+    for evolutionDatasetName in evolutionDatasetNames:
+        D = evaluation.gekko.dataset.selectCandlestickData(
+            exchange_source=datasetconf.__dict__[evolutionDatasetName]
+        )
+        evolutionDataset.append(CandlestickDataset(*D))
+        try:
+            evolutionDataset[-1].restrain(datasetconf.dataset_span)
+        except:
+            print('dataset_ span not configured for evolutionDatasetName. skipping...')
+
     # --GRAB SECONDARY (EVALUATION) DATASET
     try:
         D = evaluation.gekko.dataset.selectCandlestickData(
             exchange_source=datasetconf.eval_dataset_source,
-            avoidCurrency=evolutionDataset.specifications['asset'],
+            avoidCurrency=evolutionDataset[0].specifications['asset'],
         )
         evaluationDataset = CandlestickDataset(*D)
         evaluationDataset.restrain(datasetconf.eval_dataset_span)
@@ -109,7 +120,7 @@ def gekko_generations(
         evaluationDataset = None
         print("Evaluation dataset not found.")
     # --INITIALIZE LOGGER;
-    ds_specs = evolutionDataset.specifications
+    ds_specs = evolutionDataset[0].specifications
     logfilename = "%s-%s-%s-%s-%s" % (
         Strategy,
         ds_specs['exchange'],
@@ -119,7 +130,7 @@ def gekko_generations(
     )
     Logger = promoterz.logger.Logger(logfilename)
     # --PRINT RUNTIME ARGS TO LOG HEADER;
-    ARGS = '$python ' + ' '.join(sys.argv)
+    ARGS = ' '.join(sys.argv)
     Logger.log(ARGS, target='Header')
     # --SHOW PARAMETER INFO;
     if Strategy:
@@ -133,9 +144,10 @@ def gekko_generations(
     configInfo = json.dumps(genconf.__dict__, indent=4)
     Logger.log(configInfo, target="Header", show=False)
     # --SHOW DATASET INFO;
-    Logger.log(
-        interface.parseDatasetInfo("evolution", evolutionDataset), target="Header"
-    )
+    for _evolutionDataset in evolutionDataset:
+        Logger.log(
+            interface.parseDatasetInfo("evolution", _evolutionDataset), target="Header"
+        )
     if evaluationDataset:
         Logger.log(
             interface.parseDatasetInfo("evaluation", evaluationDataset), target="Header"
@@ -145,7 +157,7 @@ def gekko_generations(
 
     # --THIS LOADS A DATERANGE FOR A LOCALE;
     def onInitLocale(World, locale):
-        locale.DateRange = getLocaleDateRange(World, locale)
+        locale.Dataset = getLocaleDataset(World, locale)
 
 
     loops = [promoterz.sequence.standard_loop.standard_loop]
