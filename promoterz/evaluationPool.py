@@ -3,12 +3,19 @@ import time
 import random
 import itertools
 
-from multiprocessing import Pool, Process, Pipe, TimeoutError
+from multiprocessing import Pool, TimeoutError
 from multiprocessing.pool import ThreadPool
 
-showIndividue = lambda evaldata: "~ bP: %.3f\tS: %.3f\tnbT:%.3f" % (
-    evaldata[0][0], evaldata[0][1], evaldata[1]
-)
+
+def showIndividue(evaldata):
+    return "~ bP: %.3f\tS: %.3f\tnbT:%.3f" % (
+        evaldata['relativeProfit'], evaldata['sharpe'], evaldata['trades']
+    )
+
+
+def applyEvaluationResultToIndividue(result, individue):
+    individue.fitness.values = (result['relativeProfit'], result['sharpe'])
+    individue.trades = result['trades']
 
 
 class EvaluationPool():
@@ -27,13 +34,13 @@ class EvaluationPool():
         self.lasttimesperind.pop(Index)
         self.poolsizes.pop(Index)
 
-    def evaluateBackend(self, datasetSpecification, DateRange, I, inds):
+    def evaluateBackend(self, datasets, I, inds):
         stime = time.time()
-        dateInds = list(itertools.product(DateRange, inds))
+        dateInds = list(itertools.product(datasets, inds))
         # print(list(dateInds))
         Q = [
-            (datasetSpecification, dateRange, Ind, self.Urls[I])
-            for dateRange, Ind in dateInds
+            (datasets, Ind, self.Urls[I])
+            for dataset, Ind in dateInds
         ]
         P = Pool(self.poolsizes[I])
         fitnesses = P.starmap(self.EvaluationTool, Q)
@@ -49,8 +56,7 @@ class EvaluationPool():
         props = self.distributeIndividuals(individues_to_simulate)
         args = [
             [
-                locale.World.EnvironmentParameters[0].specifications,
-                [locale.DateRange],
+                locale.Dataset,
                 I,
                 props[I],
             ]
@@ -64,12 +70,10 @@ class EvaluationPool():
         TimedOut = []
         for A in range(len(results)):
             try:
-                perindTime = 3 * self.lasttimesperind[A] if self.lasttimesperind[
-                    A
-                ] else 12
-                timeout = perindTime * len(
-                    props[A]
-                ) if A else None  # no timeout for local machine;
+                perindTime = 3 * self.lasttimesperind[A]\
+                             if self.lasttimesperind[A] else 12
+                timeout = perindTime * len(props[A])\
+                          if A else None  # no timeout for local machine;
                 results[A] = results[A].get(timeout=timeout)
             except TimeoutError:  # Timeout: remote machine is dead, et al
                 print("Machine timeouts!")
@@ -79,12 +83,11 @@ class EvaluationPool():
         pool.join()
         TotalNumberOfTrades = 0
         for PoolIndex in range(len(results)):
-            for i, fit in zip(range(len(results[PoolIndex][0])), results[PoolIndex][0]):
+            for i, fit in enumerate(results[PoolIndex][0]):
                 if self.individual_info:
                     print(showIndividue(fit))
-                props[PoolIndex][i].fitness.values = (
-                    fit['relativeProfit'], fit['sharpe']
-                )
+                applyEvaluationResultToIndividue(fit, props[PoolIndex][i])
+
                 TotalNumberOfTrades += fit['trades']
             self.lasttimes[PoolIndex] = results[PoolIndex][1]
             L = len(props[PoolIndex])
