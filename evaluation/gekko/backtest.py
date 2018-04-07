@@ -17,6 +17,7 @@ def interpreteBacktestProfitv3(backtest):
     else:
         return backtest['relativeProfit'] - backtest['market']
 
+
 def getInterpreterBacktestInfo(v):
     info = {
         'v1': "<shown profit> = <backtest profit>",
@@ -24,17 +25,18 @@ def getInterpreterBacktestInfo(v):
         'v3': "\nif <backtest profit> > 0: <shown profit> = <backtest profit> - <market profit> \nelse <shown profit> = <backtest profit> "
 }
     return "interpreter %s: " % v + info[v]
+
+
 def runBacktest(
     GekkoInstanceUrl,
     TradeSetting,
-    Database,
-    DateRange,
+    Dataset,
     candleSize=10,
     gekko_config=None,
     Debug=False,
 ):
     gekko_config = createConfig(
-        TradeSetting, Database, DateRange, candleSize, gekko_config, Debug
+        TradeSetting, Dataset.specifications, Dataset.daterange, candleSize, gekko_config, Debug
     )
     url = GekkoInstanceUrl + '/api/backtest'
     result = httpPost(url, gekko_config)
@@ -53,19 +55,18 @@ def runBacktest(
     return result['report']
 
 
-def Evaluate(genconf, Database, DateRange, phenotype, GekkoInstanceUrl):
+def Evaluate(genconf, Datasets, phenotype, GekkoInstanceUrl):
     # IndividualToSettings(IND, STRAT) is a function that depends on GA algorithm,
     # so should be provided;
     result = [
         runBacktest(
             GekkoInstanceUrl,
             phenotype,
-            Database,
-            DR,
+            Dataset,
             candleSize=genconf.candleSize,
             Debug=genconf.gekkoDebug,
         )
-        for DR in DateRange
+        for Dataset in Datasets
     ]
     interpreter = {
         'v1': interpreteBacktestProfitv1,
