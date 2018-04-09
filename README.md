@@ -25,10 +25,9 @@ This somewhat corresponds to `--skeleton` mode of japonicus, which lets the GA s
 
 # Changelog
 
-The changelog is important for the user as modifications listed, even bugfixes, can cause bugs on related areas. Please report 'em ;)
+The changelog is important for the user as following modifications can cause bugs on related areas. Please report 'em ;)
 
 ```
-Changelogs 
 v0.58
 
 - runs in Windows (not confirmed)
@@ -36,6 +35,7 @@ v0.58
 - Multiple evolution datasets can be passed. `@Settings.py:dataset ->
   dataset_source is the first, add dataset_source1; dataset_source2 and so forth
 for multiple datasets.`
+- filter individues for minimum trade count (default: enabled@16 trades)
 
 v0.56 (seems stable)
 
