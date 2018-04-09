@@ -51,6 +51,9 @@ def standard_loop(World, locale):
     locale.extraStats['elder'] = qpop - wpop
     # --remove very inapt citizens
     locale.extratools.filterThreshold(-15, World.genconf._lambda)
+    # --remove individuals below tradecount
+    locale.extratools.filterTrades(World.genconf.minTradeNumber,
+                                   World.genconf._lambda)
     # --show stats;
     statistics.showStats(locale)
     # --calculate new population size;
