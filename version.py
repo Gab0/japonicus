@@ -1,2 +1,2 @@
 #!/bin/python
-VERSION = 0.56
+VERSION = 0.58
