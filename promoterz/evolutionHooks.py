@@ -37,17 +37,23 @@ def filterAwayWorst(population, N=5):
 
 
 def filterAwayThreshold(locale, Threshold, min_nb_inds):
-    Function = lambda ind: ind.fitness.values[0] > Threshold
-    populationFilter(locale, Function, min_nb_inds)
+    thresholdFilter = lambda ind: ind.fitness.values[0] > Threshold
+    populationFilter(locale, thresholdFilter, min_nb_inds)
 
 
-def populationFilter(locale, Function, min_nb_inds):
+def filterAwayMinimumTrades(locale, Threshold, min_nb_inds):
+    tradecountFilter = lambda ind: ind.trades > Threshold
+    populationFilter(locale, tradecountFilter, min_nb_inds)
+
+
+def populationFilter(locale, filterFunction, min_nb_inds):
     
     newPopulation = [
-        ind for ind in locale.population if ind.fitness.values[0] > Threshold
+        ind for ind in locale.population if filterFunction(ind)
     ]
     removed = [ind for ind in locale.population if ind not in newPopulation]
-    NBreturn = max(0, min(minimum - len(locale.population), minimum))
+    NBreturn = max(0, min(min_nb_inds - len(locale.population),
+                          min_nb_inds))
     if NBreturn and removed:
         for k in range(NBreturn):
             newPopulation.append(removed.pop(random.randrange(0, len(removed))))
@@ -56,7 +62,8 @@ def populationFilter(locale, Function, min_nb_inds):
 
 
 def evaluatePopulation(locale):
-    individues_to_simulate = [ind for ind in locale.population if not ind.fitness.valid]
+    individues_to_simulate = [ind for ind in locale.population
+                              if not ind.fitness.valid]
     fitnesses = locale.World.parallel.starmap(
         locale.extratools.Evaluate, zip(individues_to_simulate)
     )
@@ -70,6 +77,7 @@ def getLocaleEvolutionToolbox(World, locale):
     toolbox.register("ImmigrateHoF", immigrateHoF, locale.HallOfFame)
     toolbox.register("ImmigrateRandom", immigrateRandom, World.tools.population)
     toolbox.register("filterThreshold", filterAwayThreshold, locale)
+    toolbox.register("filterTrades", filterAwayMinimumTrades, locale)
     toolbox.register('ageZero', promoterz.supplement.age.ageZero)
     toolbox.register(
         'populationAges',
