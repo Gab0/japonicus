@@ -92,7 +92,7 @@ def gekko_generations(
             exit('Indicator mode is yet not compatible with multiple hosts.')
     # CHECK HOW MANY EVOLUTION DATASETS ARE SPECIFIED AT SETTINGS;
     evolutionDatasetNames = ['dataset_source']
-    evolutionDataset = []
+    evolutionDatasets = []
     for DS in range(1, 100):
         datasetConfigName = 'dataset_source%i' % DS
         if datasetConfigName in datasetconf.__dict__.keys():
@@ -102,9 +102,9 @@ def gekko_generations(
         D = evaluation.gekko.dataset.selectCandlestickData(
             exchange_source=datasetconf.__dict__[evolutionDatasetName]
         )
-        evolutionDataset.append(CandlestickDataset(*D))
+        evolutionDatasets.append(CandlestickDataset(*D))
         try:
-            evolutionDataset[-1].restrain(datasetconf.dataset_span)
+            evolutionDatasets[-1].restrain(datasetconf.dataset_span)
         except:
             print('dataset_ span not configured for evolutionDatasetName. skipping...')
 
@@ -112,15 +112,15 @@ def gekko_generations(
     try:
         D = evaluation.gekko.dataset.selectCandlestickData(
             exchange_source=datasetconf.eval_dataset_source,
-            avoidCurrency=evolutionDataset[0].specifications['asset'],
+            avoidCurrency=evolutionDatasets[0].specifications['asset'],
         )
-        evaluationDataset = CandlestickDataset(*D)
-        evaluationDataset.restrain(datasetconf.eval_dataset_span)
+        evaluationDatasets = [CandlestickDataset(*D)]
+        evaluationDatasets[0].restrain(datasetconf.eval_dataset_span)
     except RuntimeError:
         evaluationDataset = None
         print("Evaluation dataset not found.")
     # --INITIALIZE LOGGER;
-    ds_specs = evolutionDataset[0].specifications
+    ds_specs = evolutionDatasets[0].specifications
     logfilename = "%s-%s-%s-%s-%s" % (
         Strategy,
         ds_specs['exchange'],
@@ -138,22 +138,27 @@ def gekko_generations(
     Logger.log("evaluated parameters ranges:", target="Header")
     for k in TargetParameters.keys():
         Logger.log(
-            "%s%s%s\n" % (k, " " * (30 - len(k)), TargetParameters[k]), target="Header"
+            "%s%s%s\n" % (k, " " * (30 - len(k)), TargetParameters[k]),
+            target="Header"
         )
     # --LOG CONFIG INFO;
     configInfo = json.dumps(genconf.__dict__, indent=4)
     Logger.log(configInfo, target="Header", show=False)
     # --SHOW DATASET INFO;
-    for _evolutionDataset in evolutionDataset:
+    for evolutionDataset in evolutionDatasets:
         Logger.log(
-            interface.parseDatasetInfo("evolution", _evolutionDataset), target="Header"
+            interface.parseDatasetInfo("evolution", evolutionDataset),
+            target="Header"
         )
-    if evaluationDataset:
-        Logger.log(
-            interface.parseDatasetInfo("evaluation", evaluationDataset), target="Header"
-        )
+    if evaluationDatasets:
+        for evaluationDataset in evaluationDatasets:
+            Logger.log(
+                interface.parseDatasetInfo("evaluation", evaluationDataset),
+                target="Header"
+            )
     # --INITIALIZE WORLD WITH CANDLESTICK DATASET INFO; HERE THE GA KICKS IN;
-    GlobalTools.register('Evaluate', Evaluate, GlobalTools.constructPhenotype, genconf)
+    GlobalTools.register('Evaluate', Evaluate,
+                         GlobalTools.constructPhenotype, genconf)
 
     # --THIS LOADS A DATERANGE FOR A LOCALE;
     def onInitLocale(World, locale):
@@ -167,7 +172,8 @@ def gekko_generations(
         genconf,
         globalconf,
         TargetParameters,
-        EnvironmentParameters=[evolutionDataset, evaluationDataset],
+        EnvironmentParameters={'evolution':  evolutionDatasets,
+                               'evaluation': evaluationDatasets},
         onInitLocale=onInitLocale,
         web=web,
     )
