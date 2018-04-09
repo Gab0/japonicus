@@ -61,7 +61,7 @@ def getSettings(specific=None):
             # number of locales on parallel GA;
             'NBLOCALE':3,
             # show current best settings on every X epochs. (or False)
-            'evaluateSettingsPeriodically': 20,
+            'evaluateSettingsPeriodically': 50,
 
             # time window size on days of candlesticks for each evaluation
             'deltaDays': 90,
@@ -83,7 +83,7 @@ def getSettings(specific=None):
             'candleSize': 10, # candle size for gekko backtest, in minutes
 
             'proofSize': 12,
-
+            'minTradeNumber': 6,
             'DRP': 70,# Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
             'ParallelBacktests': 6,
