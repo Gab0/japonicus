@@ -43,7 +43,7 @@ def runBacktest(
     # sometime report is False(not dict)
     if type(result['report']) is bool:
         print("Warning: report not found, probable Gekko fail!")
-        print(DateRange)
+        print(Dataset.specifications)
         # That fail is so rare that has no impact.. still happens randomly;
         return {
             'relativeProfit': 0, 'market': 0, 'trades': 0, 'sharpe': 0
@@ -75,10 +75,13 @@ def Evaluate(genconf, Datasets, phenotype, GekkoInstanceUrl):
     }
     # --INTERPRETE BACKTEST RESULT;
     RelativeProfits = [interpreter[genconf.interpreteBacktestProfit](R) for R in result]
-    avgTrades = sum([R['trades'] for R in result]) / len(DateRange)
+    avgTrades = sum([R['trades'] for R in result]) / len(Datasets)
     mRelativeProfit = sum(RelativeProfits) / len(RelativeProfits)
-    avgSharpe = sum([R['sharpe'] for R in result if R['sharpe']]) / len(DateRange)
-    return {'relativeProfit': mRelativeProfit, 'sharpe': avgSharpe, 'trades': avgTrades}
+    avgSharpe = sum([R['sharpe'] for R in result if R['sharpe']])
+    avgSharpe = avgSharpe / len(Datasets)
+    return {'relativeProfit': mRelativeProfit,
+            'sharpe': avgSharpe,
+            'trades': avgTrades}
 
 
 def createConfig(
