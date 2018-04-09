@@ -39,7 +39,7 @@ class EvaluationPool():
         dateInds = list(itertools.product(datasets, inds))
         # print(list(dateInds))
         Q = [
-            (datasets, Ind, self.Urls[I])
+            ([dataset], Ind, self.Urls[I])
             for dataset, Ind in dateInds
         ]
         P = Pool(self.poolsizes[I])
