@@ -1,35 +1,39 @@
 #!/bin/python
-import os
-import datetime
 import random
 import json
 import pandas as pd
 from deap import tools
-import numpy as np
+
 
 import promoterz
 import evaluation
 import TOMLutils
 
-from Settings import getSettings
-
 
 def showResults(World):
-    ValidationDateranges = []
-    useSecondary = 1 if World.EnvironmentParameters[1] else 0
-    ValidationSpecifications = World.EnvironmentParameters[useSecondary].specifications
+    validationDatasets = []
+    # IS EVALUATION DATASET LOADED? USE IT;
+    if World.EnvironmentParameters['evaluation']:
+        useSecondary = 'evaluation'
+    else:
+        useSecondary = 'evolution'
+    # LOAD EVALUATION DATASET;
+    sourceDataset = random.choice(World.EnvironmentParameters[useSecondary])
+    getter = evaluation.gekko.datasetOperations.getRandomSectorOfDataset
     for NB in range(World.genconf.proofSize):
-        Daterange = evaluation.gekko.dataset.getRandomDateRange(
-            World.EnvironmentParameters[useSecondary].daterange, World.genconf.deltaDays
-        )
-        ValidationDateranges.append(Daterange)
+        newDataset = getter(sourceDataset, World.genconf.deltaDays)
+        validationDatasets.append(newDataset)
 
     for LOCALE in World.locales:
-        LOCALE.population = [ind for ind in LOCALE.population if ind.fitness.valid]
+        LOCALE.population = [ind for ind in LOCALE.population
+                             if ind.fitness.valid]
+        # SELECT BEST INDIVIDUALS;
         B = World.genconf.finaltest['NBBESTINDS']
         BestIndividues = tools.selBest(LOCALE.population, B)
-        Z = min(World.genconf.finaltest['NBADDITIONALINDS'], len(LOCALE.population) - B)
+        Z = min(World.genconf.finaltest['NBADDITIONALINDS'],
+                len(LOCALE.population) - B)
         Z = max(0, Z)
+        # SELECT ADDITIONAL INDIVIDUALS;
         AdditionalIndividues = promoterz.evolutionHooks.Tournament(
             LOCALE.population, Z, Z * 2
         )
@@ -40,11 +44,12 @@ def showResults(World):
         setOfToEvaluateIndividues = BestIndividues + AdditionalIndividues
         print("%i selected;" % len(setOfToEvaluateIndividues))
         print("Selecting %i+%i individues, random test;" % (B, Z))
+        # EVALAUTE EACH SELECTED INDIVIDUE;
         for FinalIndividue in setOfToEvaluateIndividues:
             GlobalLogEntry = {}
             proof = stratSettingsProofOfViability
             AssertFitness, FinalProfit, Results = proof(
-                World, FinalIndividue, ValidationSpecifications, ValidationDateranges
+                World, FinalIndividue, validationDatasets
             )
             LOCALE.lastEvaluation = FinalProfit
             GlobalLogEntry['evaluation'] = FinalProfit
@@ -52,10 +57,11 @@ def showResults(World):
                 "\n\n\nTesting Strategy of %s @ EPOCH %i:\n" % (LOCALE.name, LOCALE.EPOCH)
             )
 
-            for Result in Results:
+            for R, Result in enumerate(Results):
                 World.logger.log(
-                    'Testing monthly profit %.3f \t nbTrades: %.1f' %
-                    (Result['relativeProfit'], Result['trades'])
+                    'Testing monthly profit %.3f \t nbTrades: %.1f\t%s' %
+                    (Result['relativeProfit'], Result['trades'],
+                     validationDatasets[R].textDaterange())
                 )
 
             World.logger.log('\nRelative profit on evolution dataset: %.3f' % FinalProfit )
@@ -69,13 +75,12 @@ def showResults(World):
 
             FinalIndividueSettings = World.tools.constructPhenotype(FinalIndividue)
             # --EVALUATION DATASET TEST AND REPORT;
-            if World.EnvironmentParameters[1]:
-                Dataset = World.EnvironmentParameters[1]
-                evaluationDaterange = evaluation.gekko.dataset.getRandomDateRange(
-                    Dataset.daterange, 0
-                )
+            if World.EnvironmentParameters['evaluation']:
+                evalDataset = random.choice(
+                    World.EnvironmentParameters['evaluation'])
+
                 secondaryResults = World.parallel.evaluateBackend(
-                    Dataset.specifications, [[evaluationDaterange]], 0, [FinalIndividue]
+                    [evalDataset], 0, [FinalIndividue]
                 )
                 print()
                 # print(secondaryResults)
@@ -91,39 +96,29 @@ def showResults(World):
             print(" -- Settings for Gekko config.js -- ")
             World.logger.log(Show)
             print(" -- Settings for Gekko --ui webpage -- ")
-            World.logger.log(TOMLutils.parametersToTOML(FinalIndividueSettings))
+            World.logger.log(TOMLutils.parametersToTOML(
+                FinalIndividueSettings))
             print("\nRemember to check MAX and MIN values for each parameter.")
             print("\tresults may improve with extended ranges.")
             World.EvaluationStatistics.append(GlobalLogEntry)
     GlobalEvolutionSummary = pd.DataFrame(World.EvaluationStatistics)
     if not GlobalEvolutionSummary.empty:
-        with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        with pd.option_context('display.max_rows', None,
+                               'display.max_columns', None):
             GlobalEvolutionSummary = str(GlobalEvolutionSummary)
             World.logger.log(GlobalEvolutionSummary, target="Summary", show=False, replace=True)
     World.logger.updateFile()
 
 
-def stratSettingsProofOfViability(World, Individual, specification, Dateranges):
+def stratSettingsProofOfViability(World, Individual, Datasets):
     AllProofs = []
-    Dateranges = [[x] for x in Dateranges]
-    Results = World.parallel.evaluateBackend(specification, Dateranges, 0, [Individual])
+    #Datasets = [[x] for x in Datasets]
+    Results = World.parallel.evaluateBackend(Datasets, 0, [Individual])
     for W in Results[0]:
         AllProofs.append(W['relativeProfit'])
     testMoney = 0
     for value in AllProofs:
         testMoney += value
-    check = [ x for x in AllProofs if x > 0 ]
+    check = [x for x in AllProofs if x > 0]
     Valid = sum(check) == len(AllProofs)
     return Valid, testMoney, Results[0]
-
-
-def loadGekkoConfig():
-    pass
-
-
-def getFromDict(DataDict, Indexes):
-    return reduce(operator.getitem, Indexes, DataDict)
-
-
-def writeToDict(DataDict, Indexes, Value):
-    getFromDict(DataDict, Indexes[:-1])[Indexes[-1]] = Value
