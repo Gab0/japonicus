@@ -17,6 +17,12 @@ def selectCandlestickData(exchange_source=None, avoidCurrency=None):
     DataSetPack = getAllScanset()
     specKeys = ['exchange', 'currency', 'asset']
     scanset = []
+
+    # IF EXCHANGE SPECIFICATIONS ARE TO BRE IGNORED;
+    if 'ignore&autoselect' in exchange_source.keys():
+        if exchange_source['ignore&autoselect']:
+            exchange_source = None
+    # SEARCH CANDIDATE DATASETS AMONG THOSE OBTAINED FROM GEKKO API;
     for s in DataSetPack:
         Valid = True
         for k in specKeys:
@@ -27,6 +33,7 @@ def selectCandlestickData(exchange_source=None, avoidCurrency=None):
                 Valid = False
         if Valid:
             scanset.append(s)
+    # IN CASE NO CANDLESTICK DATASET IS COMPATIBLE;
     if len(scanset) == 0:
         if exchange_source:
             raise RuntimeError(
@@ -36,7 +43,7 @@ def selectCandlestickData(exchange_source=None, avoidCurrency=None):
 
         else:
             raise RuntimeError("no scanset available! check Gekko candle database.")
-
+    # OPERATE FOUND SCANSETS;
     for EXCHANGE in scanset:
         ranges = EXCHANGE['ranges']
         range_spans = [x['to'] - x['from'] for x in ranges]
