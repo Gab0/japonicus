@@ -10,7 +10,7 @@ def showDatasetSpecifications(specs):
     return message
 
 
-def showBacktestResult(backtestResult, dataset):
+def showBacktestResult(backtestResult, dataset=None):
     messageBackbone = ''.join([
         'Test on random candles...  ',
         'relativeProfit: %.3f \t',
