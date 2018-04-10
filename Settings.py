@@ -51,7 +51,7 @@ def getSettings(specific=None):
 
             # if parameter is set to value rather than tuple limits at settings, make the value
             # a tuple based on chosen spread value (percents); value: 10 --spread=50-->  value: (5,15)
-            'parameter_spread' : 60,
+            'parameter_spread': 60,
 
             # Initial population size, per locale
             'POP_SIZE': 30,
@@ -61,7 +61,7 @@ def getSettings(specific=None):
             # number of locales on parallel GA;
             'NBLOCALE':3,
             # show current best settings on every X epochs. (or False)
-            'evaluateSettingsPeriodically': 50,
+            'evaluateSettingsPeriodically': 1,
 
             # time window size on days of candlesticks for each evaluation
             'deltaDays': 90,
@@ -73,12 +73,16 @@ def getSettings(specific=None):
 
 
             # -- Genetic Algorithm Parameters
-            'cxpb': 0.8, # Probabilty of crossover 
-            'mutpb': 0.2,# Probability of mutation;
-            '_lambda': 7,# size of offspring generated per epoch;
+            'cxpb': 0.8,  # Probabilty of crossover 
+            'mutpb': 0.2,  # Probability of mutation;
+            '_lambda': 7,  # size of offspring generated per epoch;
 
-            'PRoFIGA_beta': 0.005, # weight of PRoFIGA calculations on variability of population size
-            'ageBoundaries': (9, 19), # minimum age to die, age when everyone dies (on EPOCHS)
+            # weight of PRoFIGA calculations
+            # on variability of population size
+            'PRoFIGA_beta': 0.005,
+
+            # minimum age to die, age when everyone dies (on EPOCHS)
+            'ageBoundaries': (9, 19),
 
             'candleSize': 10, # candle size for gekko backtest, in minutes
 
@@ -153,15 +157,19 @@ def getSettings(specific=None):
         },
         'dataset' : {
             # -- Gekko Dataset Settings
-            # leave the ! on the ignored entry as convenient;
-            'dataset_source': None,
-             # dataset_source can be set to None so it searches from any source;
-            '!dataset_source': { # in case of specifying exchange-currency-asset, rename this removing the '!', and del the original key above.
+             # dataset_source.ignore&autoselect can be set to true so it ignores the specifications and select automatically.
+            'dataset_source': { 
+                "ignore&autoselect": True,
                 "exchange": "kraken",
                 "currency": 'USD',
                 "asset": 'LTC',
             },
-            'eval_dataset_source': None,
+            'eval_dataset_source': {
+                "ignore&autoselect": False,
+                "exchange": "kraken",
+                "currency": 'USD',
+                "asset": 'LTC'
+                                },
 
             # span in days from the end of dataset to the beggining. Or zero.
             # (to restrain length);
