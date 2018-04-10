@@ -56,7 +56,9 @@ def populationFilter(locale, filterFunction, min_nb_inds):
                           min_nb_inds))
     if NBreturn and removed:
         for k in range(NBreturn):
-            newPopulation.append(removed.pop(random.randrange(0, len(removed))))
+            if removed:
+                newPopulation.append(removed.pop(random.randrange(0,
+                                                                  len(removed))))
 
     locale.population = newPopulation
 
