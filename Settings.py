@@ -61,7 +61,7 @@ def getSettings(specific=None):
             # number of locales on parallel GA;
             'NBLOCALE':3,
             # show current best settings on every X epochs. (or False)
-            'evaluateSettingsPeriodically': 1,
+            'evaluateSettingsPeriodically': 50,
 
             # time window size on days of candlesticks for each evaluation
             'deltaDays': 90,
