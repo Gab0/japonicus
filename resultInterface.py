@@ -9,6 +9,8 @@ import promoterz
 import evaluation
 import TOMLutils
 
+from interface import showBacktestResult
+
 
 def showResults(World):
     validationDatasets = []
@@ -54,40 +56,47 @@ def showResults(World):
             LOCALE.lastEvaluation = FinalProfit
             GlobalLogEntry['evaluation'] = FinalProfit
             World.logger.log(
-                "\n\n\nTesting Strategy of %s @ EPOCH %i:\n" % (LOCALE.name, LOCALE.EPOCH)
+                "\n\n\nTesting Strategy of %s @ EPOCH %i:\n" % (
+                    LOCALE.name,
+                    LOCALE.EPOCH)
             )
 
             for R, Result in enumerate(Results):
                 World.logger.log(
-                    'Testing monthly profit %.3f \t nbTrades: %.1f\t%s' %
-                    (Result['relativeProfit'], Result['trades'],
-                     validationDatasets[R].textDaterange())
-                )
+                    showBacktestResult(Result,
+                                       validationDatasets[R]) + '\n')
 
-            World.logger.log('\nRelative profit on evolution dataset: %.3f' % FinalProfit )
+            World.logger.log(
+                '\nRelative profit on evolution dataset: %.3f' %
+                FinalProfit)
             if AssertFitness or FinalProfit > 50:
                 World.logger.log("Current parameters are viable.")
             else:
                 World.logger.log("Current parameters fails.")
                 if not World.globalconf.showFailedStrategies:
-                    World.logger.log("Skipping further tests on current parameters.", show=False)
+                    World.logger.log(
+                        "Skipping further tests on current parameters.",
+                        show=False)
                     continue
 
-            FinalIndividueSettings = World.tools.constructPhenotype(FinalIndividue)
+            FinalIndividueSettings = World.tools.constructPhenotype(
+                FinalIndividue)
             # --EVALUATION DATASET TEST AND REPORT;
             if World.EnvironmentParameters['evaluation']:
                 evalDataset = random.choice(
                     World.EnvironmentParameters['evaluation'])
-
+                evalDataset = getter(evalDataset, 0)
                 secondaryResults = World.parallel.evaluateBackend(
                     [evalDataset], 0, [FinalIndividue]
                 )
                 print()
                 # print(secondaryResults)
-                score = secondaryResults[0][0]['relativeProfit']
-                World.logger.log("Relative profit on evaluation dataset: %.3f " % score)
-                LOCALE.lastEvaluationOnSecondary = score
-                GlobalLogEntry['secondary'] = score
+                backtestResult = secondaryResults[0][0]
+                World.logger.log(
+                    "Relative profit on evaluation dataset: \n\t%s" %
+                    showBacktestResult(backtestResult))
+                LOCALE.lastEvaluationOnSecondary = backtestResult['relativeProfit']
+                GlobalLogEntry['secondary'] = backtestResult['relativeProfit']
             else:
                 print("Evaluation dataset is disabled.")
             Show = json.dumps(FinalIndividueSettings, indent=2)
@@ -106,13 +115,14 @@ def showResults(World):
         with pd.option_context('display.max_rows', None,
                                'display.max_columns', None):
             GlobalEvolutionSummary = str(GlobalEvolutionSummary)
-            World.logger.log(GlobalEvolutionSummary, target="Summary", show=False, replace=True)
+            World.logger.log(GlobalEvolutionSummary, target="Summary",
+                             show=False, replace=True)
     World.logger.updateFile()
 
 
 def stratSettingsProofOfViability(World, Individual, Datasets):
     AllProofs = []
-    #Datasets = [[x] for x in Datasets]
+    # Datasets = [[x] for x in Datasets]
     Results = World.parallel.evaluateBackend(Datasets, 0, [Individual])
     for W in Results[0]:
         AllProofs.append(W['relativeProfit'])
