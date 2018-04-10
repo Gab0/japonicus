@@ -1,7 +1,7 @@
 #!/bin/python
 import evaluation
 import random
-
+import interface
 
 class CandlestickDataset():
 
@@ -20,6 +20,9 @@ class CandlestickDataset():
     def textDaterange(self):
         return dateRangeToText(self.daterange)
 
+    def textSpecifications(self):
+        return interface.showDatasetSpecifications(self.specifications)
+    
 
 def getRandomSectorOfDataset(sourceDataset, deltaDays):
 
@@ -38,7 +41,7 @@ def getLocaleDataset(World, locale, Type='evolution'):
         sourceDataset = random.choice(World.EnvironmentParameters['evolution'])
 
         newDataset = getRandomSectorOfDataset(sourceDataset,
-                                       World.genconf.deltaDays)
+                                              World.genconf.deltaDays)
         localeDataset.append(newDataset)
 
     return localeDataset
@@ -51,11 +54,8 @@ def dateRangeToText(dateRange):
         else:
             return x
 
-
     Range = [
-        convertDateRange(dateRange[x]) for x in ['from', 'to' ]
+        convertDateRange(dateRange[x]) for x in ['from', 'to']
     ]
     Text = "%s to %s" % (Range[0], Range[1])
     return Text
-
-
