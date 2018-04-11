@@ -180,6 +180,12 @@ def getSettings(specific=None):
                 "currency": 'USD',
                 "asset": 'LTC',
             },
+            'dataset_source2': {
+                'ignore&autoselect': True,
+                "exchange": "kraken",
+                "currency": 'USD',
+                "asset": 'LTC',
+            },
             'eval_dataset_source': {
                 'ignore&autoselect': True,
                 "exchange": "kraken",
