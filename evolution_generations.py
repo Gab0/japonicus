@@ -96,7 +96,7 @@ def gekko_generations(
     for DS in range(1, 100):
         datasetConfigName = 'dataset_source%i' % DS
         if datasetConfigName in datasetconf.__dict__.keys():
-            evolutionDatasetList.append(datasetConfigName)
+            evolutionDatasetNames.append(datasetConfigName)
     # --GRAB PRIMARY (EVOLUTION) DATASETS
     for evolutionDatasetName in evolutionDatasetNames:
         D = evaluation.gekko.dataset.selectCandlestickData(
