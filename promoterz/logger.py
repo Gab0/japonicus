@@ -18,6 +18,8 @@ class Logger():
     def log(self, message, target="Body", show=True, replace=False):
         if target == "Body":
             # now the log has value to be written.
+            if not self.Online:
+                os.mkdir('logs/%s' % self.logfilename)
             self.Online = True
 
         if replace:
@@ -30,13 +32,13 @@ class Logger():
     def updateFile(self):
         if not self.Online:
             return
-        File = open('logs/%s.log' % self.logfilename, 'w')
+        File = open('logs/%s/japonicus.log' % self.logfilename, 'w')
         File.write(self.Header)
         File.write(self.Summary)
         File.write(self.Body)
         File.close()
 
     def write_evolution_logs(self, i, stats, localeName):
-        filename = "logs/%s_%s.csv" % (self.logfilename, localeName)
+        filename = "logs/%s/%s.csv" % (self.logfilename, localeName)
         df = pd.DataFrame(stats)
         df.to_csv(filename)
