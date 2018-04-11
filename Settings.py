@@ -51,15 +51,17 @@ def getSettings(specific=None):
 
             # if parameter is set to value rather than tuple limits at settings, make the value
             # a tuple based on chosen spread value (percents); value: 10 --spread=50-->  value: (5,15)
-            'parameter_spread': 60,
+            'parameter_spread' : 60,
 
             # Initial population size, per locale
             'POP_SIZE': 30,
 
             # number of epochs to run
             'NBEPOCH': 800,
+
             # number of locales on parallel GA;
-            'NBLOCALE':3,
+            'NBLOCALE': 3,
+
             # show current best settings on every X epochs. (or False)
             'evaluateSettingsPeriodically': 50,
 
@@ -73,33 +75,47 @@ def getSettings(specific=None):
 
 
             # -- Genetic Algorithm Parameters
-            'cxpb': 0.8,  # Probabilty of crossover 
-            'mutpb': 0.2,  # Probability of mutation;
-            '_lambda': 7,  # size of offspring generated per epoch;
+            'cxpb': 0.8, # Probabilty of crossover 
+            'mutpb': 0.2,# Probability of mutation;
+            '_lambda': 7,# size of offspring generated per epoch;
 
-            # weight of PRoFIGA calculations
-            # on variability of population size
+            # weight of PRoFIGA calculations on variability of population size
             'PRoFIGA_beta': 0.005,
-
-            # minimum age to die, age when everyone dies (on EPOCHS)
-            'ageBoundaries': (9, 19),
+            'ageBoundaries': (9, 19), # minimum age to die, age when everyone dies (on EPOCHS)
 
             'candleSize': 10, # candle size for gekko backtest, in minutes
 
+            # number of evaluations on evaluation break. for each selected individue on locales;
             'proofSize': 12,
+            # filter individuals for minimum trade count; [has heavy impact]
             'minTradeNumber': 6,
             'DRP': 70,# Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
+
+            # number of parallel backtests running on gekko;
             'ParallelBacktests': 6,
 
             'finaltest': {
+                # number of individues selected by score on each evaluation break for each locale;
                 'NBBESTINDS': 1,
+                # number of individues randomly selected on each evaluation break for each locale;
                 'NBADDITIONALINDS': 4,
             },
+            # chromosome settings are for -gc mode, which uses another GA internal representation mode
+            # for parameter values of each individue;
+            # check promoterz/representation/chromosome.py to see how it works.
+            # both parameters interact with crossover probability AKA cxpb;
+            # practical effects on evolution are really uknown;
             'chromosome': {
+                # length of the representation for each parameter. largers sizes should mantain
+                # evolutionary dynamics for parameters with proportional larger ranges;
                 'GeneSize': 2,
+                # number of parameters represented by each cromosome;
+                # this should mantain evolutionary dynamics for strategies with proportional larger
+                # parameter counts;
                 'Density': 3,
             },
+            # weights to score each individual, self explanatory;
             'weights': {
                 'profit': 1.0,
                 'sharpe': 0.1},
@@ -157,20 +173,19 @@ def getSettings(specific=None):
         },
         'dataset' : {
             # -- Gekko Dataset Settings
-             # dataset_source.ignore&autoselect can be set to true so it ignores the specifications and select automatically.
-            'dataset_source': { 
-                "ignore&autoselect": True,
+            # in order to enable dataset selection, turn off ignore&autoselect entry;
+            'dataset_source': {
+                'ignore&autoselect': True,
                 "exchange": "kraken",
                 "currency": 'USD',
                 "asset": 'LTC',
             },
             'eval_dataset_source': {
-                "ignore&autoselect": False,
+                'ignore&autoselect': True,
                 "exchange": "kraken",
                 "currency": 'USD',
-                "asset": 'LTC'
-                                },
-
+                "asset": 'LTC',
+            },
             # span in days from the end of dataset to the beggining. Or zero.
             # (to restrain length);
             'dataset_span': 0,
