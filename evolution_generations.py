@@ -117,7 +117,7 @@ def gekko_generations(
         evaluationDatasets = [CandlestickDataset(*D)]
         evaluationDatasets[0].restrain(datasetconf.eval_dataset_span)
     except RuntimeError:
-        evaluationDataset = None
+        evaluationDatasets = None
         print("Evaluation dataset not found.")
     # --INITIALIZE LOGGER;
     ds_specs = evolutionDatasets[0].specifications
