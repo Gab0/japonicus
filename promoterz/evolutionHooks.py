@@ -52,8 +52,10 @@ def populationFilter(locale, filterFunction, min_nb_inds):
         ind for ind in locale.population if filterFunction(ind)
     ]
     removed = [ind for ind in locale.population if ind not in newPopulation]
-    NBreturn = max(0, min(min_nb_inds - len(locale.population),
-                          min_nb_inds))
+    
+    NBreturn = min(min_nb_inds - len(locale.population),
+                          min_nb_inds)
+    NBreturn = max(0, NBreturn)
     if NBreturn and removed:
         for k in range(NBreturn):
             if removed:
