@@ -127,8 +127,8 @@ def getSettings(specific=None):
 
             # after this age in epoches, locale surely explodes i.e. ends.
             'localeExpirationAge': 100,
-            # chance, on each epoch, of a locale to finish;
-            'localeExplodeChance': 0.05
+            # chance, on each epoch, of a locale to finish [in percentage];
+            'localeExplodeChance': 2
         },
 
         # bayesian optimization settings
