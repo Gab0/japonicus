@@ -12,6 +12,7 @@ def world_EPOCH(World):
         try:
             LOCALE.run()
         except AssertionError:
+            World.logger.log("Locale exploding due to assertion error! (zero population)")
             World.explodeLocale(LOCALE)
         if World.web:
             for F in range(len(World.web.GraphicList)):
@@ -33,15 +34,20 @@ def world_EPOCH(World):
     # --APPLY LOCALE CREATION;
     if random.random() < 0.01:
         World.generateLocale()
-    # --APPLY LOCALE DESTRUCTION;
-    if random.random() < World.genconf.localeExplodeChance:
-        World.explodeLocale(random.choice(World.locales))
+    # --APPLY RANDOMIC LOCALE DESTRUCTION;
+    if random.random() < World.genconf.localeExplodeChance / 100:
+        chosenLocale = random.choice(World.locales)
+        World.explodeLocale(chosenLocale)
+    # --APPLY EXPECTED LOCALE DESTRUCTION;
     for L in range(len(World.locales)):
-        if World.locales[L].EPOCH > World.genconf.localeExpirationAge and len(World.locales) > 2:
-            World.explodeLocale(World.locales[L])
-            break  # if two locales are destroyed @ same time post-locale migrations
+        if World.locales[L].EPOCH > World.genconf.localeExpirationAge:
+            if len(World.locales) > 2:
+                World.explodeLocale(World.locales[L])
+                #  if two locales are destroyed @ same time, post-locale migrations
+                #  will be a mess
+                break  
 
-    # will be a mess
+    
     World.EPOCH += 1
     etime = time.time() - stime
     print("Epoch runs in %.2f seconds;" % etime)
