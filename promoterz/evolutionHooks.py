@@ -121,16 +121,8 @@ def getFitness(individual):
     R = sum(individual.wvalues)
 
 
-
-
-# selectCriteria = lambda x: sum(x.fitness.wvalues)
 def selectCriteria(ind):
-    p = ind.fitness.wvalues[0]
-    s = (1 + ind.fitness.wvalues[1])
-    R = p * s
-    if p < 0 and s < 0:
-        R = - abs(R)
-    return R
+    return sum(ind.fitness.wvalues)
 
 
 def selBest(individuals, number):
