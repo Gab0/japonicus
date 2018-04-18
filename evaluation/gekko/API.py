@@ -10,7 +10,7 @@ def initializeGekko():  # not used yet.
     D = Popen(CMD, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
 
-def httpPost(URL, data= {}):
+def httpPost(URL, data={}):
     try:
         Request = requests.post(URL, json=data)
         Response = json.loads(Request.text)
