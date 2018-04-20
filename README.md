@@ -28,7 +28,11 @@ This somewhat corresponds to `--skeleton` mode of japonicus, which lets the GA s
 The changelog is important for the user as following modifications can cause bugs on related areas. Please report 'em ;)
 
 ```
-v0.58
+v0.70 (develop branch)
+
+- log folder restructured
+
+v0.58 (stable branch)
 
 - runs in Windows (not confirmed)
 - Settings parameters can be passed on command line (check the --help)
@@ -36,8 +40,9 @@ v0.58
   dataset_source is the first, add dataset_source1; dataset_source2 and so forth
 for multiple datasets.`
 - filter individues for minimum trade count (default: enabled@16 trades)
+- backtest scores (profit and sharpe) to individue final score method is now a sum, not multiplication
 
-v0.56 (seems stable)
+v0.56 
 
 - japonicus settings for strategies can be stored at strategy_parameters folder as .toml files
 - automated refactor on entire codebase
