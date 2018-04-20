@@ -21,8 +21,9 @@ from Settings import getSettings
 import evaluation
 
 import resultInterface
-
-from japonicus_options import options, args
+from evaluation.gekko.datasetOperations import CandlestickDataset
+from japonicus_options import parser
+options, args = parser.parse_args()
 
 dict_merge = lambda a, b: a.update(b) or a
 gsettings = getSettings()['Global']
@@ -51,9 +52,10 @@ def Evaluate(Strategy, parameters):
     DateRange = evaluation.gekko.dataset.getRandomDateRange(
         DatasetRange, deltaDays=settings['deltaDays']
     )
+    Dataset = CandlestickDataset(watch, DateRange)
     params = expandGekkoStrategyParameters(parameters, Strategy)
     BacktestResult = evaluation.gekko.backtest.Evaluate(
-        bayesconf, watch, [DateRange], params, gsettings['GekkoURLs'][0]
+        bayesconf, [Dataset], params, gsettings['GekkoURLs'][0]
     )
     BalancedProfit = BacktestResult['relativeProfit']
     return BalancedProfit
