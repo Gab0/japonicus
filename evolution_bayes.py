@@ -20,6 +20,8 @@ from Settings import getSettings
 
 import evaluation
 
+import TOMLutils
+
 import resultInterface
 from evaluation.gekko.datasetOperations import CandlestickDataset
 from japonicus_options import parser
@@ -153,6 +155,6 @@ def gekko_bayesian(strategy):
     print("// " + '-' * 50)
     print("config.%s = {%s};" % (Strategy, json.dumps(resultjson, indent=2)[1:-1]))
     print('\n\n')
-    print(resultInterface.parametersToTOML(resultjson))
+    print(TOMLutils.parametersToTOML(resultjson))
     print("// " + '-' * 50)
     return max_params
