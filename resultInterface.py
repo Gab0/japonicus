@@ -110,7 +110,7 @@ def showResults(World):
             World.logger.log(TOMLSettings)
             paramsFilename = "%s-EPOCH%i.toml" % (LOCALE.name,
                                                 LOCALE.EPOCH)
-            World.logger.saveSettings(paramsFilename, TOMLSettings)
+            World.logger.saveParameters(paramsFilename, TOMLSettings)
             print("\nRemember to check MAX and MIN values for each parameter.")
             print("\tresults may improve with extended ranges.")
             World.EvaluationStatistics.append(GlobalLogEntry)
