@@ -1,11 +1,6 @@
 #!/bin/python
 import sys
-
-if not sys.version_info.major >= 3 or not sys.version_info.minor >= 6:
-    exit('check your python version before running japonicus. Python>=3.6 is required.')
-import signal
-
-signal.signal(signal.SIGINT, lambda x, y: sys.exit(0))
+import japonicus_halt
 
 from time import sleep
 from random import choice, randrange
@@ -19,7 +14,6 @@ import TOMLutils
 import datetime
 from os import chdir, path, listdir
 
-chdir(path.dirname(path.realpath(__file__)))
 
 from japonicus_options import parser
 import web
@@ -28,6 +22,8 @@ from version import VERSION
 import os
 import evaluation
 settings = getSettings()
+
+chdir(path.dirname(path.realpath(__file__)))
 
 
 # from evolution_bayes import gekko_bayesian
@@ -48,7 +44,8 @@ def showTitleDisclaimer():
 
     profitDisclaimer = "The profits reported here depends on backtest interpreter function;"
     interpreterFuncName = getSettings('generations').interpreteBacktestProfit
-    interpreterInfo = evaluation.gekko.backtest.getInterpreterBacktestInfo(interpreterFuncName)
+    interpreterInfo = evaluation.gekko.backtest.getInterpreterBacktestInfo(
+        interpreterFuncName)
 
     print("%s \n\t%s" % ( profitDisclaimer, interpreterInfo ))
 
@@ -138,18 +135,20 @@ def launchJaponicus(parser):
         else:
             EvaluationMode = Strategy
             try:
-                TargetParameters = getSettings()['strategies'][Strategy]
-            # -- Yeah, nested exceptions;
-            except KeyError:
-                try:
-                    TOMLData = TOMLutils.preprocessTOMLFile(
-                        "strategy_parameters/%s.toml" % Strategy
-                    )
-                except FileNotFoundError:
-                    TOMLData = TOMLutils.preprocessTOMLFile(
-                        "%s/config/strategies/%s.toml" % (GekkoDir, Strategy)
-                    )
-                TargetParameters = TOMLutils.TOMLToParameters(TOMLData)
+                TOMLData = TOMLutils.preprocessTOMLFile(
+                    "strategy_parameters/%s.toml" % Strategy
+                )
+            except FileNotFoundError:
+                print("Failure to find strategy parameter rules for" % (Strategy) +
+                      "%s at ./strategy_parameters" % Strategy)
+                gekkoParameterPath = "%s/config/strategies/%s.toml" %\
+                                     (settings['global']['GekkoDir'], Strategy)
+                print("Trying to locate gekko parameters at %s" %
+                      gekkoParameterPath)
+                TOMLData = TOMLutils.preprocessTOMLFile(gekkoParameterPath)
+
+            TargetParameters = TOMLutils.TOMLToParameters(TOMLData)
+        # RUN ONE EQUAL INSTANCE PER REPEATER NUMBER SETTINGS, SEQUENTIALLY;
         for s in range(options.repeater):
             gekko_generations(
                 TargetParameters, GenerationMethod,
