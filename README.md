@@ -31,6 +31,9 @@ The changelog is important for the user as following modifications can cause bug
 v0.70 (develop branch)
 
 - log folder restructured
+- configStrategies.py DEPRECATED; use only TOML parameters at the folder strategy_parameters.
+    check TOML special syntax for parameter ranges at the wiki
+- GA benchmark mode added
 
 v0.58 (stable branch)
 
