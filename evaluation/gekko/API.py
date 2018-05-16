@@ -21,7 +21,7 @@ def httpPost(URL, data={}):
         print("Error: config failure")
         print(URL)
         print(data)
-        raise e
+        return {'report': False}
 
     return Response
 
