@@ -44,7 +44,7 @@ class Logger():
         df.to_csv(filename)
 
     def saveParameters(self, filename, content):
-        filename = "logs/%s.toml" % filename
+        filename = "logs/%s/%s.toml" % (self.logfilename,filename)
         File = open(filename, 'w')
         File.write(content)
         File.close()
