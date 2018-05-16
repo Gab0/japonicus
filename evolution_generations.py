@@ -1,6 +1,7 @@
 #!/bin/python
 import json
 import random
+import time
 import datetime
 import sys
 
@@ -127,7 +128,7 @@ def gekko_generations(
         ds_specs['exchange'],
         ds_specs['currency'],
         ds_specs['asset'],
-        str(datetime.datetime.now())[-6:],
+        time.strftime("%Y_%m_%d-%H.%M.%S", time.gmtime()),
     )
     Logger = promoterz.logger.Logger(logfilename)
     # --PRINT RUNTIME ARGS TO LOG HEADER;

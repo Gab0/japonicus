@@ -108,7 +108,7 @@ def showResults(World):
             TOMLSettings = TOMLutils.parametersToTOML(
                 FinalIndividueSettings)
             World.logger.log(TOMLSettings)
-            paramsFilename = "%s-EPOCH%i.toml" % (LOCALE.name,
+            paramsFilename = "%s-EPOCH%i" % (LOCALE.name,
                                                 LOCALE.EPOCH)
             World.logger.saveParameters(paramsFilename, TOMLSettings)
             print("\nRemember to check MAX and MIN values for each parameter.")
