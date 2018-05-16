@@ -56,7 +56,8 @@ def bEvaluate(constructPhenotype, genconf, Datasets, Individual, gekkoUrl):
 
 
 def gekko_generations(
-        TargetParameters, GenerationMethod, EvaluationMode, settings, options, web=None):
+        TargetParameters, GenerationMethod, EvaluationMode, settings,
+        options, web=None):
     # --LOAD SETTINGS;
     genconf = makeSettings(settings['generations'])
     globalconf = makeSettings(settings['Global'])
