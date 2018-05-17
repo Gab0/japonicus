@@ -45,9 +45,8 @@ def world_EPOCH(World):
                 World.explodeLocale(World.locales[L])
                 #  if two locales are destroyed @ same time, post-locale migrations
                 #  will be a mess
-                break  
+                break
 
-    
     World.EPOCH += 1
     etime = time.time() - stime
     print("Epoch runs in %.2f seconds;" % etime)
