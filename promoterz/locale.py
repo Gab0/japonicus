@@ -4,6 +4,7 @@ from deap import base
 import promoterz
 import statistics
 
+
 class Locale():
 
     def __init__(self, World, name, position, loop):
