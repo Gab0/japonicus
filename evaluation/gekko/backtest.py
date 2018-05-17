@@ -36,7 +36,8 @@ def runBacktest(
     Debug=False,
 ):
     gekko_config = createConfig(
-        TradeSetting, Dataset.specifications, Dataset.daterange, candleSize, gekko_config, Debug
+        TradeSetting, Dataset.specifications, Dataset.daterange, candleSize,
+        gekko_config, Debug
     )
     url = GekkoInstanceUrl + '/api/backtest'
     result = httpPost(url, gekko_config)
