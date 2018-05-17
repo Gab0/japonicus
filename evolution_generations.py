@@ -30,7 +30,7 @@ StrategyFileManager = None
 
 
 # TEMPORARY ASSIGNMENT OF EVAL FUNCTIONS; SO THINGS REMAIN SANE (¿SANE?);
-def aEvaluate(
+def indicatorEvaluate(
     StrategyFileManager,
     constructPhenotype,
     genconf,
@@ -47,7 +47,7 @@ def aEvaluate(
     return SCORE
 
 
-def bEvaluate(constructPhenotype, genconf, Datasets, Individual, gekkoUrl):
+def standardEvaluate(constructPhenotype, genconf, Datasets, Individual, gekkoUrl):
     phenotype = constructPhenotype(Individual)
     phenotype = {Individual.Strategy: phenotype}
     SCORE = evaluation.gekko.backtest.Evaluate(
@@ -56,42 +56,16 @@ def bEvaluate(constructPhenotype, genconf, Datasets, Individual, gekkoUrl):
     return SCORE
 
 
-def gekko_generations(
-        TargetParameters, GenerationMethod, EvaluationMode, settings,
-        options, web=None):
-    # --LOAD SETTINGS;
-    genconf = makeSettings(settings['generations'])
-    globalconf = makeSettings(settings['Global'])
-    datasetconf = makeSettings(settings['dataset'])
-    indicatorconf = makeSettings(settings['indicators'])
-    # --APPLY COMMAND LINE GENCONF SETTINGS;
-    for parameter in genconf.__dict__.keys():
-        if parameter in options.__dict__.keys():
-            if options.__dict__[parameter] != None:
-                genconf.__dict__[parameter] = options.__dict__[parameter]
-    GenerationMethod = promoterz.functions.selectRepresentationMethod(GenerationMethod)
-    if EvaluationMode == 'indicator':
-        # global StrategyFileManager
-        StrategyFileManager = stratego.gekko_strategy.StrategyFileManager(
-            globalconf.gekkoPath, indicatorconf
-        )
-        Evaluate = partial(aEvaluate, StrategyFileManager)
-        Strategy = options.skeleton
-    # --for standard methods;
-    else:
-        Evaluate = bEvaluate
-        Strategy = EvaluationMode
-    TargetParameters = promoterz.parameterOperations.flattenParameters(TargetParameters)
-    TargetParameters = promoterz.parameterOperations.parameterValuesToRangeOfValues(
-        TargetParameters, genconf.parameter_spread
+def benchmarkEvaluate(constructPhenotype, genconf, Datasets, Individual, gekkoUrl):
+    phenotype = constructPhenotype(Individual)
+    phenotype = {Individual.Strategy: phenotype}
+    SCORE = evaluation.benchmark.benchmark.Evaluate(
+        genconf, phenotype
     )
-    GlobalTools = GenerationMethod.getToolbox(Strategy, genconf, TargetParameters)
-    RemoteHosts = evaluation.gekko.API.loadHostsFile(globalconf.RemoteAWS)
-    globalconf.GekkoURLs += RemoteHosts
-    if RemoteHosts:
-        print("Connected Remote Hosts:\n%s" % ('\n').join(RemoteHosts))
-        if EvaluationMode == 'indicator':
-            exit('Indicator mode is yet not compatible with multiple hosts.')
+    return SCORE
+
+
+def grabDatasets():
     # CHECK HOW MANY EVOLUTION DATASETS ARE SPECIFIED AT SETTINGS;
     evolutionDatasetNames = ['dataset_source']
     evolutionDatasets = []
@@ -121,15 +95,63 @@ def gekko_generations(
     except RuntimeError:
         evaluationDatasets = []
         print("Evaluation dataset not found.")
-    # --INITIALIZE LOGGER;
-    ds_specs = evolutionDatasets[0].specifications
-    logfilename = "%s-%s-%s-%s-%s" % (
-        Strategy,
-        ds_specs['exchange'],
-        ds_specs['currency'],
-        ds_specs['asset'],
-        time.strftime("%Y_%m_%d-%H.%M.%S", time.gmtime()),
+
+
+def gekko_generations(
+        TargetParameters, GenerationMethod, EvaluationMode, settings,
+        options, web=None):
+    # --LOAD SETTINGS;
+    genconf = makeSettings(settings['generations'])
+    globalconf = makeSettings(settings['Global'])
+    datasetconf = makeSettings(settings['dataset'])
+    indicatorconf = makeSettings(settings['indicators'])
+    # --APPLY COMMAND LINE GENCONF SETTINGS;
+    for parameter in genconf.__dict__.keys():
+        if parameter in options.__dict__.keys():
+            if options.__dict__[parameter] != None:
+                genconf.__dict__[parameter] = options.__dict__[parameter]
+    GenerationMethod = promoterz.functions.selectRepresentationMethod(GenerationMethod)
+    if EvaluationMode == 'indicator':
+        # global StrategyFileManager
+        StrategyFileManager = stratego.gekko_strategy.StrategyFileManager(
+            globalconf.gekkoPath, indicatorconf
+        )
+        Evaluate = partial(indicatorEvaluate, StrategyFileManager)
+        Strategy = options.skeleton
+    # --for standard methods;
+    else:
+        if options.benchmarkMode:
+            Evaluate = benchmarkEvaluate
+            evolutionDatasets, evaluationDatasets = [], []
+        else:
+            Evaluate = standardEvaluate
+            evolutionDatasets, evaluationDatasets = grabDatasets()
+        Strategy = EvaluationMode
+    TargetParameters = promoterz.parameterOperations.flattenParameters(TargetParameters)
+    TargetParameters = promoterz.parameterOperations.parameterValuesToRangeOfValues(
+        TargetParameters, genconf.parameter_spread
     )
+    GlobalTools = GenerationMethod.getToolbox(Strategy, genconf, TargetParameters)
+    RemoteHosts = evaluation.gekko.API.loadHostsFile(globalconf.RemoteAWS)
+    globalconf.GekkoURLs += RemoteHosts
+    if RemoteHosts:
+        print("Connected Remote Hosts:\n%s" % ('\n').join(RemoteHosts))
+        if EvaluationMode == 'indicator':
+            exit('Indicator mode is yet not compatible with multiple hosts.')
+
+    # --INITIALIZE LOGGER;
+    todayDate = time.strftime("%Y_%m_%d-%H.%M.%S", time.gmtime())
+    if evolutionDatasets:
+        ds_specs = evolutionDatasets[0].specifications
+        logfilename = "%s-%s-%s-%s-%s" % (
+            Strategy,
+            ds_specs['exchange'],
+            ds_specs['currency'],
+            ds_specs['asset'],
+            todayDate
+        )
+    else:
+        logfilename = "benchmark%s" % todayDate
     Logger = promoterz.logger.Logger(logfilename)
     # --PRINT RUNTIME ARGS TO LOG HEADER;
     ARGS = ' '.join(sys.argv)
@@ -163,8 +185,12 @@ def gekko_generations(
                          GlobalTools.constructPhenotype, genconf)
 
     # --THIS LOADS A DATERANGE FOR A LOCALE;
-    def onInitLocale(World, locale):
-        locale.Dataset = getLocaleDataset(World, locale)
+    if options.benchmarkMode:
+        def onInitLocale(World, locale):
+            locale.Dataset = [None]
+    else:
+        def onInitLocale(World, locale):
+            locale.Dataset = getLocaleDataset(World, locale)
 
 
     loops = [promoterz.sequence.standard_loop.standard_loop]
@@ -174,8 +200,10 @@ def gekko_generations(
         genconf,
         globalconf,
         TargetParameters,
-        EnvironmentParameters={'evolution':  evolutionDatasets,
-                               'evaluation': evaluationDatasets},
+        EnvironmentParameters={
+            'evolution':  evolutionDatasets,
+            'evaluation': evaluationDatasets
+        },
         onInitLocale=onInitLocale,
         web=web,
     )
