@@ -133,10 +133,9 @@ def launchJaponicus(parser):
             if not TargetParameters:
                 exit("Bad configIndicators!")
         else:
-            if options.benchmarkMode:
-                EvaluationMode = 'functionfour'
-            else:
-                EvaluationMode = Strategy
+            EvaluationMode = Strategy
+
+            # READ STRATEGY PARAMETER RANGES FROM TOML;
             try:
                 TOMLData = TOMLutils.preprocessTOMLFile(
                     "strategy_parameters/%s.toml" % Strategy
