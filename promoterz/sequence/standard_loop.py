@@ -38,7 +38,6 @@ def standard_loop(World, locale):
     if not locale.EPOCH % 15:
         BestSetting = tools.selBest(locale.population, 1)[0]
         locale.HallOfFame.insert(BestSetting)
-    assert (len(locale.population))
     assert (sum([x.fitness.valid for x in locale.population]) == len(locale.population))
     # --compile stats;
     statistics.compileStats(locale)
