@@ -97,6 +97,9 @@ class EvaluationPool():
         for T in TimedOut:
             self.ejectURL(T)
         N = len(individues_to_simulate)
+        # RECORD NUMBER OF EVALUATIONS;
+        locale.World.totalEvaluations += N
+        # CALCULATE AVERAGE TRADE NUMBER;
         averageTrades = TotalNumberOfTrades / max(1, N)
         return N, averageTrades
 
