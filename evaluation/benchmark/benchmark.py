@@ -12,7 +12,7 @@ def evalRosenbrock(parameters):
     return -Result
 
 
-def evalGriewangk3(parameters):
+def evalGriewangk(parameters):
     Dimensions = 10
     Result = 1
 
@@ -30,10 +30,11 @@ def evalGriewangk3(parameters):
     return -Result
 
 
-def evalGriewangk2(parameters):
-    Result = 200
+def evalRastrigin(parameters):
+    Dimensions = 20
+    Result = 10 * Dimensions
 
-    for w in range(20):
+    for w in range(Dimensions):
         W = w + 1
         Result += pow(parameters[w], 2)
         Result -= 10 * (math.cos(2*math.pi*parameters[w]))
@@ -41,7 +42,7 @@ def evalGriewangk2(parameters):
     return -Result
 
 
-def evalGriewangk1(parameters):
+def evalSchwefel(parameters):
     A = 4189.829101
     Open = 10 * A
     Result = Open
@@ -62,22 +63,30 @@ def evalFunctionFour(parameters):
 
 
 def evalFoxHole(parameters):
+    # MIN = 0.998003837794449325873406851315
     Result = 0.002
     a = [
-        [-32, -16, 0, 16, 32, -32, -16, 0, 16, 32, -32, -16, 0, 16,
-         32, -32, -16, 0, 16, 32, -32, -16, 0, 16, 32],
-        [-32, -32, -32, -32, -32, -16, -16, -16, -16, -16, 0,
-         0, 0, 0, 0, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32]
+        [-32, -16, 0, 16, 32,
+         -32, -16, 0, 16, 32,
+         -32, -16, 0, 16, 32,
+         -32, -16, 0, 16, 32,
+         -32, -16, 0, 16, 32],
+        [-32, -32, -32, -32, -32,
+         -16, -16, -16, -16, -16,
+         0, 0, 0, 0, 0,
+         16, 16, 16, 16, 16,
+         32, 32, 32, 32, 32]
     ]
 
     for w in range(25):
         W = 1+w
         D = W
         for k in range(2):
-            D += pow(parameters[k] - a[k][w], 6)
-        Result += 1/D
+            D += pow((parameters[k] - a[k][w]), 6)
+        Result += (1/D)
 
-    return Result
+    Result = 1/Result
+    return -Result
 
 
 def Evaluate(genconf, phenotype):
@@ -88,9 +97,9 @@ def Evaluate(genconf, phenotype):
     evalFunctions = {
         'functionfour': evalFunctionFour,
         'foxhole': evalFoxHole,
-        'griewangk1': evalGriewangk1,
-        'griewangk2': evalGriewangk2,
-        'griewangk3': evalGriewangk3,
+        'schwefel': evalSchwefel,
+        'rastrigin': evalRastrigin,
+        'griewangk': evalGriewangk,
         'rosenbrock': evalRosenbrock
     }
     result = evalFunctions[evalFunctionName](parameters)
