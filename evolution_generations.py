@@ -221,6 +221,8 @@ def gekko_generations(
         if genconf.evaluateSettingsPeriodically and not options.benchmarkMode:
             if not World.EPOCH % genconf.evaluateSettingsPeriodically:
                 resultInterface.showResults(World)
+        if not World.EPOCH % 10:
+            print("Total Evaluations: %i" % World.totalEvaluations)
     # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
     # FinalBestScores.append(Stats['max'])
     print(World.EnvironmentParameters)
