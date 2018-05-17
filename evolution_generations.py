@@ -65,7 +65,7 @@ def benchmarkEvaluate(constructPhenotype, genconf, Datasets, Individual, gekkoUr
     return SCORE
 
 
-def grabDatasets():
+def grabDatasets(datasetconf):
     # CHECK HOW MANY EVOLUTION DATASETS ARE SPECIFIED AT SETTINGS;
     evolutionDatasetNames = ['dataset_source']
     evolutionDatasets = []
@@ -81,7 +81,7 @@ def grabDatasets():
         evolutionDatasets.append(CandlestickDataset(*D))
         try:
             evolutionDatasets[-1].restrain(datasetconf.dataset_span)
-        except:
+        except Exception:
             print('dataset_ span not configured for evolutionDatasetName. skipping...')
 
     # --GRAB SECONDARY (EVALUATION) DATASET
@@ -95,6 +95,8 @@ def grabDatasets():
     except RuntimeError:
         evaluationDatasets = []
         print("Evaluation dataset not found.")
+
+    return evolutionDatasets, evaluationDatasets
 
 
 def gekko_generations(
@@ -120,13 +122,15 @@ def gekko_generations(
         Strategy = options.skeleton
     # --for standard methods;
     else:
+        Strategy = EvaluationMode
         if options.benchmarkMode:
             Evaluate = benchmarkEvaluate
             evolutionDatasets, evaluationDatasets = [], []
         else:
             Evaluate = standardEvaluate
-            evolutionDatasets, evaluationDatasets = grabDatasets()
-        Strategy = EvaluationMode
+            evolutionDatasets, evaluationDatasets = grabDatasets(datasetconf)
+
+    # -- PARSE TARGET PARAMETERS
     TargetParameters = promoterz.parameterOperations.flattenParameters(TargetParameters)
     TargetParameters = promoterz.parameterOperations.parameterValuesToRangeOfValues(
         TargetParameters, genconf.parameter_spread
@@ -187,7 +191,7 @@ def gekko_generations(
     # --THIS LOADS A DATERANGE FOR A LOCALE;
     if options.benchmarkMode:
         def onInitLocale(World, locale):
-            locale.Dataset = [None]
+            locale.Dataset = [CandlestickDataset({},{'from':0,'to':0})]
     else:
         def onInitLocale(World, locale):
             locale.Dataset = getLocaleDataset(World, locale)
@@ -213,7 +217,7 @@ def gekko_generations(
     # --RUN EPOCHES;
     while World.EPOCH < World.genconf.NBEPOCH:
         World.runEPOCH()
-        if genconf.evaluateSettingsPeriodically:
+        if genconf.evaluateSettingsPeriodically and not options.benchmarkMode:
             if not World.EPOCH % genconf.evaluateSettingsPeriodically:
                 resultInterface.showResults(World)
     # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
