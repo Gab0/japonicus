@@ -87,8 +87,10 @@ def getSettings(specific=None):
 
             # number of evaluations on evaluation break. for each selected individue on locales;
             'proofSize': 12,
-            # filter individuals for minimum trade count; [has heavy impact]
-            'minTradeNumber': 6,
+            # filter individuals for minimum profit (or set to None)
+            'minimumProfitFilter': -15,
+            # filter individuals for minimum trade count; [has heavy impact] (or set to None)
+            'minimumTradeNumberFilter': 6,
             'DRP': 70,# Date range persistence; Number of subsequent rounds
              # until another time range in dataset is selected;
 
