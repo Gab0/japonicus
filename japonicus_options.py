@@ -18,7 +18,13 @@ parser.add_option(
 parser.add_option(
     '-r', '--random', dest='random_strategy', action='store_true', default=False
 )
-parser.add_option('-w', '--web', dest='spawn_web', action='store_true', default=False)
+parser.add_option(
+    '-e', '--benchmark', dest='benchmarkMode', action='store_true',
+    default=False
+)
+parser.add_option(
+    '-w', '--web', dest='spawn_web', action='store_true', default=False
+)
 parser.add_option('--repeat <x>', dest='repeater', type=int, default=1)
 parser.add_option('--strat <strat>', dest='strategy', default=None)
 parser.add_option('--skeleton <skeleton>', dest='skeleton', default=None)
