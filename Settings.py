@@ -38,7 +38,7 @@ def getSettings(specific=None):
             'RemoteAWS': '../AmazonSetup/hosts',
 
             # Your gekko local URL - CHECK THIS!
-            'GekkoURLs': [ 'http://localhost:3000' ],
+            'GekkoURLs': ['http://localhost:3000'],
             'showFailedStrategies': False
         },
         # genetic algorithm settings
@@ -215,6 +215,7 @@ def getSettings(specific=None):
             return makeSettings(s[specific])
 
     return s
+
 
 def get_configjs(filename="example-config.js"):
     with open(filename, "r") as f:
