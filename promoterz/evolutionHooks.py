@@ -11,7 +11,6 @@ import promoterz.supplement.phenotypicDivergence
 import itertools
 
 
-
 # population as last positional argument, to blend with toolbox;
 def immigrateHoF(HallOfFame, population):
     if not HallOfFame.items:
