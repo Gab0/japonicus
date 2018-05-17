@@ -37,7 +37,7 @@ def expandNestedParameters(Parameters):
 def parameterValuesToRangeOfValues(TargetParameters, Spread):
     for parameter in TargetParameters.keys():
         P = TargetParameters[parameter]
-        if type(P) != tuple:
+        if type(P) not in [tuple, list]:
             spread_change = Spread * P / 200
             if P < 0:
                 spread_change = -spread_change
