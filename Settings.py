@@ -77,7 +77,7 @@ def getSettings(specific=None):
             # -- Genetic Algorithm Parameters
             'cxpb': 0.8, # Probabilty of crossover 
             'mutpb': 0.2,# Probability of mutation;
-            '_lambda': 7,# size of offspring generated per epoch;
+            '_lambda': 14,# size of offspring generated per epoch;
 
             # weight of PRoFIGA calculations on variability of population size
             'PRoFIGA_beta': 0.005,
@@ -111,11 +111,11 @@ def getSettings(specific=None):
             'chromosome': {
                 # length of the representation for each parameter. largers sizes should mantain
                 # evolutionary dynamics for parameters with proportional larger ranges;
-                'GeneSize': 2,
+                'GeneSize': 3,
                 # number of parameters represented by each cromosome;
                 # this should mantain evolutionary dynamics for strategies with proportional larger
                 # parameter counts;
-                'Density': 3,
+                'Density': 2,
             },
             # weights to score each individual, self explanatory;
             'weights': {
