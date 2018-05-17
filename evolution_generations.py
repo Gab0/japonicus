@@ -126,6 +126,7 @@ def gekko_generations(
         if options.benchmarkMode:
             Evaluate = benchmarkEvaluate
             evolutionDatasets, evaluationDatasets = [], []
+            genconf.minimumProfitFilter = None
         else:
             Evaluate = standardEvaluate
             evolutionDatasets, evaluationDatasets = grabDatasets(datasetconf)
@@ -224,6 +225,7 @@ def gekko_generations(
     # FinalBestScores.append(Stats['max'])
     print(World.EnvironmentParameters)
     # After running EPOCHs, select best candidates;
-    resultInterface.showResults(World)
+    if not options.benchmarkMode:
+        resultInterface.showResults(World)
     print("")
     print("\t\t.RUN ENDS.")
