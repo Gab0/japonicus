@@ -41,6 +41,7 @@ class World():
         self.web = web
         for l in range(genconf.NBLOCALE):
             self.generateLocale()
+        self.totalEvaluations = 0
 
     def generateLocale(self):
         name = 'Locale%i' % (self.localeID)
