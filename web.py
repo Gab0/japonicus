@@ -43,21 +43,23 @@ def update_graph(GraphName, Statistics):
     statisticsNames.update(periodicStatisticsNames)
 
     for W in range(len(df['dateRange'])):
-        DR = df['dateRange'][W]
-        if DR != None:
-            annotations.append(
-                {
-                    'xref': 'axis',
-                    'yref': 'paper',
-                    'xanchor': 'left',
-                    'yanchor': 'bottom',
-                    'font': {'family': 'Arial', 'size': 12, 'color': 'rgb(37,37,37)'},
-                    'x': W,
-                    'y': 1 if not len(annotations) %
-                    2 else 0.93,  # avoid label overlap;
-                    'text': DR,
-                }
-            )
+        if 'dateRange' in df.keys():
+            DR = df['dateRange'][W]
+
+            if DR != None:
+                annotations.append(
+                    {
+                        'xref': 'axis',
+                        'yref': 'paper',
+                        'xanchor': 'left',
+                        'yanchor': 'bottom',
+                        'font': {'family': 'Arial', 'size': 12, 'color': 'rgb(37,37,37)'},
+                        'x': W,
+                        'y': 1 if not len(annotations) %
+                        2 else 0.93,  # avoid label overlap;
+                        'text': DR,
+                    }
+                )
     colorSequence = [
         (188, 189, 34),
         (100, 11, 182),
