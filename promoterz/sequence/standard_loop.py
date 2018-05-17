@@ -8,6 +8,12 @@ import statistics
 from .. import evolutionHooks
 
 
+def checkPopulation(population, message):
+    if not (len(population)):
+        print(message)
+        raise RuntimeError
+
+
 def standard_loop(World, locale):
     # --assertions are most for debugging purposes; they should not trigger
     assert (len(locale.population))
@@ -33,7 +39,7 @@ def standard_loop(World, locale):
     ] = World.parallel.evaluatePopulation(
         locale
     )
-    assert (len(locale.population))
+    checkPopulation(locale.population, "Invalid fitness values!")
     # --send best individue to HallOfFame;
     if not locale.EPOCH % 15:
         BestSetting = tools.selBest(locale.population, 1)[0]
@@ -49,10 +55,16 @@ def standard_loop(World, locale):
     wpop = len(locale.population)
     locale.extraStats['elder'] = qpop - wpop
     # --remove very inapt citizens
-    locale.extratools.filterThreshold(-15, World.genconf._lambda)
+    if World.genconf.minimumProfitFilter is not None:
+        locale.extratools.filterThreshold(World.genconf.minimumProfitFilter, World.genconf._lambda)
+        checkPopulation(locale.population, "Population dead after profit filter.")
+
     # --remove individuals below tradecount
-    locale.extratools.filterTrades(World.genconf.minTradeNumber,
-                                   World.genconf._lambda)
+    if World.genconf.minimumTradeNumberFilter is not None:
+        locale.extratools.filterTrades(World.genconf.minimumTradeNumberFilter,
+                                       World.genconf._lambda)
+        checkPopulation(locale.population, "Population dead after trading number filter.")
+
     # --show stats;
     statistics.showStats(locale)
     # --calculate new population size;
@@ -74,21 +86,11 @@ def standard_loop(World, locale):
             print(M)
     # --filter best inds;
     locale.population[:] = evolutionHooks.selBest(locale.population, locale.POP_SIZE)
-    assert (len(locale.population))
+    checkPopulation(locale.population, "Population dead after selection of score filter.")
     assert (None not in locale.population)
     # print(EvolutionStatistics)
     #FinalBestScores.append(Stats['max'])
-    '''
-    print("Loading new date range;")
-    
-    print("\t%s to %s" % (locale.DateRange['from'], locale.DateRange['to']))
-    for I in range(len(locale.population)):
-    del locale.population[I].fitness.values
-    toolbox.register("evaluate", coreFunctions.Evaluate,
-    GenerationMethod.constructPhenotype, DateRange)
-    FirstEpochOfDataset = True
-    bestScore = 0
-    '''
+
     # --select best individues to procreate
     LAMBDA = max(World.genconf._lambda, locale.POP_SIZE - len(locale.population))
     TournamentSize = max(2 * LAMBDA, len(locale.population))
