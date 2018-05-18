@@ -1,6 +1,6 @@
 #!/bin/python
 import sys
-import japonicus_halt
+#import japonicus_halt
 
 from time import sleep
 from random import choice, randrange
