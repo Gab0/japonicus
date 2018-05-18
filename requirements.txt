@@ -11,3 +11,4 @@ bayesian_optimization==0.4.0
 dash_html_components==0.7.0
 dash_core_components==0.12.6
 pytz==2018.3
+pytoml==0.1.14
