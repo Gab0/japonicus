@@ -24,6 +24,8 @@ def compileStats(locale):
     Stats['maxsize'] = locale.POP_SIZE
     Stats['size'] = len(locale.population)
     Stats['avgTrades'] = locale.extraStats['avgTrades']
+    Stats['avgExposure'] = locale.extraStats['avgExposure'] 
+    #Stats['nbElderDies'] = locale.extraStats['nbElderDies']
     Stats['sharpe'] = np.mean([x.fitness.values[1] for x in locale.population])
     Stats['evaluationScoreOnSecondary'] = locale.lastEvaluationOnSecondary
     Stats['evaluationScore'] = locale.lastEvaluation
@@ -36,23 +38,28 @@ def compileStats(locale):
     )
 
 
-def showStats(locale):
+def showStatistics(locale):
     # show information;
     Stats = locale.EvolutionStatistics[locale.EPOCH]
     print("EPOCH %i\t&%i" % (locale.EPOCH, locale.extraStats['nb_evaluated']))
-    statnames = ['max', 'avg', 'min', 'std',
-                 'size', 'maxsize', 'avgTrades', 'sharpe']
-    statText = ""
+    statnames = ['max', 'avg', 'min',
+                 'std', 'size', 'maxsize',
+                 'avgTrades', 'sharpe', 'avgExposure',
+                 # 'nbElderDies'
+    ]
+    statisticsText = []
     for s in range(len(statnames)):
         SNAME = statnames[s]
         SVAL = Stats[SNAME]
-        statText += "%s" % epochStatisticsNames[SNAME]
+        currentStatisticsText = "%s" % epochStatisticsNames[SNAME]
         if not SVAL % 1:
-            statText += " %i\t" % SVAL
+            currentStatisticsText += " %i\t" % SVAL
         else:
-            statText += " %.3f\t" % SVAL
-        if s % 2:
-            statText += '\n'
-    print(statText)
-    print('Elder dies %i' % locale.extraStats['elder'])
-    print('')
+            currentStatisticsText += " %.3f\t" % SVAL
+        statisticsText.append(currentStatisticsText)
+
+    columnWidth = max([len(STXT) for STXT in statisticsText]) + 3
+    for j in range(0, len(statisticsText), 2):
+        print(''.join(word.ljust(columnWidth) for word in statisticsText[j:j+2]))
+
+    print()
