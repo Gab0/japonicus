@@ -1,5 +1,4 @@
 #!/bin/python
-import os
 import js2py
 from pathlib import Path
 
@@ -9,20 +8,7 @@ from configIndicators import cI
 
 class makeSettings():
     def __init__(self, entries):
-        '''
-        print(entries)
-        def iterate(self, DATA):
-            for W in DATA.keys():
-                if type(DATA[W]) == dict:
-                    iterate(self,DATA[W])
-                else:
-                    self.__dict__.update(DATA)
-        iterate(self,entries)
-        '''
         self.__dict__.update(entries)
-
-    def getstrat(self, name):
-        return self.strategies[name]
 
 
 def getSettings(specific=None):
@@ -41,11 +27,46 @@ def getSettings(specific=None):
             'GekkoURLs': ['http://localhost:3000'],
             'showFailedStrategies': False
         },
-        # genetic algorithm settings
-        'generations': {
+        # gekko backtest settings;
+        'backtest': {
             # show gekko verbose (strat info) - gekko must start with -d flag;
             'gekkoDebug': True,
+            # time window size on days of candlesticks for each evaluation
+            'deltaDays': 90,
 
+            # candle size for gekko backtest, in minutes
+            'candleSize': 10,
+
+            # mode of profit interpretation: v1, v2 or v3.
+            # please check the first functions at evaluation.gekko.backtest
+            # to understand what is this. has big impact on evolutionary agenda.
+            'interpreteBacktestProfit': 'v3',
+
+            # Number of candlestick data loaded simultaneously in each locale;
+            # slower EPOCHS, theoretical better evolution;
+            # seems broken. values other than 1 makes evolution worse.
+            'ParallelCandlestickDataset': 1,
+
+            # number of parallel backtests running on gekko;
+            'ParallelBacktests': 6,
+
+        },
+        'evalbreak': {
+            # number of individues selected by score on each evaluation break for each locale;
+            'NBBESTINDS': 1,
+
+            # number of individues randomly selected on each evaluation break for each locale;
+            'NBADDITIONALINDS': 4,
+
+            # show current best settings on every X epochs. (or False)
+            'evaluateSettingsPeriodically': 50,
+
+            # number of evaluations on evaluation break. for each selected individue on locales;
+            'proofSize': 12,
+
+        },
+        # genetic algorithm settings
+        'generations': {
             # Verbose single evaluation results;
             'showIndividualEvaluationInfo': False,
 
@@ -62,18 +83,6 @@ def getSettings(specific=None):
             # number of locales on parallel GA;
             'NBLOCALE': 3,
 
-            # show current best settings on every X epochs. (or False)
-            'evaluateSettingsPeriodically': 50,
-
-            # time window size on days of candlesticks for each evaluation
-            'deltaDays': 90,
-
-            # Number of candlestick data loaded simultaneously in each locale;
-            # slower EPOCHS, theoretical better evolution;
-            # seems broken. values other than 1 makes evolution worse.
-            'ParallelCandlestickDataset': 1,
-
-
             # -- Genetic Algorithm Parameters
             'cxpb': 0.8, # Probabilty of crossover 
             'mutpb': 0.2,# Probability of mutation;
@@ -83,26 +92,17 @@ def getSettings(specific=None):
             'PRoFIGA_beta': 0.005,
             'ageBoundaries': (9, 19), # minimum age to die, age when everyone dies (on EPOCHS)
 
-            'candleSize': 10, # candle size for gekko backtest, in minutes
 
-            # number of evaluations on evaluation break. for each selected individue on locales;
-            'proofSize': 12,
             # filter individuals for minimum profit (or set to None)
             'minimumProfitFilter': -15,
             # filter individuals for minimum trade count; [has heavy impact] (or set to None)
             'minimumTradeNumberFilter': 6,
-            'DRP': 70,# Date range persistence; Number of subsequent rounds
+            # filter individuals with roundtripe duration outside this range of values in hours (or set to None)
+            'averageExposureLengthFilterRange': (0, 1300),
+            # Date range persistence; Number of subsequent rounds [DEPRECATED]
+            'DRP': 70,
              # until another time range in dataset is selected;
 
-            # number of parallel backtests running on gekko;
-            'ParallelBacktests': 6,
-
-            'finaltest': {
-                # number of individues selected by score on each evaluation break for each locale;
-                'NBBESTINDS': 1,
-                # number of individues randomly selected on each evaluation break for each locale;
-                'NBADDITIONALINDS': 4,
-            },
             # chromosome settings are for -gc mode, which uses another GA internal representation mode
             # for parameter values of each individue;
             # check promoterz/representation/chromosome.py to see how it works.
@@ -121,12 +121,6 @@ def getSettings(specific=None):
             'weights': {
                 'profit': 1.0,
                 'sharpe': 0.1},
-
-            # mode of profit interpretation: v1, v2 or v3.
-            # please check the first functions at evaluation.gekko.backtest
-            # to understand what is this. has big impact on evolutionary agenda.
-            'interpreteBacktestProfit': 'v3',
-
             # after this age in epoches, locale surely explodes i.e. ends.
             'localeExpirationAge': 100,
             # chance, on each epoch, of a locale to finish [in percentage];
