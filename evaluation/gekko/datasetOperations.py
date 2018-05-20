@@ -3,8 +3,8 @@ import evaluation
 import random
 import interface
 
-class CandlestickDataset():
 
+class CandlestickDataset():
     def __init__(self, specifications, daterange):
         self.daterange = daterange
         self.specifications = specifications
@@ -22,7 +22,7 @@ class CandlestickDataset():
 
     def textSpecifications(self):
         return interface.showDatasetSpecifications(self.specifications)
-    
+
 
 def getRandomSectorOfDataset(sourceDataset, deltaDays):
 
@@ -37,11 +37,11 @@ def getRandomSectorOfDataset(sourceDataset, deltaDays):
 def getLocaleDataset(World, locale, Type='evolution'):
 
     localeDataset = []
-    for DS in range(World.genconf.ParallelCandlestickDataset):
+    for DS in range(World.backtestconf.ParallelCandlestickDataset):
         sourceDataset = random.choice(World.EnvironmentParameters['evolution'])
 
         newDataset = getRandomSectorOfDataset(sourceDataset,
-                                              World.genconf.deltaDays)
+                                              World.backtestconf.deltaDays)
         localeDataset.append(newDataset)
 
     return localeDataset
