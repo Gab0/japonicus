@@ -42,7 +42,6 @@ def standard_loop(World, locale):
     )
 
     locale.extraStats['avgExposure'] = sum([I.averageExposure for I in locale.population])/len(locale.population)
-    checkPopulation(locale.population, "Invalid fitness values!")
 
     # --send best individue to HallOfFame;
     if not locale.EPOCH % 15:
@@ -60,7 +59,7 @@ def standard_loop(World, locale):
     wpop = len(locale.population)
     locale.extraStats['nbElderDies'] = qpop - wpop
 
-
+    # INDIVIDUE FITNESS ATTRIBUTES FILTERS;
     # --remove very inapt citizens
     if World.genconf.minimumProfitFilter is not None:
         locale.extratools.filterThreshold(World.genconf.minimumProfitFilter,
@@ -68,8 +67,8 @@ def standard_loop(World, locale):
         checkPopulation(locale.population, "Population dead after profit filter.")
 
     # --remove individuals below tradecount
-    if World.genconf.minimumTradeNumberFilter is not None:
-        locale.extratools.filterTrades(World.genconf.minimumTradeNumberFilter,
+    if World.genconf.TradeNumberFilterRange is not None:
+        locale.extratools.filterTrades(World.genconf.TradeNumberFilterRange,
                                        World.genconf._lambda)
         checkPopulation(locale.population, "Population dead after trading number filter.")
 
@@ -81,6 +80,9 @@ def standard_loop(World, locale):
         )
         checkPopulation(locale.population, "Population dead after roundtrip exposure filter.")
 
+    if not locale.population:
+        locale.population = World.tools.population(World.genconf.POP_SIZE)
+        print("Repopulating... Aborting epoch.")
     # --show stats;
     statistics.showStatistics(locale)
     # --calculate new population size;
