@@ -27,7 +27,7 @@ chdir(path.dirname(path.realpath(__file__)))
 
 
 # from evolution_bayes import gekko_bayesian
-def showTitleDisclaimer():
+def showTitleDisclaimer(backtestsettings):
     TITLE = """\tGEKKO
         ██╗ █████╗ ██████╗  ██████╗ ███╗   ██╗██╗ ██████╗██╗   ██╗███████╗
         ██║██╔══██╗██╔══██╗██╔═══██╗████╗  ██║██║██╔════╝██║   ██║██╔════╝
@@ -43,7 +43,7 @@ def showTitleDisclaimer():
     print()
 
     profitDisclaimer = "The profits reported here depends on backtest interpreter function;"
-    interpreterFuncName = getSettings('generations').interpreteBacktestProfit
+    interpreterFuncName = backtestsettings['interpreteBacktestProfit']
     interpreterInfo = evaluation.gekko.backtest.getInterpreterBacktestInfo(
         interpreterFuncName)
 
@@ -75,32 +75,34 @@ def launchWebEvolutionaryInfo():
 def launchJaponicus(parser):
 
     settings = getSettings()
+
     # PARSE GENCONF & DATASET COMMANDLINE ARGUMENTS;
-    parser = promoterz.metaPromoterz.generateCommandLineArguments(
-        parser,
-        settings['generations'])
-    parser = promoterz.metaPromoterz.generateCommandLineArguments(
-        parser,
-        settings['dataset'])
+    settingSubsets = ['generations', 'dataset', 'backtest', 'evalbreak']
+    for settingSubset in settingSubsets:
+        parser = promoterz.metaPromoterz.generateCommandLineArguments(
+            parser,
+            settings[settingSubset])
+
     options, args = parser.parse_args()
-    settings['generations'] = promoterz.metaPromoterz.applyCommandLineOptionsToSettings(
-        options,
-        settings['generations']
-    )
-    settings['dataset'] = promoterz.metaPromoterz.applyCommandLineOptionsToSettings(
-        options,
-        settings['dataset'])
+    for settingSubset in settingSubsets:
+        settings[settingSubset] = promoterz.metaPromoterz.applyCommandLineOptionsToSettings(
+            options,
+            settings[settingSubset]
+        )
+
     # ABORT WHEN ILLEGAL OPTIONS ARE SET;
     if not options.genetic_algorithm and not options.bayesian_optimization:
         exit("Aborted: No operation specified.")
     if not os.path.isfile(settings['Global']['gekkoPath'] + '/gekko.js'):
         exit("Aborted: gekko.js not found on path specified @Settings.py;")
+
     # ADDITIONAL MODES;
     gekko_server = launchGekkoChildProcess() if options.spawn_gekko else None
     web_server = launchWebEvolutionaryInfo() if options.spawn_web else None
     sleep(1)
     markzero_time = datetime.datetime.now()
-    showTitleDisclaimer()
+    showTitleDisclaimer(settings['backtest'])
+
     # --SELECT STRATEGY;
     if options.random_strategy:
         Strategy = ""
@@ -117,6 +119,7 @@ def launchJaponicus(parser):
         Strategy = options.strategy
     elif not options.skeleton:
         exit("No strategy specified! Use --strat or go --help")
+
     # --LAUNCH GENETIC ALGORITHM;
     if options.genetic_algorithm:
         GenerationMethod = 'chromosome' if options.chromosome_mode else 'oldschool'
