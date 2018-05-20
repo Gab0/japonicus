@@ -45,8 +45,21 @@ def filterAwayMinimumTrades(locale, Threshold, min_nb_inds):
     populationFilter(locale, tradecountFilter, min_nb_inds)
 
 
+def filterAwayRoundtripDuration(locale, ThresholdRange, min_nb_inds):
+    def roundtripDurationFilter(ind):
+        averageExposureHours = ind.averageExposure
+        if averageExposureHours < ThresholdRange[0]:
+            return False
+        elif averageExposureHours > ThresholdRange[1]:
+            return False
+        else:
+            return True
+
+    populationFilter(locale, roundtripDurationFilter, min_nb_inds)
+
+
 def populationFilter(locale, filterFunction, min_nb_inds):
-    
+
     newPopulation = [
         ind for ind in locale.population if filterFunction(ind)
     ]
@@ -81,6 +94,7 @@ def getLocaleEvolutionToolbox(World, locale):
     toolbox.register("ImmigrateRandom", immigrateRandom, World.tools.population)
     toolbox.register("filterThreshold", filterAwayThreshold, locale)
     toolbox.register("filterTrades", filterAwayMinimumTrades, locale)
+    toolbox.register("filterExposure", filterAwayRoundtripDuration, locale)
     toolbox.register('ageZero', promoterz.supplement.age.ageZero)
     toolbox.register(
         'populationAges',
@@ -97,7 +111,7 @@ def getLocaleEvolutionToolbox(World, locale):
 
 
 def getGlobalToolbox(representationModule):
-    # GLOBAL FUNCTION TO GET GLOBAL TBX UNDER DEVELOPMENT (ITS COMPLICATED);
+    # GLOBAL FUNCTION TO GET GLOBAL TBX UNDER DEVELOPMENT;
     toolbox = base.Toolbox()
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create(
