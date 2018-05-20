@@ -16,6 +16,7 @@ def showIndividue(evaldata):
 def applyEvaluationResultToIndividue(result, individue):
     individue.fitness.values = (result['relativeProfit'], result['sharpe'])
     individue.trades = result['trades']
+    individue.averageExposure = result['averageExposure'] / 3600000
 
 
 class EvaluationPool():
