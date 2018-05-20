@@ -30,7 +30,7 @@ def getSettings(specific=None):
         # gekko backtest settings;
         'backtest': {
             # show gekko verbose (strat info) - gekko must start with -d flag;
-            'gekkoDebug': True,
+            'gekkoDebug': False,
             # time window size on days of candlesticks for each evaluation
             'deltaDays': 90,
 
@@ -96,9 +96,9 @@ def getSettings(specific=None):
             # filter individuals for minimum profit (or set to None)
             'minimumProfitFilter': -15,
             # filter individuals for minimum trade count; [has heavy impact] (or set to None)
-            'minimumTradeNumberFilter': 6,
+            'TradeNumberFilterRange': (6, 300),
             # filter individuals with roundtripe duration outside this range of values in hours (or set to None)
-            'averageExposureLengthFilterRange': (0, 1300),
+            'averageExposureLengthFilterRange': (0, 300),
             # Date range persistence; Number of subsequent rounds [DEPRECATED]
             'DRP': 70,
              # until another time range in dataset is selected;
