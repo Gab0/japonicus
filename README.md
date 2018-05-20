@@ -28,14 +28,17 @@ This somewhat corresponds to `--skeleton` mode of japonicus, which lets the GA s
 The changelog is important for the user as following modifications can cause bugs on related areas. Please report 'em ;)
 
 ```
-v0.70 (develop branch)
+v0.70 (stable&develop branch)
 
 - log folder restructured
 - configStrategies.py DEPRECATED; use only TOML parameters at the folder strategy_parameters.
     check TOML special syntax for parameter ranges at the wiki
 - GA benchmark mode added
+- Settings.py refactor
+- Roundtrip exposure time filter
 
-v0.58 (stable branch)
+
+v0.58
 
 - runs in Windows (not confirmed)
 - Settings parameters can be passed on command line (check the --help)
