@@ -13,8 +13,6 @@ from copy import deepcopy
 import resultInterface
 import interface
 
-import promoterz.sequence.standard_loop
-
 from deap import tools
 from deap import algorithms
 from deap import base
@@ -102,11 +100,15 @@ def grabDatasets(datasetconf):
 def gekko_generations(
         TargetParameters, GenerationMethod, EvaluationMode, settings,
         options, web=None):
+
     # --LOAD SETTINGS;
     genconf = makeSettings(settings['generations'])
     globalconf = makeSettings(settings['Global'])
     datasetconf = makeSettings(settings['dataset'])
     indicatorconf = makeSettings(settings['indicators'])
+    backtestconf = makeSettings(settings['backtest'])
+    evalbreakconf = makeSettings(settings['evalbreak'])
+
     # --APPLY COMMAND LINE GENCONF SETTINGS;
     for parameter in genconf.__dict__.keys():
         if parameter in options.__dict__.keys():
@@ -158,9 +160,11 @@ def gekko_generations(
     else:
         logfilename = "benchmark%s" % todayDate
     Logger = promoterz.logger.Logger(logfilename)
+
     # --PRINT RUNTIME ARGS TO LOG HEADER;
     ARGS = ' '.join(sys.argv)
     Logger.log(ARGS, target='Header')
+
     # --SHOW PARAMETER INFO;
     if Strategy:
         Logger.log("Evolving %s strategy;\n" % Strategy)
@@ -170,9 +174,11 @@ def gekko_generations(
             "%s%s%s\n" % (k, " " * (30 - len(k)), TargetParameters[k]),
             target="Header"
         )
+
     # --LOG CONFIG INFO;
     configInfo = json.dumps(genconf.__dict__, indent=4)
     Logger.log(configInfo, target="Header", show=False)
+
     # --SHOW DATASET INFO;
     for evolutionDataset in evolutionDatasets:
         Logger.log(
@@ -185,25 +191,29 @@ def gekko_generations(
                 interface.parseDatasetInfo("evaluation", evaluationDataset),
                 target="Header"
             )
+
     # --INITIALIZE WORLD WITH CANDLESTICK DATASET INFO; HERE THE GA KICKS IN;
     GlobalTools.register('Evaluate', Evaluate,
-                         GlobalTools.constructPhenotype, genconf)
+                         GlobalTools.constructPhenotype, backtestconf)
 
     # --THIS LOADS A DATERANGE FOR A LOCALE;
     if options.benchmarkMode:
         def onInitLocale(World, locale):
-            locale.Dataset = [CandlestickDataset({},{'from':0,'to':0})]
+            locale.Dataset = [
+                CandlestickDataset({},
+                                   {
+                                       'from': 0,
+                                       'to':0
+                                   })]
     else:
         def onInitLocale(World, locale):
             locale.Dataset = getLocaleDataset(World, locale)
-
 
     loops = [promoterz.sequence.standard_loop.standard_loop]
     World = promoterz.world.World(
         GlobalTools,
         loops,
         genconf,
-        globalconf,
         TargetParameters,
         EnvironmentParameters={
             'evolution':  evolutionDatasets,
@@ -214,15 +224,33 @@ def gekko_generations(
     )
     World.logger = Logger
     World.EvaluationStatistics = []
+
+    World.backtestconf = backtestconf
+    World.evalbreakconf = evalbreakconf
+    World.globalconf = globalconf
     World.logger.updateFile()
+
+    # INITALIZE EVALUATION PROCESSING POOL
+    World.parallel = promoterz.evaluationPool.EvaluationPool(
+            World.tools.Evaluate,
+            globalconf.GekkoURLs,
+            backtestconf.ParallelBacktests,
+            genconf.showIndividualEvaluationInfo,
+        )
+
+    # --GENERATE INITIAL LOCALES;
+    for l in range(genconf.NBLOCALE):
+        World.generateLocale()
+
     # --RUN EPOCHES;
     while World.EPOCH < World.genconf.NBEPOCH:
         World.runEPOCH()
-        if genconf.evaluateSettingsPeriodically and not options.benchmarkMode:
-            if not World.EPOCH % genconf.evaluateSettingsPeriodically:
+        if evalbreakconf.evaluateSettingsPeriodically and not options.benchmarkMode:
+            if not World.EPOCH % evalbreakconf.evaluateSettingsPeriodically:
                 resultInterface.showResults(World)
         if not World.EPOCH % 10:
             print("Total Evaluations: %i" % World.totalEvaluations)
+
     # RUN ENDS. SELECT INDIVIDUE, LOG AND PRINT STUFF;
     # FinalBestScores.append(Stats['max'])
     print(World.EnvironmentParameters)
