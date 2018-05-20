@@ -40,8 +40,15 @@ def filterAwayThreshold(locale, Threshold, min_nb_inds):
     populationFilter(locale, thresholdFilter, min_nb_inds)
 
 
-def filterAwayMinimumTrades(locale, Threshold, min_nb_inds):
-    tradecountFilter = lambda ind: ind.trades > Threshold
+def filterAwayTradeCounts(locale, ThresholdRange, min_nb_inds):
+    def tradecountFilter(ind):
+        if ind.trades < ThresholdRange[0]:
+            return False
+        elif ind.trades > ThresholdRange[1]:
+            return False
+        else:
+            return True
+
     populationFilter(locale, tradecountFilter, min_nb_inds)
 
 
@@ -64,7 +71,7 @@ def populationFilter(locale, filterFunction, min_nb_inds):
         ind for ind in locale.population if filterFunction(ind)
     ]
     removed = [ind for ind in locale.population if ind not in newPopulation]
-    
+
     NBreturn = min(min_nb_inds - len(locale.population),
                           min_nb_inds)
     NBreturn = max(0, NBreturn)
@@ -93,7 +100,7 @@ def getLocaleEvolutionToolbox(World, locale):
     toolbox.register("ImmigrateHoF", immigrateHoF, locale.HallOfFame)
     toolbox.register("ImmigrateRandom", immigrateRandom, World.tools.population)
     toolbox.register("filterThreshold", filterAwayThreshold, locale)
-    toolbox.register("filterTrades", filterAwayMinimumTrades, locale)
+    toolbox.register("filterTrades", filterAwayTradeCounts, locale)
     toolbox.register("filterExposure", filterAwayRoundtripDuration, locale)
     toolbox.register('ageZero', promoterz.supplement.age.ageZero)
     toolbox.register(
