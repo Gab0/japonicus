@@ -107,5 +107,6 @@ def Evaluate(genconf, phenotype):
     return {
         'relativeProfit': result,
         'sharpe': 0,
-        'trades': 25
+        'trades': 25,
+        'averageExposure': 0
     }
