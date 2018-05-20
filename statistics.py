@@ -53,9 +53,9 @@ def showStatistics(locale):
         SVAL = Stats[SNAME]
         currentStatisticsText = "%s" % epochStatisticsNames[SNAME]
         if not SVAL % 1:
-            currentStatisticsText += " %i\t" % SVAL
+            currentStatisticsText += " %i" % SVAL
         else:
-            currentStatisticsText += " %.3f\t" % SVAL
+            currentStatisticsText += " %.3f" % SVAL
         statisticsText.append(currentStatisticsText)
 
     columnWidth = max([len(STXT) for STXT in statisticsText]) + 3
