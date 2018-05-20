@@ -8,7 +8,9 @@ epochStatisticsNames = {
     'size': 'Population size',
     'maxsize': 'Max population size',
     'avgTrades': 'Avg trade number',
-    'sharpe': 'Avg sharpe ratio'
+    'sharpe': 'Avg sharpe ratio',
+    'avgExposure': "Avg exposure time",
+    'nbElderDies': 'Elder dies count'
 }
 
 periodicStatisticsNames = {
