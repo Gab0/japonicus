@@ -53,7 +53,7 @@ def evalSchwefel(parameters):
     return -Result
 
 
-def evalFunctionFour(parameters):
+def evalQuartic(parameters):
     Result = 0
     for w in range(30):
         W = w + 1
@@ -95,7 +95,7 @@ def Evaluate(genconf, phenotype):
     parameters = [parameters[N] for N in sorted(list(parameters.keys()))]
 
     evalFunctions = {
-        'functionfour': evalFunctionFour,
+        'quartic': evalQuartic,
         'foxhole': evalFoxHole,
         'schwefel': evalSchwefel,
         'rastrigin': evalRastrigin,
