@@ -11,7 +11,6 @@ from .. import evolutionHooks
 def checkPopulation(population, message):
     if not (len(population)):
         print(message)
-        raise RuntimeError
 
 
 def standard_loop(World, locale):
@@ -23,6 +22,7 @@ def standard_loop(World, locale):
     locale.population = promoterz.validation.validatePopulation(
         World.tools.constructPhenotype, World.TargetParameters, locale.population
     )
+
     # --remove equal citizens before evaluation for efficency
     nonevaluated = [ind for ind in locale.population if not ind.fitness.valid]
     Lu = len(nonevaluated)
@@ -33,18 +33,23 @@ def standard_loop(World, locale):
     locale.population = [
         ind for ind in locale.population if ind.fitness.valid
     ] + remains
+
     # --evaluate individuals;
     locale.extraStats['nb_evaluated'], locale.extraStats[
         'avgTrades'
     ] = World.parallel.evaluatePopulation(
         locale
     )
+
+    locale.extraStats['avgExposure'] = sum([I.averageExposure for I in locale.population])/len(locale.population)
     checkPopulation(locale.population, "Invalid fitness values!")
+
     # --send best individue to HallOfFame;
     if not locale.EPOCH % 15:
         BestSetting = tools.selBest(locale.population, 1)[0]
         locale.HallOfFame.insert(BestSetting)
     assert (sum([x.fitness.valid for x in locale.population]) == len(locale.population))
+
     # --compile stats;
     statistics.compileStats(locale)
     # --population ages
@@ -53,10 +58,13 @@ def standard_loop(World, locale):
         locale.population, locale.EvolutionStatistics[locale.EPOCH]
     )
     wpop = len(locale.population)
-    locale.extraStats['elder'] = qpop - wpop
+    locale.extraStats['nbElderDies'] = qpop - wpop
+
+
     # --remove very inapt citizens
     if World.genconf.minimumProfitFilter is not None:
-        locale.extratools.filterThreshold(World.genconf.minimumProfitFilter, World.genconf._lambda)
+        locale.extratools.filterThreshold(World.genconf.minimumProfitFilter,
+                                          World.genconf._lambda)
         checkPopulation(locale.population, "Population dead after profit filter.")
 
     # --remove individuals below tradecount
@@ -65,8 +73,16 @@ def standard_loop(World, locale):
                                        World.genconf._lambda)
         checkPopulation(locale.population, "Population dead after trading number filter.")
 
+    # --remove individues based on average roundtripe exposure time;
+    if World.genconf.averageExposureLengthFilterRange is not None:
+        locale.extratools.filterExposure(
+            World.genconf.averageExposureLengthFilterRange,
+            World.genconf._lambda
+        )
+        checkPopulation(locale.population, "Population dead after roundtrip exposure filter.")
+
     # --show stats;
-    statistics.showStats(locale)
+    statistics.showStatistics(locale)
     # --calculate new population size;
     if locale.EPOCH:
         PRoFIGA = promoterz.supplement.PRoFIGA.calculatePRoFIGA(
@@ -111,11 +127,5 @@ def standard_loop(World, locale):
     if random.random() < 0.5:
         locale.population = locale.extratools.ImmigrateRandom((2, 7), locale.population)
     assert (len(locale.population))
-    '''
-    if FirstEpochOfDataset:
-        InitialBestScores.append(Stats['max'])
-        Stats['dateRange'] = "%s ~ %s" % (locale.DateRange['from'], locale.DateRange['to'])
-    else:
-        Stats['dateRange'] = None
-    '''
+
     assert (None not in locale.population)
