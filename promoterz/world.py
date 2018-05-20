@@ -2,45 +2,36 @@
 import random
 import promoterz.locale
 import time
-from promoterz.sequence.parallel_world import *
 from functools import partial
+
+import promoterz.sequence.parallel_world
 
 
 class World():
 
     def __init__(
-        self,
-        GlobalTools,
-        loops,
-        genconf,
-        globalconf,
-        TargetParameters,
-        EnvironmentParameters=None,
-        onInitLocale=None,
-        web=None,
+            self,
+            GlobalTools=None,
+            loops=None,
+            genconf=None,
+            TargetParameters=None,
+            EnvironmentParameters=None,
+            onInitLocale=None,
+            web=None,
     ):
         self.tools = GlobalTools
         self.loops = loops
         self.EPOCH = 0
         self.locales = []
         self.size = [500, 500]
-        self.maxdistance = calculateDistance([0, 0], self.size)
+        self.maxdistance = promoterz.sequence.parallel_world.calculateDistance([0, 0], self.size)
         self.localeID = 1
         self.TargetParameters = TargetParameters
         self.genconf = genconf
-        self.globalconf = globalconf
         self.EnvironmentParameters = EnvironmentParameters
-        self.runEPOCH = partial(world_EPOCH, self)
-        self.parallel = promoterz.evaluationPool.EvaluationPool(
-            self.tools.Evaluate,
-            globalconf.GekkoURLs,
-            genconf.ParallelBacktests,
-            genconf.showIndividualEvaluationInfo,
-        )
+        self.runEPOCH = partial(promoterz.sequence.parallel_world.world_EPOCH, self)
         self.onInitLocale = onInitLocale
         self.web = web
-        for l in range(genconf.NBLOCALE):
-            self.generateLocale()
         self.totalEvaluations = 0
 
     def generateLocale(self):
@@ -77,7 +68,8 @@ class World():
                 T.tempdist = 0
                 continue
 
-            distance = calculateDistance(locale.position, T.position)
+            distance = promoterz.sequence.parallel_world.calculateDistance(
+                locale.position, T.position)
             T.tempdist = distance
             totaldistance += distance
         for T in self.locales:
