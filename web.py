@@ -42,8 +42,8 @@ def update_graph(GraphName, Statistics):
     statisticsNames.update(epochStatisticsNames)
     statisticsNames.update(periodicStatisticsNames)
 
-    for W in range(len(df['dateRange'])):
-        if 'dateRange' in df.keys():
+    if 'dateRange' in df.keys():
+        for W in range(len(df['dateRange'])):
             DR = df['dateRange'][W]
 
             if DR != None:
