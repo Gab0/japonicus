@@ -6,6 +6,7 @@ import datetime
 import sys
 
 import promoterz
+import promoterz.sequence.standard_loop
 import evaluation
 
 from copy import deepcopy
