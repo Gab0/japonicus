@@ -24,6 +24,7 @@ def getInterpreterBacktestInfo(v):
         'v2': "<shown profit> = <backtest profit> - <market profit>",
         'v3': "\nif <backtest profit> > 0: <shown profit> = <backtest profit> - <market profit> \nelse <shown profit> = <backtest profit> "
 }
+
     return "interpreter %s: " % v + info[v]
 
 
@@ -47,13 +48,18 @@ def runBacktest(
         print(Dataset.specifications)
         # That fail is so rare that has no impact.. still happens randomly;
         return {
-            'relativeProfit': 0, 'market': 0, 'trades': 0, 'sharpe': 0
+            'relativeProfit': 0, 'market': 0, 'trades': 0,
+            'sharpe': 0, 'roundtrips': []
         }  # fake backtest report
 
     # rProfit = result['report']['relativeProfit']
-    #nbTransactions = result['report']['trades']
-    #market = result['report']['market']
-    return result['report']
+    # nbTransactions = result['report']['trades']
+    # market = result['report']['market']
+    backtestResult = result['report']
+    if 'roundtrips' in result.keys():
+        backtestResult['roundtrips'] = result['roundtrips']
+
+    return backtestResult
 
 
 def Evaluate(genconf, Datasets, phenotype, GekkoInstanceUrl):
@@ -80,13 +86,28 @@ def Evaluate(genconf, Datasets, phenotype, GekkoInstanceUrl):
     mRelativeProfit = sum(RelativeProfits) / len(RelativeProfits)
     avgSharpe = sum([R['sharpe'] for R in result if R['sharpe']])
     avgSharpe = avgSharpe / len(Datasets)
-    return {'relativeProfit': mRelativeProfit,
-            'sharpe': avgSharpe,
-            'trades': avgTrades}
+
+    # --CALCULATE EXPOSURE DURATIONS;
+    for R in result:
+        R['totalExposure'] = 0
+        R['averageExposure'] = 0
+        if 'roundtrips' in R.keys():
+            for roundtrip in R['roundtrips']:
+                R['totalExposure'] += roundtrip['duration']
+            R['averageExposure'] = R['totalExposure'] / len(R['roundtrips']) if len(R['roundtrips']) else 0
+
+    avgExposure = sum(R['averageExposure'] for R in result) / len(Datasets)
+    return {
+        'relativeProfit': mRelativeProfit,
+        'sharpe': avgSharpe,
+        'trades': avgTrades,
+        'averageExposure': avgExposure
+    }
 
 
 def createConfig(
-    TradeSetting, Database, DateRange, candleSize=10, gekko_config=None, Debug=False
+        TradeSetting, Database, DateRange,
+        candleSize=10, gekko_config=None, Debug=False
 ):
     TradeMethod = list(TradeSetting.keys())[0]
     CONFIG = {
@@ -121,10 +142,12 @@ def createConfig(
             ],
             "indicatorResults": True,
             "report": True,
-            "roundtrips": False,
+            "roundtrips": True,
             "trades": True,
         },
     }
+
     if gekko_config == None:
         gekko_config = CONFIG
+
     return gekko_config
