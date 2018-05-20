@@ -62,7 +62,7 @@ def runBacktest(
     return backtestResult
 
 
-def Evaluate(genconf, Datasets, phenotype, GekkoInstanceUrl):
+def Evaluate(backtestconf, Datasets, phenotype, GekkoInstanceUrl):
     # IndividualToSettings(IND, STRAT) is a function that depends on GA algorithm,
     # so should be provided;
     result = [
@@ -70,8 +70,8 @@ def Evaluate(genconf, Datasets, phenotype, GekkoInstanceUrl):
             GekkoInstanceUrl,
             phenotype,
             Dataset,
-            candleSize=genconf.candleSize,
-            Debug=genconf.gekkoDebug,
+            candleSize=backtestconf.candleSize,
+            Debug=backtestconf.gekkoDebug,
         )
         for Dataset in Datasets
     ]
@@ -81,7 +81,7 @@ def Evaluate(genconf, Datasets, phenotype, GekkoInstanceUrl):
         'v3': interpreteBacktestProfitv3,
     }
     # --INTERPRETE BACKTEST RESULT;
-    RelativeProfits = [interpreter[genconf.interpreteBacktestProfit](R) for R in result]
+    RelativeProfits = [interpreter[backtestconf.interpreteBacktestProfit](R) for R in result]
     avgTrades = sum([R['trades'] for R in result]) / len(Datasets)
     mRelativeProfit = sum(RelativeProfits) / len(RelativeProfits)
     avgSharpe = sum([R['sharpe'] for R in result if R['sharpe']])
