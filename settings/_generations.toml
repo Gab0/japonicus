@@ -24,6 +24,10 @@ _lambda = 14# size of offspring generated per epoch;
 PRoFIGA_beta = 0.005
 ageBoundaries = [9, 19] # minimum age to die age when everyone dies (on EPOCHS)
 
+# after this age in epoches locale surely explodes i.e. ends.
+localeExpirationAge = 100
+# chance on each epoch of a locale to finish [in percentage];
+localeExplodeChance = 2
 
 # filter individuals for minimum profit (or set to None)
 minimumProfitFilter = -15
@@ -55,10 +59,7 @@ Density = 2
 profit = 1.0
 sharpe = 0.1
 
-# after this age in epoches locale surely explodes i.e. ends.
-localeExpirationAge = 100
-# chance on each epoch of a locale to finish [in percentage];
-localeExplodeChance = 2
+
 
 
 
