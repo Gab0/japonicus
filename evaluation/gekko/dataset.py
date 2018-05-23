@@ -5,16 +5,14 @@ from Settings import getSettings
 from .API import httpPost
 
 
-def getAllScanset():
-    globalconf = getSettings('Global')
-    base = random.choice(globalconf.GekkoURLs)
-    URL = base + '/api/scansets'
+def getAllScanset(GekkoURL):
+    URL = GekkoURL + '/api/scansets'
     RESP = httpPost(URL)
     return RESP['datasets']
 
 
-def selectCandlestickData(exchange_source=None, avoidCurrency=None):
-    DataSetPack = getAllScanset()
+def selectCandlestickData(GekkoURL, exchange_source=None, avoidCurrency=None):
+    DataSetPack = getAllScanset(GekkoURL)
     specKeys = ['exchange', 'currency', 'asset']
     scanset = []
 
