@@ -1,5 +1,4 @@
 #!/bin/python
-import sys
 import japonicus_halt
 
 from time import sleep
@@ -8,22 +7,21 @@ from subprocess import Popen, PIPE
 from threading import Thread
 from Settings import getSettings
 from evolution_generations import gekko_generations
+from japonicus_options import parser
 
 import TOMLutils
 
 import datetime
-from os import chdir, path, listdir
+import os
 
-
-from japonicus_options import parser
 import web
 import promoterz
 from version import VERSION
-import os
 import evaluation
-settings = getSettings()
 
-chdir(path.dirname(path.realpath(__file__)))
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
+print(">%s" % os.getcwd())
 
 
 # from evolution_bayes import gekko_bayesian
@@ -47,10 +45,10 @@ def showTitleDisclaimer(backtestsettings):
     interpreterInfo = evaluation.gekko.backtest.getInterpreterBacktestInfo(
         interpreterFuncName)
 
-    print("%s \n\t%s" % ( profitDisclaimer, interpreterInfo ))
+    print("%s \n\t%s" % (profitDisclaimer, interpreterInfo))
 
 
-def launchGekkoChildProcess():
+def launchGekkoChildProcess(settings):
     gekko_args = [
         'node',
         '--max-old-space-size=8192',
@@ -62,7 +60,7 @@ def launchGekkoChildProcess():
 
 def launchWebEvolutionaryInfo():
     # web_args = ['python', 'web.py']
-    #web_server = Popen(web_args, stdin=PIPE, stdout=PIPE)
+    # web_server = Popen(web_args, stdin=PIPE, stdout=PIPE)
     print("WEBSERVER MODE")
     webServer = web.run_server()
     webServerProcess = Thread(
@@ -97,7 +95,7 @@ def launchJaponicus(parser):
         exit("Aborted: gekko.js not found on path specified @Settings.py;")
 
     # ADDITIONAL MODES;
-    gekko_server = launchGekkoChildProcess() if options.spawn_gekko else None
+    gekko_server = launchGekkoChildProcess(settings) if options.spawn_gekko else None
     web_server = launchWebEvolutionaryInfo() if options.spawn_web else None
     sleep(1)
     markzero_time = datetime.datetime.now()
@@ -106,7 +104,7 @@ def launchJaponicus(parser):
     # --SELECT STRATEGY;
     if options.random_strategy:
         Strategy = ""
-        GekkoStrategyFolder = listdir(settings['Global']['gekkoPath'] + '/strategies')
+        GekkoStrategyFolder = os.listdir(settings['Global']['gekkoPath'] + '/strategies')
         while Strategy + '.js' not in GekkoStrategyFolder:
             if Strategy:
                 print(
