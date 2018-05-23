@@ -19,8 +19,8 @@ def selectCandlestickData(exchange_source=None, avoidCurrency=None):
     scanset = []
 
     # IF EXCHANGE SPECIFICATIONS ARE TO BRE IGNORED;
-    if 'ignore&autoselect' in exchange_source.keys():
-        if exchange_source['ignore&autoselect']:
+    if 'autoselect' in exchange_source.keys():
+        if exchange_source['autoselect']:
             exchange_source = None
     # SEARCH CANDIDATE DATASETS AMONG THOSE OBTAINED FROM GEKKO API;
     for s in DataSetPack:
