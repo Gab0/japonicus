@@ -63,7 +63,7 @@ def benchmarkEvaluate(constructPhenotype, genconf, Datasets, Individual, gekkoUr
     return SCORE
 
 
-def grabDatasets(datasetconf):
+def grabDatasets(datasetconf, GekkoURL):
     # CHECK HOW MANY EVOLUTION DATASETS ARE SPECIFIED AT SETTINGS;
     evolutionDatasetNames = ['dataset_source']
     evolutionDatasets = []
@@ -73,7 +73,7 @@ def grabDatasets(datasetconf):
             evolutionDatasetNames.append(datasetConfigName)
     # --GRAB PRIMARY (EVOLUTION) DATASETS
     for evolutionDatasetName in evolutionDatasetNames:
-        D = evaluation.gekko.dataset.selectCandlestickData(
+        D = evaluation.gekko.dataset.selectCandlestickData(GekkoURL,
             exchange_source=datasetconf.__dict__[evolutionDatasetName]
         )
         evolutionDatasets.append(CandlestickDataset(*D))
@@ -84,7 +84,7 @@ def grabDatasets(datasetconf):
 
     # --GRAB SECONDARY (EVALUATION) DATASET
     try:
-        D = evaluation.gekko.dataset.selectCandlestickData(
+        D = evaluation.gekko.dataset.selectCandlestickData(GekkoURL,
             exchange_source=datasetconf.eval_dataset_source,
             avoidCurrency=evolutionDatasets[0].specifications['asset'],
         )
@@ -103,7 +103,7 @@ def gekko_generations(
 
     # --LOAD SETTINGS;
     genconf = makeSettings(settings['generations'])
-    globalconf = makeSettings(settings['Global'])
+    globalconf = makeSettings(settings['global'])
     datasetconf = makeSettings(settings['dataset'])
     indicatorconf = makeSettings(settings['indicators'])
     backtestconf = makeSettings(settings['backtest'])
@@ -131,7 +131,7 @@ def gekko_generations(
             genconf.minimumProfitFilter = None
         else:
             Evaluate = standardEvaluate
-            evolutionDatasets, evaluationDatasets = grabDatasets(datasetconf)
+            evolutionDatasets, evaluationDatasets = grabDatasets(datasetconf, globalconf.GekkoURLs[0])
 
     # -- PARSE TARGET PARAMETERS
     TargetParameters = promoterz.parameterOperations.flattenParameters(TargetParameters)
