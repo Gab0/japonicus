@@ -1,0 +1,12 @@
+# number of individues selected by score on each evaluation break for each locale;
+NBBESTINDS = 1
+# number of individues randomly selected on each evaluation break for each locale;
+NBADDITIONALINDS = 4
+
+# show current best settings on every X epochs. (or False)
+evaluateSettingsPeriodically = 50
+
+# number of evaluations on evaluation break. for each selected individue on locales;
+proofSize = 12
+
+

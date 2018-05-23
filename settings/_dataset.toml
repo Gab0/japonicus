@@ -1,0 +1,29 @@
+# span in days from the end of dataset to the beggining. Or zero.
+# (to restrain length);
+dataset_span = 0
+# span for evaluation dataset. same scheme.
+eval_dataset_span = 0
+
+
+# -- Gekko Dataset Settings
+# in order to enable dataset selection, turn off autoselect entry;
+[dataset_source]
+autoselect = true
+exchange = 'kraken'
+currency = 'USD'
+asset = 'LTC'
+
+[dataset_source2]
+autoselect = true
+exchange = 'kraken'
+currency = 'USD'
+asset = 'LTC'
+
+[eval_dataset_source]
+autoselect = true
+exchange = 'kraken'
+currency = 'USD'
+asset = 'LTC'
+
+
+

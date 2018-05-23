@@ -1,0 +1,64 @@
+
+# Verbose single evaluation results;
+showIndividualEvaluationInfo = false
+
+# if parameter is set to value rather than tuple limits at settings make the value
+# a tuple based on chosen spread value (percents); value = 10 --spread=50-->  value = (515)
+parameter_spread  = 60
+
+# Initial population size per locale
+POP_SIZE = 30
+
+# number of epochs to run
+NBEPOCH = 800
+
+# number of locales on parallel GA;
+NBLOCALE = 3
+
+# -- Genetic Algorithm Parameters
+cxpb = 0.8 # Probabilty of crossover 
+mutpb = 0.2# Probability of mutation;
+_lambda = 14# size of offspring generated per epoch;
+
+# weight of PRoFIGA calculations on variability of population size
+PRoFIGA_beta = 0.005
+ageBoundaries = [9, 19] # minimum age to die age when everyone dies (on EPOCHS)
+
+
+# filter individuals for minimum profit (or set to None)
+minimumProfitFilter = -15
+# filter individuals for minimum trade count; [has heavy impact] (or set to None)
+TradeNumberFilterRange = [6, 300]
+# filter individuals with roundtripe duration outside this range of values in hours (or set to None)
+averageExposureLengthFilterRange = [0, 300]
+# Date range persistence; Number of subsequent rounds [DEPRECATED]
+DRP = 70
+# until another time range in dataset is selected;
+
+# chromosome settings are for -gc mode which uses another GA internal representation mode
+# for parameter values of each individue;
+# check promoterz/representation/chromosome.py to see how it works.
+# both parameters interact with crossover probability AKA cxpb;
+# practical effects on evolution are really uknown;
+[chromosome]
+# length of the representation for each parameter. largers sizes should mantain
+# evolutionary dynamics for parameters with proportional larger ranges;
+GeneSize = 3
+# number of parameters represented by each cromosome;
+# this should mantain evolutionary dynamics for strategies with proportional larger
+# parameter counts;
+Density = 2
+
+
+# weights to score each individual self explanatory;
+[weights]
+profit = 1.0
+sharpe = 0.1
+
+# after this age in epoches locale surely explodes i.e. ends.
+localeExpirationAge = 100
+# chance on each epoch of a locale to finish [in percentage];
+localeExplodeChance = 2
+
+
+
