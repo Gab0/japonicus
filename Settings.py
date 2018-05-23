@@ -9,34 +9,26 @@ import os
 import pytoml
 
 
-class makeSettings():
+class makeSettings(dict):
     def __init__(self, entries):
+        for K in entries.keys():
+            if type(entries[K]) == dict:
+                entries[K] = makeSettings(entries[K])
         self.__dict__.update(entries)
+        self.update(entries)
 
 
 def getSettings(specific=None):
     HOME = str(Path.home())
 
     s = {
-        'Global': {
-            'gekkoPath': HOME+'/gekko',
-            'configFilename': 'example-config.js',
-            'log_name': 'evolution_gen.csv',
-
-            # Hosts list of remote machines running gekko, to distribute evaluation load;
-            # option values: path to HOSTS file list OR False;
-            'RemoteAWS': '../AmazonSetup/hosts',
-
-            # Your gekko local URL - CHECK THIS!
-            'GekkoURLs': ['http://localhost:3000'],
-            'showFailedStrategies': False
-        },
+        # gekko global settings;
         'global': loadTomlSettings('global'),
         # gekko backtest settings;
         'backtest': loadTomlSettings('backtest'),
         # evaluation break settings;
         'evalbreak': loadTomlSettings('evalbreak'),
-        # genetic algorithm settings
+        # genetic algorithm settings;
         'generations': loadTomlSettings('generations'),
 
 
@@ -109,10 +101,7 @@ def loadTomlSettings(settingsDivisionName):
     ]
     for targetFile in userSettingsAndDefaultSettings:
         filePath = os.path.join('settings', targetFile)
-        print(os.listdir('settings'))
-        print(filePath)
         if os.path.isfile(filePath):
-            print(filePath)
             Settings = pytoml.load(open(filePath))
             return Settings
 
