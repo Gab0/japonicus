@@ -11,17 +11,6 @@ import dash_core_components as dcc
 import dash_html_components as html
 from flask_caching import Cache
 from evaluation.gekko.statistics import epochStatisticsNames, periodicStatisticsNames
-import Settings
-
-gsettings = Settings.getSettings()['Global']
-settings = Settings.getSettings()['bayesian']
-
-
-def load_evolution_logs(filename=None):
-    FileList = os.listdir(gsettings["save_dir"])
-    filename = os.path.join(gsettings["save_dir"], filename)
-    df = pd.read_csv(filename, names=columns)
-    return df
 
 
 def update_graph(GraphName, Statistics):
