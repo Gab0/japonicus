@@ -21,8 +21,6 @@ import evaluation
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-print(">%s" % os.getcwd())
-
 
 # from evolution_bayes import gekko_bayesian
 def showTitleDisclaimer(backtestsettings):
@@ -52,7 +50,7 @@ def launchGekkoChildProcess(settings):
     gekko_args = [
         'node',
         '--max-old-space-size=8192',
-        settings['Global']['gekkoPath'] + '/web/server.js',
+        settings['global']['gekkoPath'] + '/web/server.js',
     ]
     gekko_server = Popen(gekko_args, stdin=PIPE, stdout=PIPE)
     return gekko_server
@@ -91,7 +89,7 @@ def launchJaponicus(parser):
     # ABORT WHEN ILLEGAL OPTIONS ARE SET;
     if not options.genetic_algorithm and not options.bayesian_optimization:
         exit("Aborted: No operation specified.")
-    if not os.path.isfile(settings['Global']['gekkoPath'] + '/gekko.js'):
+    if not os.path.isfile(settings['global']['gekkoPath'] + '/gekko.js'):
         exit("Aborted: gekko.js not found on path specified @Settings.py;")
 
     # ADDITIONAL MODES;
@@ -104,7 +102,7 @@ def launchJaponicus(parser):
     # --SELECT STRATEGY;
     if options.random_strategy:
         Strategy = ""
-        GekkoStrategyFolder = os.listdir(settings['Global']['gekkoPath'] + '/strategies')
+        GekkoStrategyFolder = os.listdir(settings['global']['gekkoPath'] + '/strategies')
         while Strategy + '.js' not in GekkoStrategyFolder:
             if Strategy:
                 print(
