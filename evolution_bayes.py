@@ -28,7 +28,7 @@ from japonicus_options import parser
 options, args = parser.parse_args()
 
 dict_merge = lambda a, b: a.update(b) or a
-gsettings = getSettings()['Global']
+gsettings = getSettings()['global']
 # Fix the shit below!
 settings = getSettings()['bayesian']
 bayesconf = getSettings('bayesian')
