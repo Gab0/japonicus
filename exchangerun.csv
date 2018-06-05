@@ -1,0 +1,8 @@
+EXCHANGE,CURRENCY,ASSET,STRATEGY
+binance,usdt,btc,RSI_BULL_BEAR_ADX
+binance,usdt,bcc,RSI_BULL_BEAR_ADX
+binance,usdt,ltc,RSI_BULL_BEAR_ADX
+binance,usdt,neo,RSI_BULL_BEAR_ADX
+binance,usdt,qtum,RSI_BULL_BEAR_ADX
+binance,usdt,bnb,RSI_BULL_BEAR_ADX
+binance,usdt,eth,RSI_BULL_BEAR_ADX

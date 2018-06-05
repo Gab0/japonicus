@@ -69,7 +69,6 @@ def launchWebEvolutionaryInfo():
 
 
 def launchJaponicus(parser):
-
     settings = getSettings()
 
     # PARSE GENCONF & DATASET COMMANDLINE ARGUMENTS;
@@ -140,7 +139,7 @@ def launchJaponicus(parser):
                     "strategy_parameters/%s.toml" % Strategy
                 )
             except FileNotFoundError:
-                print("Failure to find strategy parameter rules for" % (Strategy) +
+                print("Failure to find strategy parameter rules for " +
                       "%s at ./strategy_parameters" % Strategy)
                 gekkoParameterPath = "%s/config/strategies/%s.toml" %\
                                      (settings['global']['GekkoDir'], Strategy)
