@@ -7,30 +7,44 @@ from evaluation.gekko.dataset import epochToString
 import requests
 import json
 import TOMLutils
-
+import os
 import optparse
+
+import binanceMonitor
+
 
 parser = optparse.OptionParser()
 
 parser.add_option('-b', dest='tradingBot', action='store_true',
                   default=False)
-parser.add_option('--candleSize <cs>', dest='candleSize', type='int', default=5)
+parser.add_option('--candleSize <cs>', dest='candleSize', type='int',
+                  default=5)
+
 parser.add_option('--strat <strategy>', dest='strategy', type='str',
-        default='')
+                  default='')
+
+parser.add_option('--param <parameters>', dest='alternativeParameters', type='str',
+                  default='')
+
+
 def runTradingBot(botSpecifications, Strategy=None, TradingBot=False):
     URL = "http://localhost:3000/api/startGekko"
 
     if not Strategy:
         Strategy = botSpecifications['STRATEGY']
 
-    print("Starting bot at %s with %s" % (botSpecifications['EXCHANGE'],
-                                          Strategy))
+    print("Starting bot running %s for %s/%s at %s." % (
+        Strategy,
+        botSpecifications['ASSET'],
+        botSpecifications['CURRENCY'],
+        botSpecifications['EXCHANGE']))
+                 
 
     traderParameters = {
         "tradingAdvisor": {
             "enabled": 'true',
             "method": Strategy,
-            "candleSize": 1,
+            "candleSize": options.candleSize,
             "historySize": 40
         }
     }
@@ -57,8 +71,14 @@ def runTradingBot(botSpecifications, Strategy=None, TradingBot=False):
             "enabled": 'true'
         }
 
+    commonPath = 'strategy_parameters/%s.toml'
+    if options.alternativeParameters:
+        parameterPath = commonPath % options.alternativeParameters
+    else:
+        parameterPath = commonPath % Strategy
+
     strategySettings = TOMLutils.preprocessTOMLFile(
-        'strategy_parameters/%s.toml' % Strategy)
+        parameterPath)
     strategySettings = TOMLutils.TOMLToParameters(strategySettings)
     traderParameters[Strategy] = strategySettings
 
@@ -144,9 +164,14 @@ def checkWatcherExists(Watch):
 
 
 def getRunningWatchers():
-    W = requests.get('http://localhost:3000/api/gekkos')
+    try:
+        W = requests.get('http://localhost:3000/api/gekkos')
+    except requests.exceptions.ConnectionError:
+        print("Gekko is not running.")
+        return []
     W = json.loads(W.text)
     return W
+
 
 def getWatcherBaseParameters():
     Request = {
@@ -160,15 +185,35 @@ def getWatcherBaseParameters():
     return Request
 
 
+def parseAssets(exchangeList):
+    LIST = []
+    for Asset in exchangeList:
+        N = Asset.split('/')
+        A = {
+            'EXCHANGE': 'binance',
+             'ASSET': N[0],
+             'CURRENCY': N[1]
+        }
+        LIST.append(A)
+
+    return LIST
+
+
 if __name__ == '__main__':
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    print(os.getcwd())
     exchangeList = csv.DictReader(open('exchangerun.csv'))
+    exchangeList = binanceMonitor.getAssets(binanceMonitor.Binance)
+    assetCurrencyPairs = parseAssets(exchangeList)
     options, args = parser.parse_args()
     Stratlist = [options.strategy]
     if not any(Stratlist):
         exit('No strategy selected. check --help')
     #getRunningWatchers()
     #exit()
-    for Exchange in exchangeList:
+    for assetCurrencyPair in assetCurrencyPairs:
         for Strategy in Stratlist:
-            w, t = runTradingBot(Exchange, Strategy, TradingBot=True)
-
+            w, t = runTradingBot(assetCurrencyPair, Strategy, TradingBot=True)
+            # print(w)
+            # print(t)
+    print(getRunningWatchers())
