@@ -10,7 +10,7 @@ import evaluation
 
 from copy import deepcopy
 
-import resultInterface
+import evaluationBreak
 import interface
 
 from deap import tools
@@ -247,7 +247,7 @@ def gekko_generations(
         World.runEPOCH()
         if evalbreakconf.evaluateSettingsPeriodically and not options.benchmarkMode:
             if not World.EPOCH % evalbreakconf.evaluateSettingsPeriodically:
-                resultInterface.showResults(World)
+                evaluationBreak.showResults(World)
         if not World.EPOCH % 10:
             print("Total Evaluations: %i" % World.totalEvaluations)
 
@@ -256,6 +256,6 @@ def gekko_generations(
     print(World.EnvironmentParameters)
     # After running EPOCHs, select best candidates;
     if not options.benchmarkMode:
-        resultInterface.showResults(World)
+        evaluationBreak.showResults(World)
     print("")
     print("\t\t.RUN ENDS.")
