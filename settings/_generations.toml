@@ -7,10 +7,10 @@ showIndividualEvaluationInfo = false
 parameter_spread  = 60
 
 # Initial population size per locale
-POP_SIZE = 30
+POP_SIZE = 50
 
 # number of epochs to run
-NBEPOCH = 800
+NBEPOCH = 3000
 
 # number of locales on parallel GA;
 NBLOCALE = 3
