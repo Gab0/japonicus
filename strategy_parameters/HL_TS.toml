@@ -1,0 +1,23 @@
+# Minimum volume needed to enter a trade
+Min24hUSDVolume = 500000
+RollingVolumeHours = 24
+CurrencyPrice = 9000
+CandleSize = 5
+
+# Do not enter in bearish trend
+# if Med>Slow (bullish) 
+# else if Fast>Med (slightly bullish in bearish trend)
+SMA_Fast = 50
+SMA_Medium = 200
+SMA_Slow = 500
+
+DarvasPeriodSize = 24
+NoTradeResetPeriod = 3
+
+StopLossPercent = -5
+MaxLongPositionHours = 12
+
+[psar]
+optInStart = 0.0
+optInAcceleration = 0.25
+optInMaximum = 0.5

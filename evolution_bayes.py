@@ -22,7 +22,6 @@ import evaluation
 
 import TOMLutils
 
-import resultInterface
 from evaluation.gekko.datasetOperations import CandlestickDataset
 from japonicus_options import parser
 options, args = parser.parse_args()

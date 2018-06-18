@@ -1,0 +1,32 @@
+[ADX]
+adx = 3.0
+high = 50
+
+[BBands]
+NbDevDn = 2.0
+NbDevUp = 2.0
+TimePeriod = 20.0
+
+[BBtrend]
+bearPersistence = 16
+bullPersistence = 11
+lowerThreshold = 50
+upperThreshold = 86
+
+[BEAR]
+high = 60.0
+low = 29.4
+mod_high = 1.5
+mod_low = -1.5
+rsi = 9.2
+
+[BULL]
+high = 90
+low = 37
+mod_high = 6
+mod_low = -13.5
+rsi = 13.2
+
+[SMA]
+long = 1000.0
+short = 50.0
