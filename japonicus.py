@@ -68,14 +68,14 @@ def launchWebEvolutionaryInfo():
     return webServer
 
 
-def launchJaponicus(parser):
+def buildJaponicusOptions(optionparser):
     settings = getSettings()
 
     # PARSE GENCONF & DATASET COMMANDLINE ARGUMENTS;
     settingSubsets = ['generations', 'dataset', 'backtest', 'evalbreak']
     for settingSubset in settingSubsets:
         parser = promoterz.metaPromoterz.generateCommandLineArguments(
-            parser,
+            optionparser,
             settings[settingSubset])
 
     options, args = parser.parse_args()
@@ -85,6 +85,10 @@ def launchJaponicus(parser):
             settings[settingSubset]
         )
 
+    return settings, options
+
+
+def launchJaponicus(settings, options):
     # ABORT WHEN ILLEGAL OPTIONS ARE SET;
     if not options.genetic_algorithm and not options.bayesian_optimization:
         exit("Aborted: No operation specified.")
@@ -167,4 +171,5 @@ def launchJaponicus(parser):
 
 
 if __name__ == "__main__":
-    launchJaponicus(parser)
+    settings, options = buildJaponicusOptions(parser)
+    launchJaponicus(settings, options)
