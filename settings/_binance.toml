@@ -1,1 +1,3 @@
 credentialsFilePath = ""
+strategyRunTimePeriodHours = 12
+strategySelectorSigma = 10
