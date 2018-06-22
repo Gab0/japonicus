@@ -1,32 +1,14 @@
 #!/bin/python
-
-import csv
 import time
 from evaluation.gekko.API import httpPost
 from evaluation.gekko.dataset import epochToString
 import requests
 import json
 import TOMLutils
-import os
-import optparse
-
-import binanceMonitor
 
 
-parser = optparse.OptionParser()
+from . import exchangeMonitor
 
-parser.add_option('-b', dest='tradingBot', action='store_true',
-                  default=False)
-parser.add_option('--candleSize <cs>', dest='candleSize', type='int',
-                  default=5)
-
-parser.add_option('--strat <strategy>', dest='strategy', type='str',
-                  default='')
-
-parser.add_option('--param <parameters>', dest='alternativeParameters', type='str',
-                  default=None)
-
-options, args = parser.parse_args()
 
 
 def runTradingBot(botSpecifications, Strategy=None, parameterName=None, TradingBot=False):
@@ -193,18 +175,3 @@ def launchBatchTradingBots(assetCurrencyPairs, Stratlist, parameterName=None):
                                  parameterName=parameterName, TradingBot=True)
 
 
-if __name__ == '__main__':
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-
-    # exchangeList = csv.DictReader(open('exchangerun.csv'))
-
-    allPairs = binanceMonitor.getAssets(binanceMonitor.Binance)
-    assetCurrencyPairs = binanceMonitor.parseAssets(allPairs)
-    Stratlist = [options.strategy]
-
-    if not any(Stratlist):
-        exit('No strategy selected. check --help')
-
-    launchBatchTradingBots(assetCurrencyPairs, Stratlist, parameterName=options.alternativeParameters)
-
-    print(getRunningWatchers())

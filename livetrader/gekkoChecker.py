@@ -1,6 +1,6 @@
 #!/bin/python
-import gekkoTrigger
-import binanceMonitor
+from . import gekkoTrigger
+from . import exchangeMonitor
 
 from dateutil import parser as dateparser
 import datetime
@@ -35,15 +35,15 @@ def stopGekko():
 
 def selectStrategyToRun(strategyRankings):
     # SELECT AND LAUNCH TRADING BOT BATCH WITH SELECTED STRATEGY;
-    if random.random() < binanceMonitor.binanceconf.strategySelectorSigma / 100:
-        Strategy = sorted(Strategies,
+    if random.random() < exchangeMonitor.exchangeconf.strategySelectorSigma / 100:
+        Strategy = sorted(strategyRankings,
                           key=lambda s: s.getScore(), reverse=True)[0]
     else:
-        Strategy = random.choice(Strategies)
+        Strategy = random.choice(strategyRankings)
 
-    allPairs = binanceMonitor.getAssets(binanceMonitor.Binance)
+    allPairs = exchangeMonitor.getAssets(exchangeMonitor.Binance)
 
-    assetCurrencyPairs = binanceMonitor.parseAssets(allPairs)
+    assetCurrencyPairs = exchangeMonitor.parseAssets(allPairs)
 
     return assetCurrencyPairs, Strategy
 
@@ -75,7 +75,7 @@ def getParameterSettingsPath(parameterName):
     return N
 
 
-if __name__ == '__main__':
+def checkGekkoRunningBots():
     runningBots = gekkoTrigger.getRunningWatchers()
     # print(runningBots)
 
@@ -94,13 +94,13 @@ if __name__ == '__main__':
     for N in Balances:
         wBalances.writerow(N)
 
-    currentPortfolioValue = binanceMonitor.getUserBalance()
+    currentPortfolioValue = exchangeMonitor.getUserBalance()
     print(currentPortfolioValue)
 
     currentPortfolioStatistics = {
         'TIME': str(datetime.datetime.now()),
         'BALANCE': currentPortfolioValue,
-        'AVERAGE_PRICE': binanceMonitor.getAveragePrices()
+        'AVERAGE_PRICE': exchangeMonitor.getAveragePrices()
     }
 
     wBalances.writerow(currentPortfolioStatistics)
@@ -112,12 +112,12 @@ if __name__ == '__main__':
             averageRunningTime = sum(runningTimes) / len(runningTimes)
             runningTimeHours = averageRunningTime / 3600
             predictedStartTime = datetime.datetime.now() - datetime.timedelta(minutes=averageRunningTime)
-            targetMinimumRunningHours = binanceMonitor.binanceconf.strategyRunTimePeriodHours
+            targetMinimumRunningHours = exchangeMonitor.binanceconf.strategyRunTimePeriodHours
             if runningTimeHours > targetMinimumRunningHours:
                 print("Rebooting gekko trading bots.")
 
                 # APPLY LAST SCORE TO STRATEGIES;
-                Strategies = binanceMonitor.loadStrategyRankings()
+                Strategies = exchangeMonitor.loadStrategyRankings()
 
                 def makeBalanceScore(entry):
                     return (float(entry['BALANCE']) /
@@ -173,11 +173,11 @@ if __name__ == '__main__':
                 )
 
                 # WRITE NEW STRATEGY SCORES;
-                binanceMonitor.saveStrategyRankings(Strategies)
+                exchangeMonitor.saveStrategyRankings(Strategies)
             else:
                 print("Target runtime not reached.")
     else:
-        Strategies = binanceMonitor.loadStrategyRankings()
+        Strategies = exchangeMonitor.loadStrategyRankings()
         print("Launching bots on idle gekko instance.")
         assetCurrencyPairs, Strategy = selectStrategyToRun(Strategies)
         gekkoTrigger.launchBatchTradingBots(assetCurrencyPairs,

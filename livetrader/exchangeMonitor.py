@@ -5,7 +5,6 @@ import Settings
 import os
 import pytoml
 import time
-os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 binanceconf = Settings.makeSettings(Settings.loadTomlSettings('binance'))
 secret = open(binanceconf.credentialsFilePath).read()
