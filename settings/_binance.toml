@@ -1,3 +1,6 @@
 credentialsFilePath = ""
 strategyRunTimePeriodHours = 12
 strategySelectorSigma = 10
+# following option points to binance asset/currency .json file located at
+# 'exchanges' folder of gekko. selecting it up is optional.
+binanceAssetCurrencyTargetFilePath = ""
