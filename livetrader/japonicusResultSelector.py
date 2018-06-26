@@ -4,7 +4,7 @@ import csv
 import shutil
 import names
 
-import binanceMonitor
+from . import exchangeMonitor
 
 
 def readResultFolder(strategyName, runLogFolderPath, retrievalCount=1):
@@ -41,9 +41,9 @@ def readResultFolder(strategyName, runLogFolderPath, retrievalCount=1):
     stratPath = os.path.join(R['filepath'])
     shutil.copy()
 
-    strategyRankings = binanceMonitor.loadStrategyRankings()
+    strategyRankings = exchangeMonitor.loadStrategyRankings()
 
-    newEntry = binanceMonitor.strategyParameterSet(
+    newEntry = exchangeMonitor.strategyParameterSet(
         {
             'strategy': strategyName,
             'parameters': parameterName,
@@ -53,7 +53,7 @@ def readResultFolder(strategyName, runLogFolderPath, retrievalCount=1):
 
     strategyRankings.append(newEntry)
 
-    binanceMonitor.saveStrategyRankings(strategyRankings)
+    exchangeMonitor.saveStrategyRankings(strategyRankings)
     
     return True
 

@@ -1,6 +1,7 @@
 #!/bin/python
 import os
 import optparse
+import json
 
 import livetrader.exchangeMonitor
 import livetrader.gekkoTrigger
@@ -35,20 +36,36 @@ options, args = parser.parse_args()
 
 if __name__ == '__main__':
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    exchange = livetrader.exchangeMonitor.Exchange('binance')
     if options.balanceChecker:
-        totalUSD = livetrader.exchangeMonitor.getUserBalance()
-        print("net weight at %s: US$T%.2f" % (livetrader.exchangeMonitor.Binance.name,
-                                              totalUSD))
+        totalUSD = exchange.getUserBalance()
+
+        print("net weight at %s: US$T%.2f" % (
+            exchange.name,
+            totalUSD)
+        )
 
     if options.botTrigger:
-        allPairs = livetrader.exchangeMonitor.getAssets(livetrader.exchangeMonitor.Binance)
-        assetCurrencyPairs = livetrader.exchangeMonitor.parseAssets(allPairs)
+        allPairs = exchange.getAssets()
+        assetCurrencyPairs = exchange.parseAssets(allPairs)
         Stratlist = [options.botTrigger]
+
+        exchangeConfPath =\
+            exchange.conf.binanceAssetCurrencyTargetFilePath
+        if exchangeConfPath:
+            exchangeMarketData = exchange.generateMarketsJson(
+                assetCurrencyPairs)
+            exchangeConfPath = os.path.join(exchangeConfPath,
+                                            'binance-markets.json')
+
+            with open(exchangeConfPath, 'w') as F:
+                json.dump(exchangeMarketData, F, indent=2)
 
         livetrader.gekkoTrigger.launchBatchTradingBots(
             assetCurrencyPairs,
             Stratlist,
-            parameterName=options.alternativeParameters
+            options
         )
+
     if options.runningBotChecker:
         livetrader.gekkoChecker.checkGekkoRunningBots()

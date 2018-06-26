@@ -7,11 +7,7 @@ import json
 import TOMLutils
 
 
-from . import exchangeMonitor
-
-
-
-def runTradingBot(botSpecifications, Strategy=None, parameterName=None, TradingBot=False):
+def runTradingBot(botSpecifications, Strategy, options, TradingBot=False):
     URL = "http://localhost:3000/api/startGekko"
 
     if not Strategy:
@@ -55,8 +51,8 @@ def runTradingBot(botSpecifications, Strategy=None, parameterName=None, TradingB
         }
 
     commonPath = 'strategy_parameters/%s.toml'
-    if parameterName:
-        parameterPath = commonPath % parameterName
+    if options.alternativeParameters:
+        parameterPath = commonPath % options.alternativeParameters
     else:
         parameterPath = commonPath % Strategy
 
@@ -168,10 +164,10 @@ def getWatcherBaseParameters():
     return Request
 
 
-def launchBatchTradingBots(assetCurrencyPairs, Stratlist, parameterName=None):
+def launchBatchTradingBots(assetCurrencyPairs, Stratlist, options):
     for assetCurrencyPair in assetCurrencyPairs:
         for Strategy in Stratlist:
             w, t = runTradingBot(assetCurrencyPair, Strategy,
-                                 parameterName=parameterName, TradingBot=True)
+                                 options, TradingBot=True)
 
 

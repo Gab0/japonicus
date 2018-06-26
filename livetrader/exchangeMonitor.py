@@ -2,212 +2,153 @@
 import ccxt
 import json
 import Settings
-import os
-import pytoml
 import time
 
-binanceconf = Settings.makeSettings(Settings.loadTomlSettings('binance'))
-secret = open(binanceconf.credentialsFilePath).read()
 
-secret = secret.split('\n')
-Binance = ccxt.binance({'apiKey': secret[0],
-                        'secret': secret[1]})
-Binance.load_markets()
+class Exchange():
+    def __init__(self, name):
+        self.name = name
+        self.conf = Settings.makeSettings(Settings.loadTomlSettings(name))
+        secret = open(self.conf.credentialsFilePath).read()
+        secret = secret.split('\n')
+        self.API = ccxt.binance({
+            'apiKey': secret[0],
+            'secret': secret[1]
+        })
+        self.API.load_markets()
 
+    def getCotations(self):
+        return self.fetchAssetPrices(self.getRelevantSymbols())
 
-class strategyParameterSet():
-    def __init__(self, jsonData):
-        self.Attributes = ['strategy', 'parameters', 'profits']
-        self.fromJson(jsonData)
+    def parseAsset(self, Asset):
+        P = [float(Asset[code]) for code in ['free', 'locked']]
+        return P[0], P[1]
 
-    def fromJson(self, jsonData):
-        for Name in self.Attributes:
-            self.__dict__[Name] = jsonData[Name]
+    def fetchAssetPrices(self, Symbols):
+        Prices = {}
+        for Symbol in Symbols:
+            Cotation = self.API.fetch_ticker(Symbol)
+            Prices[Symbol] = float(Cotation['info']['lastPrice'])
 
-    def toJson(self):
-        jsonData = {}
-        for Name in self.Attributes:
-            jsonData[Name] = self.__dict__[Name]
-        return jsonData
+        return Prices
 
-    def loadParameterSet(self):
-        self.parameterSet = pytoml.load(open(self.parameters))
+    def getAveragePrices(self):
+        Cotations = self.getCotations()
+        AllCotations = list(Cotations.keys())
 
-    def getScore(self):
-        if self.profits:
-            return sum(self.profits) / len(self.profits)
-        else:
-            return 0
+        averagePrices = sum([Cotations[S] for S in AllCotations]) / len(AllCotations)
+        return averagePrices
 
+    def getMarketsOfCurrency(self, currency='USDT'):
+        return [S for S in self.API.symbols if '/%s' % currency in S]
 
-def parseAsset(Asset):
-    P = [float(Asset[code]) for code in ['free', 'locked']]
-    return P[0], P[1]
+    def getUserBalance(self, Verbose=False):
+        Balance = self.API.fetch_balance()['info']['balances']
+        totalUSD = 0
+        Cotations = self.getCotations()
 
-
-def fetchAssetPrices(Symbols):
-    Prices = {}
-    for Symbol in Symbols:
-        Cotation = Binance.fetch_ticker(Symbol)
-        Prices[Symbol] = float(Cotation['info']['lastPrice'])
-
-    return Prices
-
-
-def getAveragePrices():
-    Cotations = fetchAssetPrices(getRelevantSymbols())
-    AllCotations = list(Cotations.keys())
-
-    averagePrices = sum([Cotations[S] for S in AllCotations]) / len(AllCotations)
-    return averagePrices
-
-
-def getRelevantSymbols():
-    return [S for S in Binance.symbols if '/USDT' in S]
-
-
-def getUserBalance(Verbose=False):
-    Balance = Binance.fetch_balance()['info']['balances']
-    totalUSD = 0
-    Cotations = fetchAssetPrices(getRelevantSymbols())
-    for Asset in Balance:
-        Free, Locked = parseAsset(Asset)
-        if Free or Locked:
-            if Verbose:
-                print(Asset)
-            if Asset['asset'] == 'USDT':
-                Symbol = 'USDT'
-                totalAsset = Free + Locked
-                assetValue = totalAsset
+        for Asset in Balance:
+            Free, Locked = self.parseAsset(Asset)
+            if Free or Locked:
                 if Verbose:
-                    print("%.2f USDT" % totalAsset)
-            else:
-                Symbol = '%s/USDT' % Asset['asset']
-                if Symbol in Binance.symbols:
-                    price = Cotations[Symbol]
-                    if Verbose:
-                        print("%s price %.2f" % (Asset['asset'], price))
+                    print(Asset)
+                if Asset['asset'] == 'USDT':
+                    Symbol = 'USDT'
                     totalAsset = Free + Locked
-                    assetValue = (totalAsset * price)
+                    assetValue = totalAsset
+                    if Verbose:
+                        print("%.2f USDT" % totalAsset)
                 else:
-                    continue
+                    Symbol = '%s/USDT' % Asset['asset']
+                    if Symbol in self.API.symbols:
+                        price = Cotations[Symbol]
+                        if Verbose:
+                            print("%s price %.2f" % (Asset['asset'], price))
+                        totalAsset = Free + Locked
+                        assetValue = (totalAsset * price)
+                    else:
+                        continue
 
-            totalUSD += assetValue
-            if Verbose:
-                print('--')
-                print(totalAsset)
-                print(assetValue)
-                print(totalUSD)
-                print()
+                totalUSD += assetValue
+                if Verbose:
+                    print('--')
+                    print(totalAsset)
+                    print(assetValue)
+                    print(totalUSD)
+                    print()
 
-    return totalUSD
+        return totalUSD
 
+    def getAssets(self):
+        Assets = [A for A in self.API.symbols if 'USDT' in A]
+        return Assets
 
-def loadStrategyRankings():
-    W = json.load(open("gekkoStrategyRankings.json"))
-    Strategies = []
-    for s in W:
-        S = strategyParameterSet(s)
-        Strategies.append(S)
-    return Strategies
+    def parseAssets(self, assets):
+        LIST = []
+        for Asset in assets:
+            N = Asset.split('/')
+            A = {
+                'EXCHANGE': self.name,
+                'ASSET': N[0],
+                'CURRENCY': N[1]
+            }
+            LIST.append(A)
 
+        return LIST
 
-def saveStrategyRankings(rankingList):
-    outputList = []
+    def generateMarketsJson(self, Assets):
+        Assets = self.getAssets()
+        marketData = []
+        assetList = []
+        exchangeAssetInfo = self.API.publicGetExchangeInfo()['symbols']
 
-    for strategy in rankingList:
-        outputList.append(strategy.toJson())
+        for Asset in Assets:
+            pair = Asset.split('/')
+            assetList.append(pair[0])
+            pair.reverse()
+            orderInfo = None
+            for pairInfo in exchangeAssetInfo:
+                if pairInfo['symbol'] == Asset.replace('/', ''):
+                    allFilters = {}
 
-    json.dump(outputList, open("gekkoStrategyRankings.json", 'w'))
+                    for Filter in pairInfo['filters']:
+                        del Filter['filterType']
+                        allFilters.update(Filter)
 
+                    orderInfo = {
+                        "amount": allFilters['minQty'],
+                        "price": allFilters['minPrice'],
+                        "order": 1
+                    }
 
-def getAssets(Exchange):
-    Assets = [A for A in Exchange.symbols if 'USDT' in A]
-    return Assets
+                    break
 
+            if orderInfo is None:
+                print("Failed to grab data for %s" % Asset)
+                continue
 
-def parseAssets(exchangeList):
-    LIST = []
-    for Asset in exchangeList:
-        N = Asset.split('/')
-        A = {
-            'EXCHANGE': 'binance',
-             'ASSET': N[0],
-             'CURRENCY': N[1]
-        }
-        LIST.append(A)
+            pairEntry = {
+                "pair": pair,
+                "minimalOrder": orderInfo
+            }
 
-    return LIST
+            marketData.append(pairEntry)
 
-
-def generateMarketsJson(Assets, Exchange):
-    Assets = getAssets(Exchange)
-    marketData = []
-    assetList = []
-    exchangeAssetInfo = Exchange.publicGetExchangeInfo()['symbols']
-
-    for Asset in Assets:
-        pair = Asset.split('/')
-        assetList.append(pair[0])
-        pair.reverse()
-        orderInfo = None
-        for pairInfo in exchangeAssetInfo:
-            if pairInfo['symbol'] == Asset.replace('/', ''):
-                allFilters = {}
-
-                for Filter in pairInfo['filters']:
-                    del Filter['filterType']
-                    allFilters.update(Filter)
-
-                orderInfo = {
-                    "amount": allFilters['minQty'],
-                    "price": allFilters['minPrice'],
-                    "order": 1
-                }
-
-                break
-
-        if orderInfo is None:
-            print("Failed to grab data for %s" % Asset)
-            continue
-
-        pairEntry = {
-            "pair": pair,
-            "minimalOrder": orderInfo
+        fullMarketData = {
+            "assets": assetList,
+            "currencies": ["USDT"],
+            "markets": marketData
         }
 
-        marketData.append(pairEntry)
+        return fullMarketData
 
-    fullMarketData = {
-        "assets": assetList,
-        "currencies": ["USDT"],
-        "markets": marketData
-    }
+    def getRecentOrders(self, pastTimeRangeDays=2):
+        userOrderHistory = []
+        for Market in self.getAssets():
+            pastTimeRange = pastTimeRangeDays * 24 * 3600
+            sinceTimestamp = (time.time() - pastTimeRange) * 1000
+            Orders = self.API.fetch_my_trades(Market, since=sinceTimestamp)
 
-    return fullMarketData
-
-
-def getRecentOrders(Exchange, pastTimeRangeDays=2):
-    userOrderHistory = []
-    for Market in getAssets(Exchange):
-        sinceTimestamp = (time.time() - pastTimeRangeDays * 24 * 3600) * 1000
-        Orders = Exchange.fetch_my_trades(Market, since=sinceTimestamp)
-
-        for Order in Orders:
-            print(json.dumps(Order, indent=2))
-            userOrderHistory.append(Order)
-
-
-if __name__ == '__main__':
-    totalUSD = getUserBalance()
-    Strategies = loadStrategyRankings()
-
-    getRecentOrders(Binance)
-    Assets = getAssets(Binance)
-    print(Assets)
-    marketGekkoData = generateMarketsJson(Assets, Binance)
-
-    with open('binance-markets.json', 'w') as F:
-        json.dump(marketGekkoData, F, indent=4)
-
-    print(totalUSD)
+            for Order in Orders:
+                print(json.dumps(Order, indent=2))
+                userOrderHistory.append(Order)

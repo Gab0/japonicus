@@ -33,21 +33,6 @@ def stopGekko():
         N.communicate()
 
 
-def selectStrategyToRun(strategyRankings):
-    # SELECT AND LAUNCH TRADING BOT BATCH WITH SELECTED STRATEGY;
-    if random.random() < exchangeMonitor.exchangeconf.strategySelectorSigma / 100:
-        Strategy = sorted(strategyRankings,
-                          key=lambda s: s.getScore(), reverse=True)[0]
-    else:
-        Strategy = random.choice(strategyRankings)
-
-    allPairs = exchangeMonitor.getAssets(exchangeMonitor.Binance)
-
-    assetCurrencyPairs = exchangeMonitor.parseAssets(allPairs)
-
-    return assetCurrencyPairs, Strategy
-
-
 def interpreteRunningBotStatistics(runningBots):
     allBotStrategies = []
     runningTimes = []
@@ -75,11 +60,14 @@ def getParameterSettingsPath(parameterName):
     return N
 
 
-def checkGekkoRunningBots():
+def checkGekkoRunningBots(exchange, ranker):
     runningBots = gekkoTrigger.getRunningWatchers()
-    # print(runningBots)
 
     BalancesFields = ['TIME', 'BALANCE', 'AVERAGE_PRICE']
+
+    selectorSigma = exchange.conf.strategySelectorSigma
+    allPairs = exchange.getAssets()
+    assetCurrencyPairs = exchange.parseAssets(allPairs)
 
     try:
         Balances = csv.DictReader(open('balances.csv'))
@@ -111,8 +99,11 @@ def checkGekkoRunningBots():
         if runningTimes and runningBotStrategies:
             averageRunningTime = sum(runningTimes) / len(runningTimes)
             runningTimeHours = averageRunningTime / 3600
-            predictedStartTime = datetime.datetime.now() - datetime.timedelta(minutes=averageRunningTime)
-            targetMinimumRunningHours = exchangeMonitor.binanceconf.strategyRunTimePeriodHours
+            markzeroTime = datetime.timedelta(minutes=averageRunningTime)
+            predictedStartTime = datetime.datetime.now() - markzeroTime
+            targetMinimumRunningHours = exchange.conf.strategyRunTimePeriodHours
+
+            # if
             if runningTimeHours > targetMinimumRunningHours:
                 print("Rebooting gekko trading bots.")
 
@@ -162,7 +153,7 @@ def checkGekkoRunningBots():
                     else:
                         print("Running strategy not found at scoreboard.")
 
-                assetCurrencyPairs, Strategy = selectStrategyToRun(Strategies)
+                Strategy = ranker.selectStrategyToRun(selectorSigma)
 
                 stopGekko()
                 time.sleep(60)
@@ -179,7 +170,9 @@ def checkGekkoRunningBots():
     else:
         Strategies = exchangeMonitor.loadStrategyRankings()
         print("Launching bots on idle gekko instance.")
-        assetCurrencyPairs, Strategy = selectStrategyToRun(Strategies)
-        gekkoTrigger.launchBatchTradingBots(assetCurrencyPairs,
-                                            [Strategy.strategy],
-                                            parameterName=Strategy.parameters)
+        assetCurrencyPairs, Strategy = ranker.selectStrategyToRun(selectorSigma)
+        gekkoTrigger.launchBatchTradingBots(
+            assetCurrencyPairs,
+            [Strategy.strategy],
+            parameterName=Strategy.parameters
+        )
