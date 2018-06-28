@@ -6,6 +6,7 @@ import json
 import livetrader.exchangeMonitor
 import livetrader.gekkoTrigger
 import livetrader.gekkoChecker
+import livetrader.strategyRanker
 
 parser = optparse.OptionParser()
 
@@ -30,13 +31,13 @@ parser.add_option('--strat <strategy>', dest='strategy',
 parser.add_option('--param <parameters>', dest='alternativeParameters',
                   type='str', default=None)
 
-
 options, args = parser.parse_args()
 
 
 if __name__ == '__main__':
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
     exchange = livetrader.exchangeMonitor.Exchange('binance')
+
     if options.balanceChecker:
         totalUSD = exchange.getUserBalance()
 
@@ -68,4 +69,13 @@ if __name__ == '__main__':
         )
 
     if options.runningBotChecker:
-        livetrader.gekkoChecker.checkGekkoRunningBots()
+        ranker = livetrader.strategyRanker.strategyRanker()
+        ranker.loadStrategyRankings()
+        userOrderHistory = exchange.getRecentOrders()
+        for M in userOrderHistory.keys():
+            marketOrderHistory = userOrderHistory[M]
+            if marketOrderHistory:
+                information = json.dumps(marketOrderHistory, indent=2)
+                print(information)
+
+        livetrader.gekkoChecker.checkGekkoRunningBots(exchange, ranker)
