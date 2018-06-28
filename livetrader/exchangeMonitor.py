@@ -18,7 +18,7 @@ class Exchange():
         self.API.load_markets()
 
     def getCotations(self):
-        return self.fetchAssetPrices(self.getRelevantSymbols())
+        return self.fetchAssetPrices(self.getMarketsOfCurrency())
 
     def parseAsset(self, Asset):
         P = [float(Asset[code]) for code in ['free', 'locked']]
@@ -143,12 +143,12 @@ class Exchange():
         return fullMarketData
 
     def getRecentOrders(self, pastTimeRangeDays=2):
-        userOrderHistory = []
+        userOrderHistory = {}
         for Market in self.getAssets():
             pastTimeRange = pastTimeRangeDays * 24 * 3600
             sinceTimestamp = (time.time() - pastTimeRange) * 1000
             Orders = self.API.fetch_my_trades(Market, since=sinceTimestamp)
 
-            for Order in Orders:
-                print(json.dumps(Order, indent=2))
-                userOrderHistory.append(Order)
+            userOrderHistory[Market] = Orders
+
+        return userOrderHistory
