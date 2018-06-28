@@ -1,6 +1,5 @@
 #!/bin/python
 from . import gekkoTrigger
-from . import exchangeMonitor
 
 from dateutil import parser as dateparser
 import datetime
@@ -37,19 +36,25 @@ def interpreteRunningBotStatistics(runningBots):
     allBotStrategies = []
     runningTimes = []
     for Bot in runningBots:
-        print(Bot)
+        usefulBot = False
         if 'trader' in Bot.keys() and Bot["trader"] == "tradebot":
+            usefulBot = True
             botCurrentStrategy = Bot["strat"]
             allBotStrategies.append(botCurrentStrategy)
 
         if "firstCandle" in Bot.keys():
+            usefulBot = True
             fC = dateparser.parse(Bot["firstCandle"]["start"])
             lC = dateparser.parse(Bot["lastCandle"]["start"])
-
             delta = (lC - fC).seconds
-            print(delta)
+
             runningTime = delta
             runningTimes.append(runningTime)
+
+        if not usefulBot:
+            print("Odd runningBot found:")
+            print(Bot)
+            print(delta)
 
     return runningTimes, allBotStrategies
 
@@ -82,33 +87,36 @@ def checkGekkoRunningBots(exchange, ranker):
     for N in Balances:
         wBalances.writerow(N)
 
-    currentPortfolioValue = exchangeMonitor.getUserBalance()
-    print(currentPortfolioValue)
+    currentPortfolioValue = exchange.getUserBalance()
+    print("Net weight %.2f USD" % currentPortfolioValue)
 
     currentPortfolioStatistics = {
         'TIME': str(datetime.datetime.now()),
         'BALANCE': currentPortfolioValue,
-        'AVERAGE_PRICE': exchangeMonitor.getAveragePrices()
+        'AVERAGE_PRICE': exchange.getAveragePrices()
     }
 
     wBalances.writerow(currentPortfolioStatistics)
 
     if runningBots:
-        runningTimes, runningBotStrategies = interpreteRunningBotStatistics(runningBots)
+        runningTimes, runningBotStrategies =\
+            interpreteRunningBotStatistics(runningBots)
 
         if runningTimes and runningBotStrategies:
             averageRunningTime = sum(runningTimes) / len(runningTimes)
             runningTimeHours = averageRunningTime / 3600
             markzeroTime = datetime.timedelta(minutes=averageRunningTime)
             predictedStartTime = datetime.datetime.now() - markzeroTime
-            targetMinimumRunningHours = exchange.conf.strategyRunTimePeriodHours
+
+            targetMinimumRunningHours =\
+                exchange.conf.strategyRunTimePeriodHours
 
             # if
             if runningTimeHours > targetMinimumRunningHours:
                 print("Rebooting gekko trading bots.")
 
                 # APPLY LAST SCORE TO STRATEGIES;
-                Strategies = exchangeMonitor.loadStrategyRankings()
+                Strategies = exchange.loadStrategyRankings()
 
                 def makeBalanceScore(entry):
                     return (float(entry['BALANCE']) /
@@ -123,7 +131,8 @@ def checkGekkoRunningBots(exchange, ranker):
                         pastCorrespondingScore = makeBalanceScore(row)
 
                 if pastCorrespondingScore is not None:
-                    currentScore = makeBalanceScore(currentPortfolioStatistics)
+                    currentScore =\
+                        makeBalanceScore(currentPortfolioStatistics)
 
                     botRunScore = currentScore / pastCorrespondingScore * 100
                     normalizedBotRunScore = botRunScore / runningTimeHours
@@ -134,14 +143,16 @@ def checkGekkoRunningBots(exchange, ranker):
                         strategyParameters = pytoml.load(open(
                             getParameterSettingsPath(Strat.parameters)))
                         print(runningBotStrategies[-1])
-                        comparateParameters = runningBotStrategies[-1]['params']
+                        comparateParameters =\
+                            runningBotStrategies[-1]['params']
                         for param in comparateParameters.keys():
                             if type(param) == dict:
                                 continue
                             if param not in strategyParameters.keys():
                                 equalStrats = False
                                 break
-                            if strategyParameters[param] != comparateParameters[param]:
+                            if strategyParameters[param] !=\
+                               comparateParameters[param]:
                                 equalStrats = False
                                 break
                         if equalStrats:
@@ -164,13 +175,15 @@ def checkGekkoRunningBots(exchange, ranker):
                 )
 
                 # WRITE NEW STRATEGY SCORES;
-                exchangeMonitor.saveStrategyRankings(Strategies)
+                exchange.saveStrategyRankings(Strategies)
             else:
                 print("Target runtime not reached.")
     else:
-        Strategies = exchangeMonitor.loadStrategyRankings()
+        Strategies = exchange.loadStrategyRankings()
         print("Launching bots on idle gekko instance.")
-        assetCurrencyPairs, Strategy = ranker.selectStrategyToRun(selectorSigma)
+        assetCurrencyPairs, Strategy =\
+            ranker.selectStrategyToRun(selectorSigma)
+
         gekkoTrigger.launchBatchTradingBots(
             assetCurrencyPairs,
             [Strategy.strategy],
