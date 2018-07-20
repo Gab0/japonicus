@@ -43,8 +43,8 @@ def runBacktest(
     url = GekkoInstanceUrl + '/api/backtest'
     result = httpPost(url, gekko_config)
     # sometime report is False(not dict)
-    if type(result['report']) is bool:
-        print("Warning: report not found, probable Gekko fail!")
+    if type(result['performanceReport']) is bool:
+        print("Warning: performanceReport not found, probable Gekko fail!")
         print(Dataset.specifications)
         # That fail is so rare that has no impact.. still happens randomly;
         return {
@@ -55,7 +55,7 @@ def runBacktest(
     # rProfit = result['report']['relativeProfit']
     # nbTransactions = result['report']['trades']
     # market = result['report']['market']
-    backtestResult = result['report']
+    backtestResult = result['performanceReport']
     if 'roundtrips' in result.keys():
         backtestResult['roundtrips'] = result['roundtrips']
 
@@ -111,31 +111,27 @@ def createConfig(
 ):
     TradeMethod = list(TradeSetting.keys())[0]
     CONFIG = {
-        "gekkoConfig": {
-            "debug": Debug,
-            "info": Debug,
-            "watch": Database,
-            "paperTrader": {
-                "fee": 0.25,  # declare deprecated 'fee' so keeps working w/ old gekko;
-                "feeMaker": 0.15,
-                "feeTaker": 0.25,
-                "feeUsing": 'maker',
-                "slippage": 0.05,
-                "simulationBalance": {"asset": 1, "currency": 100},
-                "reportRoundtrips": True,
-                "enabled": True,
-            },
-            "tradingAdvisor": {
-                "enabled": True,
-                "method": TradeMethod,
-                "candleSize": candleSize,  # candleSize: smaller = heavier computation + better possible results;
-                "historySize": 10,
-            },
-            TradeMethod: TradeSetting[TradeMethod],
-            "backtest": {"daterange": DateRange},
-            "performanceAnalyzer": {"riskFreeReturn": 2, "enabled": True},
-            "valid": True,
+        "watch": Database,
+        "paperTrader": {
+            "fee": 0.25,  # declare deprecated 'fee' so keeps working w/ old gekko;
+            "feeMaker": 0.15,
+            "feeTaker": 0.25,
+            "feeUsing": 'maker',
+            "slippage": 0.05,
+            "simulationBalance": {"asset": 1, "currency": 100},
+            "reportRoundtrips": True,
+            "enabled": True,
         },
+        "tradingAdvisor": {
+            "enabled": True,
+            "method": TradeMethod,
+            "candleSize": candleSize,  # candleSize: smaller = heavier computation + better possible results;
+            "historySize": 10,
+        },
+        TradeMethod: TradeSetting[TradeMethod],
+        "backtest": {"daterange": DateRange},
+        "performanceAnalyzer": {"riskFreeReturn": 2, "enabled": True},
+        "valid": True,
         "data": {
             "candleProps": [
                 "id", "start", "open", "high", "low", "close", "vwp", "volume", "trades"
@@ -145,6 +141,19 @@ def createConfig(
             "roundtrips": True,
             "trades": True,
         },
+        "backtestResultExporter": {
+            "enabled": True,
+            "writeToDisk": False,
+            "data": {
+                "stratUpdates": False,
+                "roundtrips": True,
+                "stratCandles": False,
+                "stratCandleProps": [
+                    "open"
+                ],
+                "trades": False
+            }
+        }
     }
 
     if gekko_config == None:
