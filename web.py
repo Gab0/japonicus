@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import datetime
-import pandas as pd
-import os
 
 import flask
 import dash
@@ -16,6 +14,7 @@ from evaluation.gekko.statistics import epochStatisticsNames, periodicStatistics
 def update_graph(GraphName, Statistics):
     print('Loading')
     ID = [s for s in GraphName if s.isdigit()]
+
     '''
     try:
         df = load_evolution_logs(filename="evolution_gen_Locale%s.csv" % ''.join(ID))
@@ -24,16 +23,16 @@ def update_graph(GraphName, Statistics):
         print("Failure to read evolution data.")
         return None
     '''
-    df = pd.DataFrame(Statistics)
+
     annotations = []
 
     statisticsNames = {}
     statisticsNames.update(epochStatisticsNames)
     statisticsNames.update(periodicStatisticsNames)
 
-    if 'dateRange' in df.keys():
-        for W in range(len(df['dateRange'])):
-            DR = df['dateRange'][W]
+    if 'dateRange' in Statistics.keys():
+        for W in range(len(Statistics['dateRange'])):
+            DR = Statistics['dateRange'][W]
 
             if DR != None:
                 annotations.append(
@@ -62,8 +61,8 @@ def update_graph(GraphName, Statistics):
     ]
     DATA = [
         {
-            'x': df['id'],
-            'y': df[statNames[S]],
+            'x': Statistics['id'],
+            'y': Statistics[statNames[S]],
             'type': 'line',
             'name': statisticsNames[statNames[S]],
             'line': {'color': 'rgb%s' % str(colorSequence[S])},
@@ -73,7 +72,7 @@ def update_graph(GraphName, Statistics):
     fig = {
         'data': [
             {
-                'x': [0, df["id"]],
+                'x': [0, Statistics["id"]],
                 'y': [0],
                 'type': 'line',
                 'name': 'markzero',
