@@ -1,7 +1,7 @@
 #!/bin/python
 import random
 import json
-import pandas as pd
+import csv
 from deap import tools
 
 
@@ -110,21 +110,28 @@ def showResults(World):
                 FinalIndividueSettings)
             World.logger.log(TOMLSettings)
             paramsFilename = "%s-EPOCH%i" % (LOCALE.name,
-                                                LOCALE.EPOCH)
+                                             LOCALE.EPOCH)
             World.logger.saveParameters(paramsFilename, TOMLSettings)
             GlobalLogEntry['filename'] = paramsFilename
             print("\nRemember to check MAX and MIN values for each parameter.")
             print("\tresults may improve with extended ranges.")
             World.EvaluationStatistics.append(GlobalLogEntry)
-    GlobalEvolutionSummary = pd.DataFrame(World.EvaluationStatistics)
-    if not GlobalEvolutionSummary.empty:
-        with pd.option_context('display.max_rows', None,
-                               'display.max_columns', None):
-            GlobalEvolutionSummary = str(GlobalEvolutionSummary)
+
+    # SAVE GLOBAL EVALUATION LOGS;
+    evaluationBreaksFilename = 'logs/evaluation_breaks.csv'
+
+    if World.EvolutionStatistics:
+        fieldnames = list(World.EvaluationStatistics[0].keys())
+        with open(evaluationBreaksFilename, 'w') as f:
+            GlobalEvolutionSummary = csv.DictWriter(f, fieldnames)
+            GlobalEvolutionSummary.writeheader()
             World.logger.log(GlobalEvolutionSummary, target="Summary",
                              show=False, replace=True)
-            with open('logs/evaluation_breaks.csv', 'w') as GES:
-                GES.write(GlobalEvolutionSummary)
+
+            for n in World.EvaluationStatistics:
+                GlobalEvolutionSummary.writerow(n)
+                World.logger.log(n, target="Summary",
+                                 show=False, replace=False)
 
     World.logger.updateFile()
 
