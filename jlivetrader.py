@@ -31,6 +31,14 @@ parser.add_option('--strat <strategy>', dest='strategy',
 parser.add_option('--param <parameters>', dest='alternativeParameters',
                   type='str', default=None)
 
+parser.add_option('-k', dest='killGekkoBots', action='store_true',
+                  default=False,
+                  help='Destroy all running gekko bot instances.')
+
+parser.add_option('-s', dest='viewLastTrades', action='store_true',
+                  default=False,
+                  help='Show last trades done by bots.')
+
 options, args = parser.parse_args()
 
 
@@ -78,4 +86,13 @@ if __name__ == '__main__':
                 information = json.dumps(marketOrderHistory, indent=2)
                 print(information)
 
-        livetrader.gekkoChecker.checkGekkoRunningBots(exchange, ranker)
+        livetrader.gekkoChecker.checkGekkoRunningBots(exchange,
+                                                      ranker, options)
+    if options.killGekkoBots:
+        livetrader.gekkoChecker.stopGekkoBots()
+
+    if options.viewLastTrades:
+        Orders = exchange.getRecentOrders()
+        print(json.dumps(Orders, indent=2))
+
+
