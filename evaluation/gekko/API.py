@@ -10,7 +10,7 @@ def initializeGekko():  # not used yet.
     D = Popen(CMD, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
 
-def httpPost(URL, data={}):
+def httpPost(URL, data={}, Verbose=True):
     try:
         Request = requests.post(URL, json=data)
         Response = json.loads(Request.text)
@@ -18,10 +18,12 @@ def httpPost(URL, data={}):
         print("Error: Gekko comm error! Check your local Gekko instance.")
         exit()
     except Exception as e:
-        print("Error: config failure")
-        print(URL)
-        print(data)
-        return {'report': False}
+        if Verbose:
+            print("Error: config failure")
+            print(e)
+            print(URL)
+            print(data)
+        return False
 
     return Response
 
