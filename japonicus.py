@@ -9,6 +9,8 @@ from Settings import getSettings
 from evolution_generations import gekko_generations
 from japonicus_options import parser
 
+
+
 import TOMLutils
 
 import datetime
@@ -101,6 +103,24 @@ def launchJaponicus(settings, options):
     sleep(1)
     markzero_time = datetime.datetime.now()
     showTitleDisclaimer(settings['backtest'])
+
+    print()
+
+    # LOCATE & VALIDATE RUNNING GEKKO INSTANCES FROM CONFIG URLs;
+    possibleInstances = settings['global']['GekkoURLs']
+    validatedInstances = []
+    for instance in possibleInstances:
+        Response = evaluation.gekko.API.httpPost(instance, Verbose=False)
+        if Response:
+            validatedInstances.append(instance)
+            print("Located gekko @ %s" % instance)
+        else:
+            print("unable to locate %s" % instance)
+
+    if validatedInstances:
+        settings['global']['GekkoURLs'] = validatedInstances
+    else:
+        exit("Aborted: No running gekko instances found.")
 
     # --SELECT STRATEGY;
     if options.random_strategy:
