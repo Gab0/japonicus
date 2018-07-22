@@ -4,7 +4,7 @@ import datetime
 import json
 import os
 import numpy as np
-import pandas as pd
+import statistics
 import copy
 
 # from plotInfo import plotEvolutionSummary
@@ -76,13 +76,12 @@ def gekko_search(**parameters):
         p.join()
     else:
         scores = [Evaluate(Strategy, parameters) for n in range(num_rounds)]
-    series = pd.Series(scores)
-    mean = series.mean()
+
+    mean = statistics.mean(scores)
     stats.append(
-        [series.count(), mean, series.std(), series.min()] +
-        [series.quantile(x) for x in percentiles] +
-        [series.max()]
-    )
+        [len(scores), mean, statistics.stdev(scores), min(scores)] +
+        [0 for p in percentiles] +
+        [max(scores)])
     all_val.append(mean)
     return mean
 
