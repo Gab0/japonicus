@@ -1,7 +1,7 @@
 #!/bin/python
 import datetime
 import os
-import pandas as pd
+import csv
 
 
 class Logger():
@@ -9,7 +9,7 @@ class Logger():
         date = datetime.datetime.now()
         if not os.path.isdir('logs'):
             os.mkdir('logs')
-        
+
         self.logfilename = logfilename
         self.Header = ""
         self.Summary = ""
@@ -42,11 +42,14 @@ class Logger():
 
     def write_evolution_logs(self, i, stats, localeName):
         filename = "logs/%s/%s.csv" % (self.logfilename, localeName)
-        df = pd.DataFrame(stats)
-        df.to_csv(filename)
+        if stats:
+            fieldnames = list(stats[0].keys())
+            with open(filename, 'w') as f:
+                df = csv.DictWriter(f, fieldnames)
+                df.writeheader()
+                df.writerows(stats)
 
     def saveParameters(self, filename, content):
-        
         filename = "logs/%s/results/%s.toml" % (self.logfilename, filename)
         File = open(filename, 'w')
         File.write(content)
