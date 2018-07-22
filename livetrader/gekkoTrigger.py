@@ -90,14 +90,14 @@ def getTraderBaseParameters():
         },
         "mode": "realtime",
         "adviceWriter" : {
-            "enabled": 'true',
+            "enabled": 'false',
             "muteSoft": 'false'
             },
         "adviceLogger": {
-            "enabled": 'true',
+            "enabled": 'false',
             "muteSoft": 'false'
             },
-        
+
         "candleWriter": {
             "enabled": 'false',
             "adapter": "sqlite"
@@ -105,7 +105,7 @@ def getTraderBaseParameters():
         "type": "paper trader",
         "performanceAnalyzer": {
             "riskFreeReturn": 2,
-            "enabled": 'true'
+            "enabled": 'false'
         },
         "valid": 'true'
     }
@@ -124,32 +124,32 @@ def getWatchSettings(coinInfo):
 
 
 def checkWatcherExists(Watch):
-    Watchers = getRunningWatchers()
+    gekkoInstances = getRunningGekkos()
     Watch = Watch['watch']
     checkKeys = ['asset', 'currency', 'exchange']
-    for W in Watchers:
-        if 'strat' in W.keys():
-            continue
-        FOUND = True
-        for C in checkKeys:
-            if W['watch'][C] != Watch[C]:
-                FOUND = False
-                break
-
-        if FOUND:
-            return W['id']
+    for instanceName in gekkoInstances.keys():
+        instance = gekkoInstances[instanceName]
+        if instance['type'] == 'watcher':
+            FOUND = True
+            watcherTargetAssetCurrency = instance['config']['watch']
+            for C in checkKeys:
+                if watcherTargetAssetCurrency[C] != Watch[C]:
+                    FOUND = False
+                    break
+            if FOUND:
+                return instance['id']
 
     return False
 
 
-def getRunningWatchers():
+def getRunningGekkos():
     try:
         W = requests.get('http://localhost:3000/api/gekkos')
     except requests.exceptions.ConnectionError:
         print("Gekko is not running.")
-        return []
-    W = json.loads(W.text)
-    return W
+        return {}
+    runningGekkos = json.loads(W.text)['live']
+    return runningGekkos
 
 
 def getWatcherBaseParameters():
