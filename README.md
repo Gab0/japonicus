@@ -28,7 +28,15 @@ This somewhat corresponds to `--skeleton` mode of japonicus, which lets the GA s
 The changelog is important for the user as following modifications can cause bugs on related areas. Please report 'em ;)
 
 ```
-v0.70 (stable&develop branch)
+v0.80 (develop branch)
+
+- supports gekko v0.6.X (only).
+- Dockerfile and docker-compose methods revisited.
+- automatic filter for multiple remote gekko urls (urls defined inside settings/global)
+- live trading bot watcher at `jlivetrader.py`. For binance only, undocumented and experimental.
+
+
+v0.70 (stable branch)
 
 - log folder restructured
 - configStrategies.py DEPRECATED; use only TOML parameters at the folder strategy_parameters.
