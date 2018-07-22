@@ -152,3 +152,10 @@ class Exchange():
             userOrderHistory[Market] = Orders
 
         return userOrderHistory
+
+    def getPriceHistory(self):
+        candlestickData = {}
+        for Market in self.getAssets():
+            candlestickData[Market] = self.API.fetch_ohlcv(Market)
+
+        return candlestickData
