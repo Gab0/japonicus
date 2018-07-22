@@ -1,18 +1,30 @@
 #!/bin/python
-from . import gekkoTrigger
 
+from . import gekkoTrigger
+from . import assetAllocator
 from dateutil import parser as dateparser
 import datetime
 import csv
 import re
 import random
 from subprocess import Popen, PIPE
+
 import pytoml
 import os
 import time
+import json
 
 
-def stopGekko():
+def calculateMostIndicatedAssets(exchange):
+    candlestickData = exchange.getPriceHistory()
+    Assets = assetAllocator.selectMostProbableAssets(candlestickData)
+    Assets = [{'EXCHANGE': exchange.name,
+               'ASSET': a.split('/')[0],
+               'CURRENCY': a.split('/')[1]} for a in Assets]
+    return Assets
+
+
+def stopGekkoBots():
     PS = ['ps', 'aux']
 
     runningProcs = Popen(PS,
@@ -35,26 +47,25 @@ def stopGekko():
 def interpreteRunningBotStatistics(runningBots):
     allBotStrategies = []
     runningTimes = []
-    for Bot in runningBots:
-        usefulBot = False
-        if 'trader' in Bot.keys() and Bot["trader"] == "tradebot":
-            usefulBot = True
-            botCurrentStrategy = Bot["strat"]
+
+    for B in runningBots.keys():
+        Bot = runningBots[B]
+
+        if Bot["config"]["type"] == 'tradebot':
+            botCurrentStrategy = Bot["config"]["tradingAdvisor"]["method"]
             allBotStrategies.append(botCurrentStrategy)
 
-        if "firstCandle" in Bot.keys():
-            usefulBot = True
-            fC = dateparser.parse(Bot["firstCandle"]["start"])
-            lC = dateparser.parse(Bot["lastCandle"]["start"])
+        elif Bot["config"]["type"] == 'market watcher':
+            fC = dateparser.parse(Bot["events"]["initial"]["candle"]["start"])
+            lC = dateparser.parse(Bot["events"]["latest"]["candle"]["start"])
             delta = (lC - fC).seconds
 
             runningTime = delta
             runningTimes.append(runningTime)
 
-        if not usefulBot:
+        else:
             print("Odd runningBot found:")
-            print(Bot)
-            print(delta)
+            print(json.dumps(Bot, indent=2))
 
     return runningTimes, allBotStrategies
 
@@ -65,8 +76,69 @@ def getParameterSettingsPath(parameterName):
     return N
 
 
-def checkGekkoRunningBots(exchange, ranker):
-    runningBots = gekkoTrigger.getRunningWatchers()
+def operateStrategyScores(exchange, ranker,
+                          Balances, runningTimeHours,
+                          currentPortfolioStatistics, runningBotStrategies):
+    print("Rebooting gekko trading bots.")
+
+    markzeroTime = datetime.timedelta(minutes=runningTimeHours*3600)
+    predictedStartTime = datetime.datetime.now() - markzeroTime
+    # APPLY LAST SCORE TO STRATEGIES;
+    ranker.loadStrategyRankings()
+
+    def makeBalanceScore(entry):
+        return (float(entry['BALANCE']) /
+                float(entry['AVERAGE_PRICE']))
+
+    pastCorrespondingScore = None
+    for row in Balances:
+        balanceDate = dateparser.parse(row['TIME'])
+        timeDelta = predictedStartTime - balanceDate
+        minuteDelta = abs(timeDelta.seconds) / 60
+        if minuteDelta < 60:
+            pastCorrespondingScore = makeBalanceScore(row)
+
+    if pastCorrespondingScore is not None:
+        currentScore =\
+            makeBalanceScore(currentPortfolioStatistics)
+
+        botRunScore = currentScore / pastCorrespondingScore * 100
+        normalizedBotRunScore = botRunScore / runningTimeHours
+
+        runningStrategy = None
+        for Strategy in ranker.Strategies:
+            equalStrats = True
+            strategyParameters = pytoml.load(open(
+                getParameterSettingsPath(Strategy.parameters)))
+            print(runningBotStrategies[-1])
+            comparateParameters =\
+                runningBotStrategies[-1]['params']
+            for param in comparateParameters.keys():
+                if type(param) == dict:
+                    continue
+                if param not in strategyParameters.keys():
+                    equalStrats = False
+                    break
+                if strategyParameters[param] !=\
+                   comparateParameters[param]:
+                    equalStrats = False
+                    break
+            if equalStrats:
+                runningStrategy = Strategy
+                break
+
+        if runningStrategy:
+            print("Runnnig strategy found at scoreboard.")
+            runningStrategy.profits.append(normalizedBotRunScore)
+        else:
+            print("Running strategy not found at scoreboard.")
+
+    # WRITE NEW STRATEGY SCORES;
+    ranker.saveStrategyRankings()
+
+
+def checkGekkoRunningBots(exchange, ranker, options):
+    runningBots = gekkoTrigger.getRunningGekkos()
 
     BalancesFields = ['TIME', 'BALANCE', 'AVERAGE_PRICE']
 
@@ -105,87 +177,40 @@ def checkGekkoRunningBots(exchange, ranker):
         if runningTimes and runningBotStrategies:
             averageRunningTime = sum(runningTimes) / len(runningTimes)
             runningTimeHours = averageRunningTime / 3600
-            markzeroTime = datetime.timedelta(minutes=averageRunningTime)
-            predictedStartTime = datetime.datetime.now() - markzeroTime
 
             targetMinimumRunningHours =\
                 exchange.conf.strategyRunTimePeriodHours
 
-            # if
+            # if target running time is reached;
             if runningTimeHours > targetMinimumRunningHours:
-                print("Rebooting gekko trading bots.")
-
-                # APPLY LAST SCORE TO STRATEGIES;
-                Strategies = exchange.loadStrategyRankings()
-
-                def makeBalanceScore(entry):
-                    return (float(entry['BALANCE']) /
-                            float(entry['AVERAGE_PRICE']))
-
-                pastCorrespondingScore = None
-                for row in Balances:
-                    balanceDate = dateparser.parse(row['TIME'])
-                    timeDelta = predictedStartTime - balanceDate
-                    minuteDelta = abs(timeDelta.seconds) / 60
-                    if minuteDelta < 60:
-                        pastCorrespondingScore = makeBalanceScore(row)
-
-                if pastCorrespondingScore is not None:
-                    currentScore =\
-                        makeBalanceScore(currentPortfolioStatistics)
-
-                    botRunScore = currentScore / pastCorrespondingScore * 100
-                    normalizedBotRunScore = botRunScore / runningTimeHours
-
-                    runningStrategy = None
-                    for Strat in Strategies:
-                        equalStrats = True
-                        strategyParameters = pytoml.load(open(
-                            getParameterSettingsPath(Strat.parameters)))
-                        print(runningBotStrategies[-1])
-                        comparateParameters =\
-                            runningBotStrategies[-1]['params']
-                        for param in comparateParameters.keys():
-                            if type(param) == dict:
-                                continue
-                            if param not in strategyParameters.keys():
-                                equalStrats = False
-                                break
-                            if strategyParameters[param] !=\
-                               comparateParameters[param]:
-                                equalStrats = False
-                                break
-                        if equalStrats:
-                            runningStrategy = Strat
-                            break
-                    if runningStrategy:
-                        print("Runnnig strategy found at scoreboard.")
-                        runningStrategy.profits.append(normalizedBotRunScore)
-                    else:
-                        print("Running strategy not found at scoreboard.")
+                operateStrategyScores(exchange, ranker,
+                                      Balances, runningTimeHours,
+                                      currentPortfolioStatistics,
+                                      runningBotStrategies)
 
                 Strategy = ranker.selectStrategyToRun(selectorSigma)
 
-                stopGekko()
+                stopGekkoBots()
                 time.sleep(60)
+
+                selectedAssetCurrencyPairs = calculateMostIndicatedAssets(exchange)
                 gekkoTrigger.launchBatchTradingBots(
-                    assetCurrencyPairs,
+                    selectedAssetCurrencyPairs,
                     [Strategy.strategy],
-                    parameterName=Strategy.parameters
+                    options
                 )
 
-                # WRITE NEW STRATEGY SCORES;
-                exchange.saveStrategyRankings(Strategies)
             else:
                 print("Target runtime not reached.")
     else:
-        Strategies = exchange.loadStrategyRankings()
+        ranker.loadStrategyRankings()
         print("Launching bots on idle gekko instance.")
-        assetCurrencyPairs, Strategy =\
-            ranker.selectStrategyToRun(selectorSigma)
-
+        Strategy = ranker.selectStrategyToRun(selectorSigma)
+        selectedAssetCurrencyPairs = calculateMostIndicatedAssets(exchange)
+        print(assetCurrencyPairs)
+        print(selectedAssetCurrencyPairs)
         gekkoTrigger.launchBatchTradingBots(
-            assetCurrencyPairs,
+            selectedAssetCurrencyPairs,
             [Strategy.strategy],
-            parameterName=Strategy.parameters
+            options
         )
