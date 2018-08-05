@@ -178,6 +178,7 @@ def launchJaponicus(settings, options):
                 TargetParameters, GenerationMethod,
                 EvaluationMode, settings, options, web=web_server
             )
+
     # --LAUNCH BAYESIAN OPTIMIZATION;
     elif options.bayesian_optimization:
         import evolution_bayes
