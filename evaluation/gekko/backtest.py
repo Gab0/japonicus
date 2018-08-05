@@ -41,16 +41,21 @@ def runBacktest(
         gekko_config, Debug
     )
     url = GekkoInstanceUrl + '/api/backtest'
-    result = httpPost(url, gekko_config)
-    # sometime report is False(not dict)
-    if type(result['performanceReport']) is bool:
-        print("Warning: performanceReport not found, probable Gekko fail!")
-        print(Dataset.specifications)
-        # That fail is so rare that has no impact.. still happens randomly;
-        return {
-            'relativeProfit': 0, 'market': 0, 'trades': 0,
-            'sharpe': 0, 'roundtrips': []
-        }  # fake backtest report
+    fakeReport = {
+        'relativeProfit': 0, 'market': 0, 'trades': 0,
+        'sharpe': 0, 'roundtrips': []
+    }
+    try:
+        result = httpPost(url, gekko_config)
+        # sometime report is False(not dict)
+        if type(result['performanceReport']) is bool:
+            print("Warning: performanceReport not found, probable Gekko fail!")
+            print(Dataset.specifications)
+            # That fail is so rare that has no impact.. still happens randomly;
+            return fakeReport  # fake backtest report
+    except Exception as e:
+        print(e)
+        return fakeReport
 
     # rProfit = result['report']['relativeProfit']
     # nbTransactions = result['report']['trades']
