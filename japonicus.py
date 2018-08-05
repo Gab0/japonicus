@@ -98,8 +98,10 @@ def launchJaponicus(settings, options):
         exit("Aborted: gekko.js not found on path specified @Settings.py;")
 
     # ADDITIONAL MODES;
-    gekko_server = launchGekkoChildProcess(settings) if options.spawn_gekko else None
-    web_server = launchWebEvolutionaryInfo() if options.spawn_web else None
+    gekko_server = launchGekkoChildProcess(settings)\
+        if options.spawn_gekko else None
+    web_server = launchWebEvolutionaryInfo()\
+        if options.spawn_web else None
     sleep(1)
     markzero_time = datetime.datetime.now()
     showTitleDisclaimer(settings['backtest'])
@@ -110,10 +112,10 @@ def launchJaponicus(settings, options):
     possibleInstances = settings['global']['GekkoURLs']
     validatedInstances = []
     for instance in possibleInstances:
-        Response = evaluation.gekko.API.httpPost(instance, Verbose=False)
+        Response = evaluation.gekko.API.checkInstance(instance)
         if Response:
             validatedInstances.append(instance)
-            print("Located gekko @ %s" % instance)
+            print("found gekko @ %s" % instance)
         else:
             print("unable to locate %s" % instance)
 
