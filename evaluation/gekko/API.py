@@ -9,11 +9,21 @@ def initializeGekko():  # not used yet.
     CMD = ['node', gekkoDIR + '/gekko', '--ui']
     D = Popen(CMD, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
+    
+def checkInstance(instanceUrl):
+    try:
+        Request = requests.get(instanceUrl)
+    except Exception:
+        return False
+    if Request.text:
+        return True
+
 
 def httpPost(URL, data={}, Verbose=True):
     try:
         Request = requests.post(URL, json=data)
         Response = json.loads(Request.text)
+
     except ConnectionRefusedError:
         print("Error: Gekko comm error! Check your local Gekko instance.")
         exit()
