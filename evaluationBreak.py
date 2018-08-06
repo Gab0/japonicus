@@ -19,6 +19,7 @@ def showResults(World):
         useSecondary = 'evaluation'
     else:
         useSecondary = 'evolution'
+
     # LOAD EVALUATION DATASET;
     sourceDataset = random.choice(World.EnvironmentParameters[useSecondary])
     getter = evaluation.gekko.datasetOperations.getRandomSectorOfDataset
@@ -120,7 +121,7 @@ def showResults(World):
     # SAVE GLOBAL EVALUATION LOGS;
     evaluationBreaksFilename = 'logs/evaluation_breaks.csv'
 
-    if World.EvolutionStatistics:
+    if World.EvaluationStatistics:
         fieldnames = list(World.EvaluationStatistics[0].keys())
         with open(evaluationBreaksFilename, 'w') as f:
             GlobalEvolutionSummary = csv.DictWriter(f, fieldnames)
