@@ -126,12 +126,15 @@ def showResults(World):
         with open(evaluationBreaksFilename, 'w') as f:
             GlobalEvolutionSummary = csv.DictWriter(f, fieldnames)
             GlobalEvolutionSummary.writeheader()
-            World.logger.log(GlobalEvolutionSummary, target="Summary",
+            World.logger.log('\t'.join(GlobalEvolutionSummary.fieldnames), target="Summary",
                              show=False, replace=True)
 
             for n in World.EvaluationStatistics:
                 GlobalEvolutionSummary.writerow(n)
-                World.logger.log(n, target="Summary",
+        with open(evaluationBreaksFilename) as f:
+            GlobalEvolutionSummary = csv.DictReader(f)
+            for row in GlobalEvolutionSummary:
+                World.logger.log('\t'.join([x[1] for x in row]), target="Summary",
                                  show=False, replace=False)
 
     World.logger.updateFile()
