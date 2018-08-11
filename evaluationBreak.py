@@ -134,7 +134,7 @@ def showResults(World):
         with open(evaluationBreaksFilename) as f:
             GlobalEvolutionSummary = csv.DictReader(f)
             for row in GlobalEvolutionSummary:
-                World.logger.log('\t'.join([x[1] for x in row]), target="Summary",
+                World.logger.log('\t'.join([row[x] for x in row.keys()]), target="Summary",
                                  show=False, replace=False)
 
     World.logger.updateFile()
