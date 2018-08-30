@@ -1,2 +1,2 @@
 #!/bin/python
-VERSION = 0.75
+VERSION = 0.90

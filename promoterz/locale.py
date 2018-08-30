@@ -29,6 +29,7 @@ class Locale():
         self.population = World.tools.population(World.genconf.POP_SIZE)
         self.lastEvaluation = None
         self.lastEvaluationOnSecondary = None
+
         # --INIT STATISTICS;
         self.stats = statistics.getStatisticsMeter()
         self.InitialBestScores, self.FinalBestScores = [], []

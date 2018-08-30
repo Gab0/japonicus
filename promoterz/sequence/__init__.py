@@ -1,4 +1,4 @@
 #!/bin/python
 
-from .import standard_loop
-from .import parallel_world
+from .locale import standard_loop
+from .world import parallel_world

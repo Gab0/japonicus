@@ -27,7 +27,7 @@ from evaluation.gekko.datasetOperations import *
 StrategyFileManager = None
 
 
-# TEMPORARY ASSIGNMENT OF EVAL FUNCTIONS; SO THINGS REMAIN SANE (¿SANE?);
+# TEMPORARY ASSIGNMENT OF EVAL FUNCTIONS; SO THINGS REMAIN ¿SANE;
 def indicatorEvaluate(
     StrategyFileManager,
     constructPhenotype,
@@ -209,12 +209,14 @@ def gekko_generations(
         def onInitLocale(World, locale):
             locale.Dataset = getLocaleDataset(World, locale)
 
-    loops = [promoterz.sequence.standard_loop.standard_loop]
+    populationLoops = [promoterz.sequence.locale.standard_loop.execute]
+    worldLoops = [promoterz.sequence.world.parallel_world.execute]
     World = promoterz.world.World(
-        GlobalTools,
-        loops,
-        genconf,
-        TargetParameters,
+        GlobalTools=GlobalTools,
+        populationLoops=populationLoops,
+        worldLoops=worldLoops,
+        genconf=genconf,
+        TargetParameters=TargetParameters,
         EnvironmentParameters={
             'evolution':  evolutionDatasets,
             'evaluation': evaluationDatasets
@@ -244,7 +246,7 @@ def gekko_generations(
 
     # --RUN EPOCHES;
     while World.EPOCH < World.genconf.NBEPOCH:
-        World.runEPOCH()
+        World.runEpoch()
         if evalbreakconf.evaluateSettingsPeriodically and not options.benchmarkMode:
             if not World.EPOCH % evalbreakconf.evaluateSettingsPeriodically:
                 evaluationBreak.showResults(World)

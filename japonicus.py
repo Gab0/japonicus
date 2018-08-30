@@ -16,7 +16,7 @@ import TOMLutils
 import datetime
 import os
 
-import web
+
 import promoterz
 from version import VERSION
 import evaluation
@@ -59,12 +59,15 @@ def launchGekkoChildProcess(settings):
 
 
 def launchWebEvolutionaryInfo():
-    # web_args = ['python', 'web.py']
-    # web_server = Popen(web_args, stdin=PIPE, stdout=PIPE)
     print("WEBSERVER MODE")
-    webServer = web.run_server()
+    webpageTitle = "japonicus evolutionary statistics - v%.2f" % VERSION
+    webServer = promoterz.webServer.core.run_server(webpageTitle)
     webServerProcess = Thread(
-        target=webServer.server.run, kwargs={'debug': False, 'host': '0.0.0.0'}
+        target=webServer.server.run,
+        kwargs={
+            'debug': False,
+            'host': '0.0.0.0'
+        }
     )
     webServerProcess.start()
     return webServer
@@ -82,7 +85,8 @@ def buildJaponicusOptions(optionparser):
 
     options, args = parser.parse_args()
     for settingSubset in settingSubsets:
-        settings[settingSubset] = promoterz.metaPromoterz.applyCommandLineOptionsToSettings(
+        settings[settingSubset] =\
+            promoterz.metaPromoterz.applyCommandLineOptionsToSettings(
             options,
             settings[settingSubset]
         )
@@ -97,6 +101,9 @@ def launchJaponicus(settings, options):
     if not os.path.isfile(settings['global']['gekkoPath'] + '/gekko.js'):
         exit("Aborted: gekko.js not found on path specified @Settings.py;")
 
+    # show title;
+    showTitleDisclaimer(settings['backtest'])
+
     # ADDITIONAL MODES;
     gekko_server = launchGekkoChildProcess(settings)\
         if options.spawn_gekko else None
@@ -104,7 +111,6 @@ def launchJaponicus(settings, options):
         if options.spawn_web else None
     sleep(1)
     markzero_time = datetime.datetime.now()
-    showTitleDisclaimer(settings['backtest'])
 
     print()
 
@@ -183,10 +189,8 @@ def launchJaponicus(settings, options):
 
     # --LAUNCH BAYESIAN OPTIMIZATION;
     elif options.bayesian_optimization:
-        import evolution_bayes
+        exit("Bayesian method is deprecated.")
 
-        for s in range(options.repeater):
-            evolution_bayes.gekko_bayesian(Strategy)
     deltatime = datetime.datetime.now() - markzero_time
     print("Run took %i seconds." % deltatime.seconds)
     if options.spawn_web:

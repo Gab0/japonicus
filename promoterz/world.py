@@ -1,18 +1,18 @@
 #!/bin/python
 import random
-import promoterz.locale
-import time
-from functools import partial
 
-import promoterz.sequence.parallel_world
+import time
+import math
+
+from . import locale
 
 
 class World():
-
     def __init__(
             self,
             GlobalTools=None,
-            loops=None,
+            populationLoops=None,
+            worldLoops=None,
             genconf=None,
             TargetParameters=None,
             EnvironmentParameters=None,
@@ -20,29 +20,37 @@ class World():
             web=None,
     ):
         self.tools = GlobalTools
-        self.loops = loops
+
+        # main components
+        self.populationLoops = populationLoops
+        self.worldLoops = worldLoops
+
+        # genetic algorithm status
         self.EPOCH = 0
         self.locales = []
+        self.totalEvaluations = 0
+
+        # genetic algorithm attributes
         self.size = [500, 500]
-        self.maxdistance = promoterz.sequence.parallel_world.calculateDistance([0, 0], self.size)
-        self.localeID = 1
+        self.maxdistance = self.calculateDistance([0, 0], self.size)
         self.TargetParameters = TargetParameters
         self.genconf = genconf
+
+        self.localeID = 1
         self.EnvironmentParameters = EnvironmentParameters
-        self.runEPOCH = partial(promoterz.sequence.parallel_world.world_EPOCH, self)
         self.onInitLocale = onInitLocale
         self.web = web
-        self.totalEvaluations = 0
 
     def generateLocale(self):
         name = 'Locale%i' % (self.localeID)
         self.localeID += 1
         position = [random.randrange(0, self.size[x]) for x in range(2)]
-        L = promoterz.locale.Locale(self, name, position, random.choice(self.loops))
+        L = locale.Locale(self, name,
+                          position,
+                          random.choice(self.populationLoops))
         if self.onInitLocale:
             self.onInitLocale(self, L)
-        if self.web:
-            self.web.newGraphic(name)
+
         self.locales.append(L)
 
     def migration(self, source, target, number_range):
@@ -54,30 +62,75 @@ class World():
                 del individual.fitness.values
                 target.population.append(individual)
 
-    def explodeLocale(self, locale):
+    def explodeLocale(self, explLocale):
         if len(self.locales) < 2:
             return
 
         if self.web:
             for g in range(len(self.web.GraphicList)):
-                if self.web.GraphicList[g].id == locale.name:
+                if self.web.GraphicList[g].id == explLocale.name:
                     self.web.GraphicList[g].Active = False
+
         totaldistance = 0
         for T in self.locales:
-            if locale == T:
+            if explLocale == T:
                 T.tempdist = 0
                 continue
 
-            distance = promoterz.sequence.parallel_world.calculateDistance(
-                locale.position, T.position)
+            distance = self.calculateDistance(
+                explLocale.position, T.position)
             T.tempdist = distance
             totaldistance += distance
         for T in self.locales:
             T.fugitivenumber = int(
-                round(T.tempdist / totaldistance * len(locale.population))
+                round(T.tempdist / totaldistance * len(explLocale.population))
             )
         for T in self.locales:
-            self.migration(locale, T, (T.fugitivenumber, T.fugitivenumber + 1))
+            self.migration(locale, T,
+                           (T.fugitivenumber, T.fugitivenumber + 1))
             del T.tempdist
             del T.fugitivenumber
         self.locales = [x for x in self.locales if x != locale]
+
+    def runEpoch(self):
+        print("\t======  EPOCH %i/%i  ======" % (self.EPOCH,
+                                                 self.genconf.NBEPOCH))
+        epochStartTime = time.time()
+
+        if self.web:
+            self.web.WorldGraph.__setattr__(
+                'figure',
+                self.web.updateWorldGraph(self.locales))
+        for LOCALE in self.locales:
+            LOCALE.run()
+            if self.web:
+                graphUpdated = False
+                for F in range(len(self.web.GraphicList)):
+                    if self.web.GraphicList[F].id == LOCALE.name:
+                        graphUpdated = True
+                        print("Updating %s graph." % LOCALE.name)
+                        print(dir(self.web.GraphicList[F]))
+                        self.web.GraphicList[F].__setattr__(
+                            'figure',
+                            self.web.updateLocaleStatsGraph(LOCALE.name,
+                                                            LOCALE.EvolutionStatistics[-1]),
+                        )
+                if not graphUpdated:
+                    print("Creating new graphic for locale %s" % LOCALE.name)
+                    self.web.newGraphic(LOCALE.name)
+
+        self.worldLoops[0](self)
+
+        self.EPOCH += 1
+        epochRunTime = time.time() - epochStartTime
+        print("Epoch runs in %.2f seconds;" % epochRunTime)
+        if not self.EPOCH % 10:
+            print("Backend power %s" % self.parallel.lasttimesperind)
+        print("")
+
+    @staticmethod
+    def calculateDistance(point1, point2):
+        x = abs(point1[0] - point2[0])
+        y = abs(point1[1] - point2[1])
+        D = math.sqrt(x ** 2 + y ** 2)
+        return D
