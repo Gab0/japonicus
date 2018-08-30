@@ -28,7 +28,13 @@ This somewhat corresponds to `--skeleton` mode of japonicus, which lets the GA s
 The changelog is important for the user as following modifications can cause bugs on related areas. Please report 'em ;)
 
 ```
-v0.80 (develop branch)
+v0.90 
+
+- web interface reworked - now the recommended method to run the ga's.
+- locale creation/destruction chances updated.
+- bayesian evolution method deprecated.
+
+v0.80 
 
 - supports gekko v0.6.X (only).
 - Dockerfile and docker-compose methods revisited.
@@ -36,7 +42,7 @@ v0.80 (develop branch)
 - live trading bot watcher at `jlivetrader.py`. For binance only, undocumented and experimental.
 
 
-v0.70 (stable branch)
+v0.70 
 
 - log folder restructured
 - configStrategies.py DEPRECATED; use only TOML parameters at the folder strategy_parameters.
