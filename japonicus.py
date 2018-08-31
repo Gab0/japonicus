@@ -174,7 +174,7 @@ def launchJaponicus(settings, options):
                 print("Failure to find strategy parameter rules for " +
                       "%s at ./strategy_parameters" % Strategy)
                 gekkoParameterPath = "%s/config/strategies/%s.toml" %\
-                                     (settings['global']['GekkoDir'], Strategy)
+                                     (settings['global']['gekkoPath'], Strategy)
                 print("Trying to locate gekko parameters at %s" %
                       gekkoParameterPath)
                 TOMLData = TOMLutils.preprocessTOMLFile(gekkoParameterPath)

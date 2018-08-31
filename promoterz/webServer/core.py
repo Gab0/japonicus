@@ -15,6 +15,7 @@ from evaluation.gekko.statistics import epochStatisticsNames, periodicStatistics
 from . import graphs
 from . import layout
 
+import functools
 import logging
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
@@ -28,63 +29,52 @@ def run_server(webpageTitle):
     app.scripts.config.serve_locally = False
     app.css.config.serve_locally = False
 
-    dcc._js_dist[0]['external_url'] =\
-        'https://cdn.plot.ly/plotly-finance-1.28.0.min.js'
+    app.webpageTitle = webpageTitle
 
-    # Add caching
-    cache = Cache(app.server, config={'CACHE_TYPE': 'simple'})
     timeout = 60 * 60  # 1 hour
 
     # Update function bindings;
-    app.updateLocaleStatsGraph = graphs.updateLocaleStatsGraph
+    app.updateLocaleGraph = graphs.updateLocaleGraph
     app.updateWorldGraph = graphs.updateWorldGraph
 
-    # Graphics initialization;
-    app.WorldGraph = graphs.newGraphic("World Topology")
-    app.GraphicList = []
+    # Graphics initialization and input points against World;
+    # why is this placeholder required? ;(
+    app.WorldGraph = dcc.Graph(id='WorldGraph', figure={})
+    app.LocaleGraphs = []
 
-    def newGraphic(name):
-        app.GraphicList.append(graphs.newGraphic(name))
+    app.epochInfo = ""
+    app.layout = functools.partial(layout.getLayout, app)
 
-    app.newGraphic = newGraphic
-    app.layout = layout.getLayout(webpageTitle)
-
-    app.config['suppress_callback_exceptions'] = True
+    app.config['suppress_callback_exceptions'] = False
 
     # event triggers
-    onRefreshClick = Event('refresh', 'click')
+    onRefreshClick = Input('refresh-button', 'n_clicks')
     onInterval = Event('my-interval', 'interval')
 
+
+    """
     # update graph methods
-    @app.callback(Output('display-time', 'children'),
-                  events=[onRefreshClick])
-    def display_time():
+    @app.callback(Output('last-refresh', 'children'),
+                  [Input('refresh-button', 'n_clicks')])
+    def display_time(w):
+        print("Refreshing graphical interface graphics.")
         return str(datetime.datetime.now())
 
-    @app.callback(Output('my-interval', 'interval'),
-                  [Input('set-time', 'value')])
-    def update_interval(value):
-        return value
-
-
-    @cache.memoize(timeout=timeout)
     @app.callback(Output('WorldGraph', 'children'),
-                  events=[onRefreshClick])
-    def updateGGraphs():
-        return app.WorldGraph
+                  [Input('refresh-button', 'n_clicks')])
+    def updateGGraphs(w):
+        return [app.WorldGraph]
 
-    @cache.memoize(timeout=timeout)
     @app.callback(Output('LocaleGraphs', 'children'),
-                  events=[onRefreshClick])
-    def updateLGraphs():
-        return app.GraphicList
-
+                  [Input('refresh-button', 'n_clicks')])
+    def updateLGraphs(w):
+        return [app.GraphicList]
+    """
 
 
     @server.route('/static/<path:path>')
     def send_css(path):
         return flask.send_from_directory(os.path.dirname(__file__), path)
-
 
     # load external css
     currentDirectory = os.path.dirname(os.path.abspath(__file__))
@@ -95,17 +85,8 @@ def run_server(webpageTitle):
         external_css = cssListFile.read().split("\n")
         external_css = list(filter(None, external_css))
 
-    print(external_css)
     for css in external_css:
         app.css.append_css({"external_url": css})
-
-    D = os.getcwd() + '/'
-    D = re.sub(D, '', os.path.dirname(__file__))
-    localCSS = os.path.join('static',
-                            "promoterz_style.css")
-    print(localCSS)
-    # app.css.append_css({"relative_package_path": localCSS})
-
 
     # launch DASH APP
     return app

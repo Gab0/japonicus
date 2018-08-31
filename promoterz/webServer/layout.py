@@ -5,15 +5,24 @@ import dash_html_components as html
 import datetime
 
 
-def getLayout(webpageTitle):
+def getLayout(app):
+    inlineBlock = {"display": "inline-block"}
     headerWidgets = [
-        html.Button("Refresh", id='refresh'),
+        html.Button("Refresh", id='refresh-button'),
         html.Div(
             [
+                html.Div("Last refresh @ ", style=inlineBlock.update({"float": "left"})),
                 html.Div(datetime.datetime.now(),
-                         id='display-time', className="showTime"),
-                html.Div("Running since %s" % datetime.datetime.now(),
-                         id='running-since', className="showTime")
+                         id='last-refresh', className="showTime",
+                         style=inlineBlock.update({"float": "left"})),
+
+                html.Div("%s Start time" % datetime.datetime.now(),
+                         id='start-time', className="showTime",
+                         style=inlineBlock.update({"float": "right"})),
+                html.Br(),
+                html.Center([
+                    html.Div(app.epochInfo, id="current-epoch")
+                    ])
             ], className="showTime")
     ]
 
@@ -26,18 +35,20 @@ def getLayout(webpageTitle):
 
     layout = html.Div(
         [
-            html.Link(rel='stylesheet', href='/static/promoterz_style.css'),
+            # html.Link(rel='stylesheet', href='/static/promoterz_style.css'),
             html.Div(
                 [
                     html.H2(
-                        webpageTitle,
+                        app.webpageTitle,
                         style={'padding-top': '20', 'text-align': 'center'},
                     ),
                     html.Div(headerWidgets),
                     html.Div(pageMenu),
-                    html.Div(id='WorldGraph'),
-                    html.Div(id='LocaleGraphs'),
-        ])],
+                ]
+            ),
+            html.Div(children=app.WorldGraph, id='WorldGraphContainer'),
+            html.Div(children=app.LocaleGraphs, id='LocaleGraphsContainer'),
+        ],
         style={
             'width': '1100',
             'margin-left': 'auto',

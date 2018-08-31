@@ -93,31 +93,22 @@ class World():
         self.locales = [x for x in self.locales if x != locale]
 
     def runEpoch(self):
-        print("\t======  EPOCH %i/%i  ======" % (self.EPOCH,
-                                                 self.genconf.NBEPOCH))
+        epochHeader = "EPOCH %i/%i" % (
+            self.EPOCH,
+            self.genconf.NBEPOCH
+        )
+
+        print("\t====== %s ======" % epochHeader)
         epochStartTime = time.time()
 
         if self.web:
-            self.web.WorldGraph.__setattr__(
-                'figure',
-                self.web.updateWorldGraph(self.locales))
+            self.epochInfo = epochHeader
+            self.web.updateWorldGraph(app=self.web, WORLD=self)
+
         for LOCALE in self.locales:
             LOCALE.run()
             if self.web:
-                graphUpdated = False
-                for F in range(len(self.web.GraphicList)):
-                    if self.web.GraphicList[F].id == LOCALE.name:
-                        graphUpdated = True
-                        print("Updating %s graph." % LOCALE.name)
-                        print(dir(self.web.GraphicList[F]))
-                        self.web.GraphicList[F].__setattr__(
-                            'figure',
-                            self.web.updateLocaleStatsGraph(LOCALE.name,
-                                                            LOCALE.EvolutionStatistics[-1]),
-                        )
-                if not graphUpdated:
-                    print("Creating new graphic for locale %s" % LOCALE.name)
-                    self.web.newGraphic(LOCALE.name)
+                self.web.updateLocaleGraph(app=self.web, LOCALE=LOCALE)
 
         self.worldLoops[0](self)
 
