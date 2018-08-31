@@ -77,14 +77,17 @@ class World():
             T.tempdist = distance
             totaldistance += distance
         for T in self.locales:
-            T.fugitivenumber = int(
-                round(T.tempdist / totaldistance * len(explLocale.population))
-            )
+            fugitiveNumber = T.tempdist / totaldistance *\
+                len(explLocale.population)
+
+            T.fugitivenumber = int(round(fugitiveNumber))
+
         for T in self.locales:
-            self.migration(locale, T,
+            self.migration(explLocale, T,
                            (T.fugitivenumber, T.fugitivenumber + 1))
             del T.tempdist
             del T.fugitivenumber
+
         self.locales = [x for x in self.locales if x != locale]
 
     def runEpoch(self):
