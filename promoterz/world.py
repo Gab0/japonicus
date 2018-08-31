@@ -66,11 +66,6 @@ class World():
         if len(self.locales) < 2:
             return
 
-        if self.web:
-            for g in range(len(self.web.GraphicList)):
-                if self.web.GraphicList[g].id == explLocale.name:
-                    self.web.GraphicList[g].Active = False
-
         totaldistance = 0
         for T in self.locales:
             if explLocale == T:

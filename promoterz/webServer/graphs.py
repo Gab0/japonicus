@@ -128,7 +128,6 @@ def updateLocaleGraph(app, LOCALE):
             'annotations': annotations
         },
     }
-    print(fig)
 
     G = dcc.Graph(figure=fig, id=LOCALE.name)
     if oldLocaleGraph:
