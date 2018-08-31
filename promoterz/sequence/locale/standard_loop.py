@@ -16,13 +16,20 @@ def checkPopulation(population, message):
 
 def execute(World, locale):
 
-    # --assertions are most for debugging purposes; they should not trigger
-    assert (len(locale.population))
+    # --populate if we don't have population (migrations might do it);
+    if not (locale.population):
+        locale.population = locale.extratools.ImmigrateRandom(
+            (5, 10),
+            locale.population
+        )
+
     locale.extraStats = {}
 
     # --validate individuals;
     locale.population = validation.validatePopulation(
-        World.tools.constructPhenotype, World.TargetParameters, locale.population
+        World.tools.constructPhenotype,
+        World.TargetParameters,
+        locale.population
     )
 
     # --remove equal citizens before evaluation for efficency
@@ -53,6 +60,7 @@ def execute(World, locale):
 
     # --compile stats;
     statistics.compileStats(locale)
+
     # --population ages
     qpop = len(locale.population)
     locale.population = locale.extratools.populationAges(
@@ -66,13 +74,15 @@ def execute(World, locale):
     if World.genconf.minimumProfitFilter is not None:
         locale.extratools.filterThreshold(World.genconf.minimumProfitFilter,
                                           World.genconf._lambda)
-        checkPopulation(locale.population, "Population dead after profit filter.")
+        checkPopulation(locale.population,
+                        "Population dead after profit filter.")
 
     # --remove individuals below tradecount
     if World.genconf.TradeNumberFilterRange is not None:
         locale.extratools.filterTrades(World.genconf.TradeNumberFilterRange,
                                        World.genconf._lambda)
-        checkPopulation(locale.population, "Population dead after trading number filter.")
+        checkPopulation(locale.population,
+                        "Population dead after trading number filter.")
 
     # --remove individues based on average roundtripe exposure time;
     if World.genconf.averageExposureLengthFilterRange is not None:
@@ -80,13 +90,16 @@ def execute(World, locale):
             World.genconf.averageExposureLengthFilterRange,
             World.genconf._lambda
         )
-        checkPopulation(locale.population, "Population dead after roundtrip exposure filter.")
+        checkPopulation(locale.population,
+                        "Population dead after roundtrip exposure filter.")
 
     if not locale.population:
         locale.population = World.tools.population(World.genconf.POP_SIZE)
         print("Repopulating... Aborting epoch.")
+
     # --show stats;
     statistics.showStatistics(locale)
+
     # --calculate new population size;
     if locale.EPOCH:
         PRoFIGA = supplement.PRoFIGA.calculatePRoFIGA(
@@ -97,39 +110,58 @@ def execute(World, locale):
             locale.EvolutionStatistics[locale.EPOCH],
         )
         locale.POP_SIZE += locale.POP_SIZE * PRoFIGA
-        minps, maxps = World.genconf.POP_SIZE // 2, World.genconf.POP_SIZE * 3
+
+        # put population size inside thresholds;
+        minps = World.genconf.POP_SIZE // 2
+        maxps = World.genconf.POP_SIZE * 3
         try:
-            locale.POP_SIZE = int(round(max(min(locale.POP_SIZE, maxps), minps)))
-        except:
+            _POP_SIZE = max(min(locale.POP_SIZE, maxps), minps)
+            locale.POP_SIZE = int(round(_POP_SIZE))
+        except Exception as e:
             locale.POP_SIZE = 30
             M = "POP_SIZE PROFIGA ERROR;"
             print(M)
+
     # --filter best inds;
-    locale.population[:] = evolutionHooks.selBest(locale.population, locale.POP_SIZE)
-    checkPopulation(locale.population, "Population dead after selection of score filter.")
+    locale.population[:] = evolutionHooks.selBest(locale.population,
+                                                  locale.POP_SIZE)
+    checkPopulation(locale.population,
+                    "Population dead after selection of score filter.")
     assert (None not in locale.population)
-    # print(EvolutionStatistics)
-    #FinalBestScores.append(Stats['max'])
 
     # --select best individues to procreate
-    LAMBDA = max(World.genconf._lambda, locale.POP_SIZE - len(locale.population))
-    TournamentSize = max(2 * LAMBDA, len(locale.population))
-    offspring = evolutionHooks.Tournament(locale.population, LAMBDA, TournamentSize)
+    LAMBDA = max(World.genconf._lambda,
+                 locale.POP_SIZE - len(locale.population))
+
+    TournamentSize = max(2 * LAMBDA,
+                         len(locale.population))
+
+    offspring = evolutionHooks.Tournament(locale.population,
+                                          LAMBDA,
+                                          TournamentSize)
+
     offspring = [deepcopy(x) for x in offspring]  # is deepcopy necessary?
+
     # --modify and integrate offspring;
     offspring = algorithms.varAnd(
         offspring, World.tools, World.genconf.cxpb, World.genconf.mutpb
     )
+
     locale.extratools.ageZero(offspring)
     locale.population += offspring
+
     # --NOW DOESN'T MATTER IF SOME INDIVIDUE LACKS FITNESS VALUES;
     assert (None not in locale.population)
+
     # --immigrate individual from HallOfFame;
     if random.random() < 0.2:
         locale.population = locale.extratools.ImmigrateHoF(locale.population)
+
     # --immigrate random number of random individues;
-    if random.random() < 0.5:
-        locale.population = locale.extratools.ImmigrateRandom((2, 7), locale.population)
-    assert (len(locale.population))
+    if random.random() < 0.5 or not locale.population:
+        locale.population = locale.extratools.ImmigrateRandom(
+            (2, 7),
+            locale.population
+        )
 
     assert (None not in locale.population)
