@@ -130,7 +130,7 @@ def updateLocaleGraph(app, LOCALE):
     }
 
     G = dcc.Graph(figure=fig, id=LOCALE.name)
-    if oldLocaleGraph:
+    if oldLocaleGraph is not None:
         app.LocaleGraphs[oldLocaleGraph] = G
     else:
         app.LocaleGraphs.append(G)
