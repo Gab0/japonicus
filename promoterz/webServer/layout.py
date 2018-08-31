@@ -6,6 +6,7 @@ import datetime
 
 
 def getLayout(app):
+    # this is a mess;
     inlineBlock = {"display": "inline-block"}
     headerWidgets = [
         html.Button("Refresh", id='refresh-button'),

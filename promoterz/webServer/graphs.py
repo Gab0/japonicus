@@ -98,27 +98,16 @@ def updateLocaleGraph(app, LOCALE):
         'max', 'evaluationScore',
         'evaluationScoreOnSecondary'
     ]
-    """
-    centralMarker = {
-        'x': [0, Statistics[-1]["id"]],
-        'y': [0],
-        'type': 'line',
-        'name': 'markzero',
-        'line': {'color': 'rgb(0,0,0)'},
-    }
-    """
-    DATA = []
-    for Statistic in Statistics:
-        DATA += [
+
+    DATA = [
             {
-                'x': [Statistic['id']],
-                'y': [Statistic[statNames[S]]],
+                'x': [Statistic['id'] for Statistic in Statistics],
+                'y': [Statistic[statNames[S]] for Statistic in Statistics],
                 'type': 'line',
                 'name': statisticsNames[statNames[S]],
                 'line': {'color': 'rgb%s' % str(colorSequence[S])},
             }
             for S in range(len(statNames))
-            if Statistic[statNames[S]] is not None
         ]
 
     fig = {
