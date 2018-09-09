@@ -30,12 +30,14 @@ def showResults(World):
     for LOCALE in World.locales:
         LOCALE.population = [ind for ind in LOCALE.population
                              if ind.fitness.valid]
+
         # SELECT BEST INDIVIDUALS;
         B = World.evalbreakconf.NBBESTINDS
         BestIndividues = tools.selBest(LOCALE.population, B)
         Z = min(World.evalbreakconf.NBADDITIONALINDS,
                 len(LOCALE.population) - B)
         Z = max(0, Z)
+
         # SELECT ADDITIONAL INDIVIDUALS;
         AdditionalIndividues = promoterz.evolutionHooks.Tournament(
             LOCALE.population, Z, Z * 2
@@ -47,6 +49,7 @@ def showResults(World):
         setOfToEvaluateIndividues = BestIndividues + AdditionalIndividues
         print("%i selected;" % len(setOfToEvaluateIndividues))
         print("Selecting %i+%i individues, random test;" % (B, Z))
+
         # EVALAUTE EACH SELECTED INDIVIDUE;
         for FinalIndividue in setOfToEvaluateIndividues:
             GlobalLogEntry = {}
@@ -138,6 +141,9 @@ def showResults(World):
                                  show=False, replace=False)
 
     World.logger.updateFile()
+
+    if World.web:
+        World.web.updateEvalBreakGraph(World.web, World.EvaluationStatistics)
 
 
 def stratSettingsProofOfViability(World, Individual, Datasets):
