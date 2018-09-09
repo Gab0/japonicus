@@ -8,6 +8,7 @@ import dash
 from dash.dependencies import Input, Output, Event
 
 import dash_core_components as dcc
+import dash_html_components as html
 
 from flask_caching import Cache
 from evaluation.gekko.statistics import epochStatisticsNames, periodicStatisticsNames
@@ -33,15 +34,19 @@ def run_server(webpageTitle):
 
     timeout = 60 * 60  # 1 hour
 
-    # Update function bindings;
+    app.startTime = datetime.datetime.now()
+
+    # Graph Update function bindings;
     app.updateLocaleGraph = graphs.updateLocaleGraph
     app.updateWorldGraph = graphs.updateWorldGraph
+    app.updateEvalBreakGraph = graphs.updateEvalbreakGraph
+
 
     # Graphics initialization and input points against World;
     # why is this placeholder required? ;(
     app.WorldGraph = dcc.Graph(id='WorldGraph', figure={})
     app.LocaleGraphs = []
-
+    app.EvalBreakGraph = []
     app.epochInfo = ""
     app.layout = functools.partial(layout.getLayout, app)
 
@@ -71,6 +76,14 @@ def run_server(webpageTitle):
         return [app.GraphicList]
     """
 
+    # SELECT PAGE;
+    @app.callback(dash.dependencies.Output('page-content', 'children'),
+                  [dash.dependencies.Input('url', 'pathname')])
+    def display_page(pathname):
+        if re.findall("evalbreak", str(pathname)):
+            return layout.getEvalbreak(app)
+        else:
+            return layout.getCommon(app)
 
     @server.route('/static/<path:path>')
     def send_css(path):

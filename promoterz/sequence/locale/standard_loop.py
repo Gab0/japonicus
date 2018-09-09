@@ -9,6 +9,7 @@ from ... import evolutionHooks
 from ... import validation
 from ... import supplement
 
+
 def checkPopulation(population, message):
     if not (len(population)):
         print(message)

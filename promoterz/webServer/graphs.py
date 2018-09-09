@@ -28,7 +28,7 @@ def updateWorldGraph(app, WORLD):
     fig = {
         'data': populationGroupData,
         'layout': {
-            'title': "World Topology"
+            'title': "World Topology: 2D MAP"
         }
     }
 
@@ -47,7 +47,6 @@ def updateLocaleGraph(app, LOCALE):
     ID = [s for s in GraphName if s.isdigit()]
     annotations = []
 
-
     oldLocaleGraph = None
     for lidx, localeGraph in enumerate(app.LocaleGraphs):
         if localeGraph.id == LOCALE.name:
@@ -56,7 +55,7 @@ def updateLocaleGraph(app, LOCALE):
 
     statisticsNames = {}
     statisticsNames.update(epochStatisticsNames)
-    statisticsNames.update(periodicStatisticsNames)
+    # statisticsNames.update(periodicStatisticsNames)
 
     annotationFontDescription = {
         'family': 'Arial',
@@ -95,8 +94,9 @@ def updateLocaleGraph(app, LOCALE):
     ]
     statNames = [
         'avg', 'std', 'min',
-        'max', 'evaluationScore',
-        'evaluationScoreOnSecondary'
+        'max',
+        #'evaluationScore',
+        #'evaluationScoreOnSecondary'
     ]
 
     DATA = [
@@ -126,3 +126,34 @@ def updateLocaleGraph(app, LOCALE):
 
     return G
 
+
+def updateEvalbreakGraph(app, EvaluationSummary):
+
+    K = ["evaluation", "secondary"]
+    GES = dict([(k, []) for k in K])
+    for E in EvaluationSummary:
+        for k in K:
+            if k in E.keys():
+                GES[k].append(E[k])
+            else:
+                GES[k].append(None)
+
+    DATA = [
+        {
+            'x': list(range(len(GES[KEY]))),
+            'y': GES[KEY],
+            'type': 'line',
+            'name': KEY.upper()
+        } for KEY in GES.keys()
+    ]
+
+    figure = {
+        'data': DATA,
+        'layout': {
+            'title': "Evaluation Breaks"
+        }
+    }
+
+    G = dcc.Graph(figure=figure, id="EvaluationBreaksGraph")
+    app.EvalBreakGraph = G
+    return G
