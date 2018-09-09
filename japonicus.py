@@ -9,8 +9,6 @@ from Settings import getSettings
 from evolution_generations import gekko_generations
 from japonicus_options import parser
 
-
-
 import TOMLutils
 
 import datetime
