@@ -4,7 +4,7 @@ from copy import deepcopy
 import random
 from deap import algorithms
 
-import statistics
+from ... import statistics
 from ... import evolutionHooks
 from ... import validation
 from ... import supplement

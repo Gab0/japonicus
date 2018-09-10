@@ -123,3 +123,7 @@ class World():
         y = abs(point1[1] - point2[1])
         D = math.sqrt(x ** 2 + y ** 2)
         return D
+
+    def seedEnvironment(self, ammount):
+        self.Bounds = []
+        pass

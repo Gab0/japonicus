@@ -1,7 +1,6 @@
 #!/bin/python
 import evaluation
 import random
-import interface
 
 
 class CandlestickDataset():
@@ -21,7 +20,11 @@ class CandlestickDataset():
         return dateRangeToText(self.daterange)
 
     def textSpecifications(self):
-        return interface.showDatasetSpecifications(self.specifications)
+        message = "%s/%s @%s" % (self.specifications["asset"],
+                                 self.specifications["currency"],
+                                 self.specifications["exchange"])
+
+        return message
 
 
 def getRandomSectorOfDataset(sourceDataset, deltaDays):

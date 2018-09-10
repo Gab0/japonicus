@@ -48,6 +48,7 @@ def getHeader(app):
     pageMenu = [
         html.A(html.Button("Evolution Statistics"), href="/"),
         html.A(html.Button("Evaluation Breaks"), href="/evalbreak"),
+        html.A(html.Button("View Results"), href="/results")
         # html.Button("View Settings", className="unimplemented"),
         # html.Button("Inspect Population", className="unimplemented")
     ]
@@ -80,3 +81,7 @@ def getEvalbreak(app):
     return html.Div([
         html.Div(children=app.EvalBreakGraph, id='EvalBreakContainer')
     ], style=allStyle)
+
+
+def getResults(app):
+    return [html.P(str(r[0]) + '\n' + r) for r in app.resultParameters]

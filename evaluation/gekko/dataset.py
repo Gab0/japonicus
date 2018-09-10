@@ -1,7 +1,6 @@
 #!/bin/python
 import random
 import datetime
-from Settings import getSettings
 from .API import httpPost
 
 
@@ -59,8 +58,7 @@ def selectCandlestickData(GekkoURL, exchange_source=None, avoidCurrency=None):
     return chosenScansetSpecifications, chosenScansetRange
 
 
-def getCandles(DateRange, Dataset, size=100):
-    globalconf = getSettings('Global')
+def getCandles(globalconf, DateRange, Dataset, size=100):
     base = random.choice(globalconf.GekkoURLs)
     URL = base + "/api/getCandles"
     CONFIG = {

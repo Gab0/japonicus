@@ -1,8 +1,8 @@
 #!/bin/python
 from deap import tools
-from deap import base
-import promoterz
-import statistics
+
+from . import evolutionHooks
+from . import statistics
 
 
 class Locale():
@@ -14,7 +14,7 @@ class Locale():
         self.position = position
         self.EvolutionStatistics = []
         self.HallOfFame = tools.HallOfFame(30)
-        self.extratools = promoterz.evolutionHooks.getLocaleEvolutionToolbox(
+        self.extratools = evolutionHooks.getLocaleEvolutionToolbox(
             World, self
         )
         # GENERATION METHOD SELECTION;

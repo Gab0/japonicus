@@ -41,12 +41,13 @@ def run_server(webpageTitle):
     app.updateWorldGraph = graphs.updateWorldGraph
     app.updateEvalBreakGraph = graphs.updateEvalbreakGraph
 
-
     # Graphics initialization and input points against World;
     # why is this placeholder required? ;(
     app.WorldGraph = dcc.Graph(id='WorldGraph', figure={})
     app.LocaleGraphs = []
     app.EvalBreakGraph = []
+
+    app.resultParameters = []
     app.epochInfo = ""
     app.layout = functools.partial(layout.getLayout, app)
 
@@ -55,7 +56,6 @@ def run_server(webpageTitle):
     # event triggers
     onRefreshClick = Input('refresh-button', 'n_clicks')
     onInterval = Event('my-interval', 'interval')
-
 
     """
     # update graph methods
@@ -82,6 +82,8 @@ def run_server(webpageTitle):
     def display_page(pathname):
         if re.findall("evalbreak", str(pathname)):
             return layout.getEvalbreak(app)
+        if re.findall("results", str(pathname)):
+            return layout.getResults(app)
         else:
             return layout.getCommon(app)
 
