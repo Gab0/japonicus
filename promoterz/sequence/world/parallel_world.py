@@ -19,7 +19,7 @@ def execute(World):
                 World.migration(L[1], L[0], (1, 7))
 
     # --APPLY LOCALE CREATION;
-    if random.random() < 0.01:
+    if random.random() < World.genconf.localeCreationChance / 100:
         World.generateLocale()
 
     # --APPLY RANDOMIC LOCALE DESTRUCTION;
@@ -36,5 +36,7 @@ def execute(World):
                 #  will be a mess
                 break
 
-
-
+    # --APPLY LOCALE WALKS;
+    for L in range(len(World.locales)):
+        if random.random() < World.genconf.localeWalkChance / 100:
+            World.localeWalk(World.locales[L])

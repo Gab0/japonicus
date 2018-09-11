@@ -48,8 +48,6 @@ class World():
         L = locale.Locale(self, name,
                           position,
                           random.choice(self.populationLoops))
-        if self.onInitLocale:
-            self.onInitLocale(self, L)
 
         self.locales.append(L)
 
@@ -124,6 +122,38 @@ class World():
         D = math.sqrt(x ** 2 + y ** 2)
         return D
 
-    def seedEnvironment(self, ammount):
-        self.Bounds = []
-        pass
+    def seedEnvironment(self):
+        # round to nearest square number
+        self.sectorSeedRoot = round(math.sqrt(self.genconf.worldSeedSize))
+
+        self.environmentSectors = []
+        for i in range(self.sectorSeedRoot):
+            row = []
+            for j in range(self.sectorSeedRoot):
+                ENV = self.onInitLocale(self)
+                row.append(ENV)
+            self.environmentSectors.append(row)
+
+    def loadDatasetForLocalePosition(self, position):
+        pos = [P // self.size[p] for p, P in enumerate(position)]
+
+        return self.environmentSectors[pos[0]][pos[1]]
+
+    def localeWalk(self, locale):
+        ammount = self.genconf.localeWalkDistance
+
+        variation = [random.randrange(-ammount, ammount)
+                     for i in range(2)]
+
+        for i in range(2):
+            locale.position[i] += variation[i]
+
+            # put it inside boundaries,
+            # make world appear rounded like our planet :3;
+
+            # fix too low values
+            while locale.position[i] < 0:
+                locale.position[i] += self.size[i]
+
+            # fix too high values
+            locale.position[i] = locale.position[i] % self.size[i]

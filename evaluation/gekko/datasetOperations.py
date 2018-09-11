@@ -37,7 +37,7 @@ def getRandomSectorOfDataset(sourceDataset, deltaDays):
     return newDataset
 
 
-def getLocaleDataset(World, locale, Type='evolution'):
+def getLocaleDataset(World, Type='evolution'):
 
     localeDataset = []
     for DS in range(World.backtestconf.ParallelCandlestickDataset):

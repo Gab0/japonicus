@@ -26,17 +26,34 @@ ageBoundaries = [9, 19] # minimum age to die age when everyone dies (on EPOCHS)
 
 # after this age in epoches locale surely explodes i.e. ends.
 localeExpirationAge = 100
+
 # chance on each epoch of a locale to finish [in percentage];
 localeExplodeChance = 2
 
+# chance on each epoch of a locale creation [in percentage];
+localeCreationChance = 2
+
+# chance on each epoch of a locale to change position [in percentage];
+localeWalkChance = 40
+
+# max distance a locale can walk across world map on each epoch;
+localeWalkDistance = 5
+
+# number of different candle date ranges to seed world;
+# no area overlap, no empty spaces.
+# this rounds to the nearest square number.
+worldSeedSize = 40
+
 # filter individuals for minimum profit (or set to None)
 minimumProfitFilter = -15
+
 # filter individuals for minimum trade count; [has heavy impact] (or set to None)
 TradeNumberFilterRange = [6, 300]
+
 # filter individuals with roundtripe duration outside this range of values in hours (or set to None)
 averageExposureLengthFilterRange = [0, 300]
-# Date range persistence; Number of subsequent rounds [DEPRECATED]
-DRP = 70
+
+
 # until another time range in dataset is selected;
 
 # chromosome settings are for -gc mode which uses another GA internal representation mode
@@ -44,6 +61,7 @@ DRP = 70
 # check promoterz/representation/chromosome.py to see how it works.
 # both parameters interact with crossover probability AKA cxpb;
 # practical effects on evolution are really uknown;
+
 [chromosome]
 # length of the representation for each parameter. largers sizes should mantain
 # evolutionary dynamics for parameters with proportional larger ranges;

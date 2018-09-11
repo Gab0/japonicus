@@ -20,7 +20,7 @@ from .Settings import getSettings, makeSettings
 import stratego
 from functools import partial
 
-from evaluation.gekko.datasetOperations import *
+import evaluation.gekko.datasetOperations as datasetOperations
 
 
 StrategyFileManager = None
@@ -75,7 +75,7 @@ def grabDatasets(datasetconf, GekkoURL):
         D = evaluation.gekko.dataset.selectCandlestickData(GekkoURL,
             exchange_source=datasetconf.__dict__[evolutionDatasetName]
         )
-        evolutionDatasets.append(CandlestickDataset(*D))
+        evolutionDatasets.append(datasetOperations.CandlestickDataset(*D))
         try:
             evolutionDatasets[-1].restrain(datasetconf.dataset_span)
         except Exception:
@@ -83,11 +83,12 @@ def grabDatasets(datasetconf, GekkoURL):
 
     # --GRAB SECONDARY (EVALUATION) DATASET
     try:
-        D = evaluation.gekko.dataset.selectCandlestickData(GekkoURL,
+        D = evaluation.gekko.dataset.selectCandlestickData(
+            GekkoURL,
             exchange_source=datasetconf.eval_dataset_source,
             avoidCurrency=evolutionDatasets[0].specifications['asset'],
         )
-        evaluationDatasets = [CandlestickDataset(*D)]
+        evaluationDatasets = [datasetOperations.CandlestickDataset(*D)]
         evaluationDatasets[0].restrain(datasetconf.eval_dataset_span)
     except RuntimeError:
         evaluationDatasets = []
@@ -197,16 +198,20 @@ def gekko_generations(
 
     # --THIS LOADS A DATERANGE FOR A LOCALE;
     if options.benchmarkMode:
-        def onInitLocale(World, locale):
-            locale.Dataset = [
-                CandlestickDataset({},
-                                   {
-                                       'from': 0,
-                                       'to':0
-                                   })]
+        def onInitLocale(World):
+            Dataset = [
+                datasetOperations.CandlestickDataset(
+                    {},
+                    {
+                        'from': 0,
+                        'to': 0
+                    }
+                )]
+            return Dataset
     else:
-        def onInitLocale(World, locale):
-            locale.Dataset = getLocaleDataset(World, locale)
+        def onInitLocale(World):
+            Dataset = datasetOperations.getLocaleDataset(World)
+            return Dataset
 
     populationLoops = [promoterz.sequence.locale.standard_loop.execute]
     worldLoops = [promoterz.sequence.world.parallel_world.execute]
@@ -229,6 +234,9 @@ def gekko_generations(
     World.backtestconf = backtestconf
     World.evalbreakconf = evalbreakconf
     World.globalconf = globalconf
+
+    World.seedEnvironment()
+
     World.logger.updateFile()
 
     # INITALIZE EVALUATION PROCESSING POOL

@@ -44,6 +44,9 @@ def execute(World, locale):
         ind for ind in locale.population if ind.fitness.valid
     ] + remains
 
+    # --load current dataset for locale;
+    locale.Dataset = World.loadDatasetForLocalePosition(locale.position)
+
     # --evaluate individuals;
     locale.extraStats['nb_evaluated'], locale.extraStats[
         'avgTrades'
@@ -51,7 +54,9 @@ def execute(World, locale):
         locale
     )
 
-    locale.extraStats['avgExposure'] = sum([I.averageExposure for I in locale.population])/len(locale.population)
+    locale.extraStats['avgExposure'] = sum(
+        [I.averageExposure
+         for I in locale.population])/len(locale.population)
 
     # --send best individue to HallOfFame;
     if not locale.EPOCH % 15:

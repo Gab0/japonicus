@@ -7,9 +7,9 @@ from deap import tools
 
 import promoterz
 import evaluation
-import TOMLutils
+from . import TOMLutils
 
-from interface import showBacktestResult
+from japonicus.interface import showBacktestResult
 
 
 def showResults(World):
