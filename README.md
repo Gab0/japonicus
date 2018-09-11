@@ -30,9 +30,10 @@ The changelog is important for the user as following modifications can cause bug
 ```
 v0.90 
 
-- web interface reworked - now the recommended method to run the ga's.
+- web interface reworked - now it is the recommended method to run the ga's.
 - locale creation/destruction chances updated.
 - bayesian evolution method deprecated.
+- the evolution candle date ranges are now defined by given area in the map, instead of attached at each locale.
 
 v0.80 
 
