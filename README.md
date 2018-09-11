@@ -28,12 +28,16 @@ This somewhat corresponds to `--skeleton` mode of japonicus, which lets the GA s
 The changelog is important for the user as following modifications can cause bugs on related areas. Please report 'em ;)
 
 ```
+v0.91
+
+- the evolution candle date ranges are now defined by given area in the map, instead of attached at each locale.
+
+
 v0.90 
 
 - web interface reworked - now it is the recommended method to run the ga's.
 - locale creation/destruction chances updated.
 - bayesian evolution method deprecated.
-- the evolution candle date ranges are now defined by given area in the map, instead of attached at each locale.
 
 v0.80 
 
