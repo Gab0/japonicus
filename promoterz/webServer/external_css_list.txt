@@ -1,2 +1,2 @@
 https://fonts.googleapis.com/css?family=Overpass:400,400i,700,700i
-https://cdn.rawgit.com/plotly/dash-app-stylesheets/c6a126a684eaaa94a708d41d6ceb32b28ac78583/dash-technical-charting.css
+https://cdn.jsdelivr.net/gh/plotly/dash-app-stylesheets@c6a126a684eaaa94a708d41d6ceb32b28ac78583/dash-technical-charting.css
