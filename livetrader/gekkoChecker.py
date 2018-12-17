@@ -1,7 +1,12 @@
 #!/bin/python
 
 from . import gekkoTrigger
-from . import assetAllocator
+
+try:
+    from . import assetAllocator
+except Exception:
+    pass
+
 from dateutil import parser as dateparser
 import datetime
 import csv

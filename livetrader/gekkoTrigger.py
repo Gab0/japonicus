@@ -4,7 +4,7 @@ from evaluation.gekko.API import httpPost
 from evaluation.gekko.dataset import epochToString
 import requests
 import json
-import TOMLutils
+from promoterz import TOMLutils
 
 
 def runTradingBot(botSpecifications, Strategy, options, TradingBot=False):

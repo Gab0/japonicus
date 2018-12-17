@@ -115,6 +115,8 @@ def gekko_generations(
             if options.__dict__[parameter] != None:
                 genconf.__dict__[parameter] = options.__dict__[parameter]
     GenerationMethod = promoterz.functions.selectRepresentationMethod(GenerationMethod)
+
+    # --MANAGE Evaluation Modes;
     if EvaluationMode == 'indicator':
         # global StrategyFileManager
         StrategyFileManager = stratego.gekko_strategy.StrategyFileManager(

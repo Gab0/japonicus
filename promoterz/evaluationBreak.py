@@ -101,8 +101,10 @@ def showResults(World):
                 World.logger.log(
                     "Relative profit on evaluation dataset: \n\t%s" %
                     showBacktestResult(backtestResult))
-                LOCALE.lastEvaluationOnSecondary = backtestResult['relativeProfit']
-                GlobalLogEntry['secondary'] = backtestResult['relativeProfit']
+                LOCALE.lastEvaluationOnSecondary =\
+                    backtestResult['relativeProfit']
+                GlobalLogEntry['secondary'] =\
+                    backtestResult['relativeProfit']
             else:
                 print("Evaluation dataset is disabled.")
 
@@ -116,7 +118,8 @@ def showResults(World):
             TOMLSettings = TOMLutils.parametersToTOML(
                 FinalIndividueSettings)
             World.logger.log(TOMLSettings)
-            currentSessionBreakResults.append((backtestResult['relativeProfit'], TOMLSettings))
+            currentSessionBreakResults.append((backtestResult['relativeProfit'],
+                                               TOMLSettings))
             paramsFilename = "%s-EPOCH%i" % (LOCALE.name,
                                              LOCALE.EPOCH)
             World.logger.saveParameters(paramsFilename, TOMLSettings)

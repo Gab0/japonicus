@@ -32,5 +32,5 @@ EXPOSE 5000
 
 RUN python3.6 --version
 
-ENTRYPOINT ["python3.6", "/opt/japonicus/japonicus.py"]
-CMD ["python3.6", "/opt/japonicus/japonicus.py", "--help"]
+ENTRYPOINT ["python3.6", "/opt/japonicus/japonicus-run"]
+CMD ["python3.6", "/opt/japonicus/japonicus-run", "--help"]

@@ -6,7 +6,11 @@ import json
 import livetrader.exchangeMonitor
 import livetrader.gekkoTrigger
 import livetrader.gekkoChecker
-import livetrader.strategyRanker
+
+try:
+    import livetrader.strategyRanker
+except Exception:
+    pass
 
 parser = optparse.OptionParser()
 

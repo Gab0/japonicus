@@ -1,7 +1,7 @@
 #!/bin/python
 import ccxt
 import json
-import Settings
+from japonicus import Settings
 import time
 
 

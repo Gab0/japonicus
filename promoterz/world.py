@@ -45,9 +45,12 @@ class World():
         name = 'Locale%i' % (self.localeID)
         self.localeID += 1
         position = [random.randrange(0, self.size[x]) for x in range(2)]
-        L = locale.Locale(self, name,
+
+        L = locale.Locale(self,
+                          name,
                           position,
-                          random.choice(self.populationLoops))
+                          random.choice(self.populationLoops)
+        )
 
         self.locales.append(L)
 
@@ -135,7 +138,8 @@ class World():
             self.environmentSectors.append(row)
 
     def loadDatasetForLocalePosition(self, position):
-        pos = [P // self.size[p] for p, P in enumerate(position)]
+        pos = [round(P / self.size[p] * self.sectorSeedRoot)
+               for p, P in enumerate(position)]
 
         return self.environmentSectors[pos[0]][pos[1]]
 

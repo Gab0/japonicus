@@ -19,6 +19,7 @@ def selectCandlestickData(GekkoURL, exchange_source=None, avoidCurrency=None):
     if 'autoselect' in exchange_source.keys():
         if exchange_source['autoselect']:
             exchange_source = None
+
     # SEARCH CANDIDATE DATASETS AMONG THOSE OBTAINED FROM GEKKO API;
     for s in DataSetPack:
         Valid = True
@@ -30,6 +31,7 @@ def selectCandlestickData(GekkoURL, exchange_source=None, avoidCurrency=None):
                 Valid = False
         if Valid:
             scanset.append(s)
+
     # IN CASE NO CANDLESTICK DATASET IS COMPATIBLE;
     if len(scanset) == 0:
         if exchange_source:
@@ -40,21 +42,39 @@ def selectCandlestickData(GekkoURL, exchange_source=None, avoidCurrency=None):
 
         else:
             raise RuntimeError("no scanset available! check Gekko candle database.")
-    # OPERATE FOUND SCANSETS;
+
+    # SEARCH ON ALL FOUND SCANSETS;
     for EXCHANGE in scanset:
         ranges = EXCHANGE['ranges']
+        # no ranges found?
+        if not ranges:
+            # print("No scansets found for %s" % EXCHANGE)
+            continue
         range_spans = [x['to'] - x['from'] for x in ranges]
         LONGEST = range_spans.index(max(range_spans))
         EXCHANGE['max_span'] = range_spans[LONGEST]
         EXCHANGE['max_span_index'] = LONGEST
-    exchange_longest_spans = [x['max_span'] for x in scanset]
+
+    # COMPILE MOST INTERESTING SCANSETS;
+    availableScanset = [exchange for exchange in scanset
+                        if 'max_span' in exchange.keys()]
+    exchange_longest_spans = [x['max_span'] for x in availableScanset]
+
+    # Without scansets we cannot continue.
+    if not exchange_longest_spans:
+        print("FATAL: No scanset available.")
+        exit(1)
+
     best_exchange = exchange_longest_spans.index(max(exchange_longest_spans))
-    chosenScansetRange = scanset[best_exchange]['ranges'][
-        scanset[best_exchange]['max_span_index']
-    ]
+    best_exchange_span = availableScanset[best_exchange]['max_span_index']
+    chosenScansetRange = availableScanset[best_exchange]['ranges'][best_exchange_span]
+
     chosenScansetSpecifications = {
-        K: scanset[best_exchange][K] for K in scanset[best_exchange] if K in specKeys
+        K: availableScanset[best_exchange][K]
+        for K in availableScanset[best_exchange]
+        if K in specKeys
     }
+
     return chosenScansetSpecifications, chosenScansetRange
 
 
@@ -95,7 +115,7 @@ def getRandomDateRange(Limits, deltaDays):
         print(
             "Fatal: deltaDays on Settings.py set to a value bigger than current dataset.\n Edit Settings file to fit your chosen candlestick data."
         )
-        exit()
+        exit(1)
     Start = random.randint(FLms, TLms - deltams) if deltaDays else FLms
     End = (Start + deltams) if deltaDays else TLms
     DateRange = {

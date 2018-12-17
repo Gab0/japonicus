@@ -26,6 +26,9 @@ class CandlestickDataset():
 
         return message
 
+    def __str__(self):
+        return self.textSpecification()
+
 
 def getRandomSectorOfDataset(sourceDataset, deltaDays):
 
