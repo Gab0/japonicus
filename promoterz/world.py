@@ -138,7 +138,7 @@ class World():
             self.environmentSectors.append(row)
 
     def loadDatasetForLocalePosition(self, position):
-        pos = [round(P / self.size[p] * self.sectorSeedRoot)
+        pos = [math.floor(P / self.size[p] * self.sectorSeedRoot)
                for p, P in enumerate(position)]
 
         return self.environmentSectors[pos[0]][pos[1]]
