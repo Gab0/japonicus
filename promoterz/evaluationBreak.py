@@ -87,6 +87,11 @@ def showResults(World):
             FinalIndividueSettings = World.tools.constructPhenotype(
                 FinalIndividue)
 
+            # -- PREFETCH TOMLSettings;
+            TOMLSettings = TOMLutils.parametersToTOML(
+                FinalIndividueSettings
+            )
+
             # --EVALUATION DATASET TEST AND REPORT;
             if World.EnvironmentParameters['evaluation']:
                 evalDataset = random.choice(
@@ -105,6 +110,9 @@ def showResults(World):
                     backtestResult['relativeProfit']
                 GlobalLogEntry['secondary'] =\
                     backtestResult['relativeProfit']
+
+                currentSessionBreakResults.append((backtestResult['relativeProfit'],
+                                                   TOMLSettings))
             else:
                 print("Evaluation dataset is disabled.")
 
@@ -115,11 +123,9 @@ def showResults(World):
             print(" -- Settings for Gekko config.js -- ")
             World.logger.log(Show)
             print(" -- Settings for Gekko --ui webpage -- ")
-            TOMLSettings = TOMLutils.parametersToTOML(
-                FinalIndividueSettings)
+
             World.logger.log(TOMLSettings)
-            currentSessionBreakResults.append((backtestResult['relativeProfit'],
-                                               TOMLSettings))
+
             paramsFilename = "%s-EPOCH%i" % (LOCALE.name,
                                              LOCALE.EPOCH)
             World.logger.saveParameters(paramsFilename, TOMLSettings)
