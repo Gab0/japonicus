@@ -70,6 +70,7 @@ def grabDatasets(datasetconf, GekkoURL):
         datasetConfigName = 'dataset_source%i' % DS
         if datasetConfigName in datasetconf.__dict__.keys():
             evolutionDatasetNames.append(datasetConfigName)
+
     # --GRAB PRIMARY (EVOLUTION) DATASETS
     for evolutionDatasetName in evolutionDatasetNames:
         D = evaluation.gekko.dataset.selectCandlestickData(GekkoURL,
@@ -117,7 +118,7 @@ def gekko_generations(
         if parameter in options.__dict__.keys():
             if options.__dict__[parameter] != None:
                 genconf.__dict__[parameter] = options.__dict__[parameter]
-    GenerationMethod = promoterz.functions.selectRepresentationMethod(GenerationMethod)
+    GenerationMethod = promoterz.functions.selectRepresentationMethod(japonicusOptions["GenerationMethod"])
 
     # --MANAGE Evaluation Modes;
     if EvaluationMode == 'indicator':
@@ -139,7 +140,7 @@ def gekko_generations(
             evolutionDatasets, evaluationDatasets = grabDatasets(datasetconf, globalconf.GekkoURLs[0])
 
     # -- PARSE TARGET PARAMETERS
-    TargetParameters = promoterz.parameterOperations.flattenParameters(TargetParameters)
+    TargetParameters = promoterz.parameterOperations.flattenParameters(japonicusOptions["TargetParameters"])
     TargetParameters = promoterz.parameterOperations.parameterValuesToRangeOfValues(
         TargetParameters, genconf.parameter_spread
     )

@@ -1,5 +1,4 @@
 #!/bin/python
-import promoterz
 import evaluation
 
 

@@ -7,4 +7,4 @@ os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 
 settings, options = japonicus.buildJaponicusOptions(japonicus.options.parser)
-japonicus.launchJaponicus(settings, options)
+japonicus.JaponicusSession(settings, options)

@@ -81,7 +81,7 @@ class JaponicusSession():
             exit(1)
 
     def __init__(self, settings, options):
-        self.filterIllegalOptions(self, settings, options)
+        self.filterIllegalOptions(settings, options)
 
         # ADDITIONAL MODES;
         self.gekko_server = launchGekkoChildProcess(settings)\
