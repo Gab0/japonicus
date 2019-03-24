@@ -10,7 +10,7 @@ pytoml==0.1.16
 Js2Py==0.59
 Flask_Caching==1.4.0
 Quandl==3.4.0
-dash==0.21.1
+dash==0.24.1
 Flask==1.0.2
 requests==2.19.1
 bayesian_optimization==0.6.0
