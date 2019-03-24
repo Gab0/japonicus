@@ -1,8 +1,6 @@
 #!/bin/python
 
-
-from . import halt
-from . import Settings
+from . import halt, Settings, interface
 
 from time import sleep
 from random import choice, randrange
@@ -17,29 +15,6 @@ import os
 import promoterz
 from version import VERSION
 import evaluation
-
-
-def showTitleDisclaimer(backtestsettings):
-    TITLE = """\tGEKKO
-        ██╗ █████╗ ██████╗  ██████╗ ███╗   ██╗██╗ ██████╗██╗   ██╗███████╗
-        ██║██╔══██╗██╔══██╗██╔═══██╗████╗  ██║██║██╔════╝██║   ██║██╔════╝
-        ██║███████║██████╔╝██║   ██║██╔██╗ ██║██║██║     ██║   ██║███████╗
-   ██   ██║██╔══██║██╔═══╝ ██║   ██║██║╚██╗██║██║██║     ██║   ██║╚════██║
-   ╚█████╔╝██║  ██║██║     ╚██████╔╝██║ ╚████║██║╚██████╗╚██████╔╝███████║
-    ╚════╝ ╚═╝  ╚═╝╚═╝      ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═════╝ ╚══════╝"""
-    try:
-        print(TITLE)
-    except UnicodeEncodeError or SyntaxError:
-        print("\nJAPONICUS\n")
-    print('\t' * 8 + 'v%.2f' % VERSION)
-    print()
-
-    profitDisclaimer = "The profits reported here depends on backtest interpreter function;"
-    interpreterFuncName = backtestsettings['interpreteBacktestProfit']
-    interpreterInfo = evaluation.gekko.backtest.getInterpreterBacktestInfo(
-        interpreterFuncName)
-
-    print("%s \n\t%s" % (profitDisclaimer, interpreterInfo))
 
 
 def launchGekkoChildProcess(settings):
@@ -88,106 +63,133 @@ def buildJaponicusOptions(optionparser):
     return settings, options
 
 
-def launchJaponicus(settings, options):
-    # ABORT WHEN ILLEGAL OPTIONS ARE SET;
-    if not options.genetic_algorithm and not options.bayesian_optimization:
-        exit("Aborted: No operation specified.")
-    if not os.path.isfile(settings['global']['gekkoPath'] + '/gekko.js'):
-        exit("Aborted: gekko.js not found on path specified @Settings.py;")
+class JaponicusSession():
 
-    # show title;
-    showTitleDisclaimer(settings['backtest'])
+    def filterIllegalOptions(self, settings, options):
+        # ABORT WHEN ILLEGAL OPTIONS ARE SET;
+        if not options.genetic_algorithm and not options.bayesian_optimization:
+            print("Aborted: No operation specified.")
+            exit(1)
 
-    # ADDITIONAL MODES;
-    gekko_server = launchGekkoChildProcess(settings)\
-        if options.spawn_gekko else None
-    web_server = launchWebEvolutionaryInfo()\
-        if options.spawn_web else None
-    sleep(1)
-    markzero_time = datetime.datetime.now()
+        if not os.path.isfile(settings['global']['gekkoPath'] + '/gekko.js'):
+            print("Aborted: gekko.js not found on path specified @Settings.py;")
+            exit(1)
 
-    print()
+        # -- BAYESIAN IS DEPRECATED;
+        elif options.bayesian_optimization:
+            print("Bayesian method is deprecated.")
+            exit(1)
 
-    # LOCATE & VALIDATE RUNNING GEKKO INSTANCES FROM CONFIG URLs;
-    possibleInstances = settings['global']['GekkoURLs']
-    validatedInstances = []
-    for instance in possibleInstances:
-        Response = evaluation.gekko.API.checkInstance(instance)
-        if Response:
-            validatedInstances.append(instance)
-            print("found gekko @ %s" % instance)
+    def __init__(self, settings, options):
+        self.filterIllegalOptions(self, settings, options)
+
+        # ADDITIONAL MODES;
+        self.gekko_server = launchGekkoChildProcess(settings)\
+            if options.spawn_gekko else None
+        self.web_server = launchWebEvolutionaryInfo()\
+            if options.spawn_web else None
+        sleep(1)
+        markzero_time = datetime.datetime.now()
+
+        print()
+
+        # show title;
+        interface.showTitleDisclaimer(settings['backtest'], VERSION)
+        # LOCATE & VALIDATE RUNNING GEKKO INSTANCES FROM CONFIG URLs;
+        possibleInstances = settings['global']['GekkoURLs']
+        validatedInstances = []
+        for instance in possibleInstances:
+            Response = evaluation.gekko.API.checkInstance(instance)
+            if Response:
+                validatedInstances.append(instance)
+                print("found gekko @ %s" % instance)
+            else:
+                print("unable to locate %s" % instance)
+
+        if validatedInstances:
+            settings['global']['GekkoURLs'] = validatedInstances
         else:
-            print("unable to locate %s" % instance)
+            print("Aborted: No running gekko instances found.")
+            exit(1)
 
-    if validatedInstances:
-        settings['global']['GekkoURLs'] = validatedInstances
-    else:
-        exit("Aborted: No running gekko instances found.")
+        # --SELECT STRATEGY;
+        if options.random_strategy:
+            Strategy = ""
+            GekkoStrategyFolder = os.listdir(settings['global']['gekkoPath'] + '/strategies')
+            while Strategy + '.js' not in GekkoStrategyFolder:
+                if Strategy:
+                    print(
+                        "Strategy %s descripted on settings but not found on strat folder." %
+                        Strategy
+                    )
+                Strategy = choice(list(settings['strategies'].keys()))
+                print("> %s" % Strategy)
+        elif options.strategy:
+            Strategy = options.strategy
+        elif not options.skeleton:
+            print("No strategy specified! Use --strat or go --help")
+            exit(1)
 
-    # --SELECT STRATEGY;
-    if options.random_strategy:
-        Strategy = ""
-        GekkoStrategyFolder = os.listdir(settings['global']['gekkoPath'] + '/strategies')
-        while Strategy + '.js' not in GekkoStrategyFolder:
-            if Strategy:
-                print(
-                    "Strategy %s descripted on settings but not found on strat folder." %
-                    Strategy
+        # --LAUNCH GENETIC ALGORITHM;
+        if options.genetic_algorithm:
+
+            japonicusOptions = {
+                "GenerationMethod": None,
+                "TargetParameters": None
+            }
+
+            japonicusOptions["GenerationMethod"] =\
+                'chromosome' if options.chromosome_mode else 'oldschool'
+
+            if options.skeleton:
+                EvaluationMode = 'indicator'
+                AllIndicators = Settings.getSettings()['indicators']
+                TargetParameters = Settings.getSettings()['skeletons'][options.skeleton]
+                for K in AllIndicators.keys():
+                    if type(AllIndicators[K]) != dict:
+                        TargetParameters[K] = AllIndicators[K]
+                    elif AllIndicators[K]['active']:
+                        TargetParameters[K] = AllIndicators[K]
+                        TargetParameters[K]['active'] = (0, 1)
+
+                japonicusOptions["TargetParameters"] = TargetParameters
+
+                if not TargetParameters:
+                    print("Bad configIndicators!")
+                    exit(1)
+            else:
+                EvaluationMode = Strategy
+
+                # READ STRATEGY PARAMETER RANGES FROM TOML;
+                try:
+                    TOMLData = promoterz.TOMLutils.preprocessTOMLFile(
+                        "strategy_parameters/%s.toml" % Strategy
+                    )
+                except FileNotFoundError:
+                    print("Failure to find strategy parameter rules for " +
+                          "%s at ./strategy_parameters" % Strategy)
+                    gekkoParameterPath = "%s/config/strategies/%s.toml" %\
+                                         (settings['global']['gekkoPath'], Strategy)
+                    print("Trying to locate gekko parameters at %s" %
+                          gekkoParameterPath)
+                    TOMLData = promoterz.TOMLutils.preprocessTOMLFile(gekkoParameterPath)
+
+                japonicusOptions["TargetParameters"] =\
+                    promoterz.TOMLutils.TOMLToParameters(TOMLData)
+
+            # RUN ONE EQUAL INSTANCE PER REPEATER NUMBER SETTINGS, SEQUENTIALLY;
+            for s in range(options.repeater):
+                gekko_generations(
+                    japonicusOptions,
+                    EvaluationMode,
+                    settings,
+                    options,
+                    web=self.web_server
                 )
-            Strategy = choice(list(settings['strategies'].keys()))
-            print("> %s" % Strategy)
-    elif options.strategy:
-        Strategy = options.strategy
-    elif not options.skeleton:
-        exit("No strategy specified! Use --strat or go --help")
 
-    # --LAUNCH GENETIC ALGORITHM;
-    if options.genetic_algorithm:
-        GenerationMethod = 'chromosome' if options.chromosome_mode else 'oldschool'
-        if options.skeleton:
-            EvaluationMode = 'indicator'
-            AllIndicators = Settings.getSettings()['indicators']
-            TargetParameters = Settings.getSettings()['skeletons'][options.skeleton]
-            for K in AllIndicators.keys():
-                if type(AllIndicators[K]) != dict:
-                    TargetParameters[K] = AllIndicators[K]
-                elif AllIndicators[K]['active']:
-                    TargetParameters[K] = AllIndicators[K]
-                    TargetParameters[K]['active'] = (0, 1)
-            if not TargetParameters:
-                exit("Bad configIndicators!")
-        else:
-            EvaluationMode = Strategy
-
-            # READ STRATEGY PARAMETER RANGES FROM TOML;
-            try:
-                TOMLData = promoterz.TOMLutils.preprocessTOMLFile(
-                    "strategy_parameters/%s.toml" % Strategy
-                )
-            except FileNotFoundError:
-                print("Failure to find strategy parameter rules for " +
-                      "%s at ./strategy_parameters" % Strategy)
-                gekkoParameterPath = "%s/config/strategies/%s.toml" %\
-                                     (settings['global']['gekkoPath'], Strategy)
-                print("Trying to locate gekko parameters at %s" %
-                      gekkoParameterPath)
-                TOMLData = promoterz.TOMLutils.preprocessTOMLFile(gekkoParameterPath)
-
-            TargetParameters = promoterz.TOMLutils.TOMLToParameters(TOMLData)
-        # RUN ONE EQUAL INSTANCE PER REPEATER NUMBER SETTINGS, SEQUENTIALLY;
-        for s in range(options.repeater):
-            gekko_generations(
-                TargetParameters, GenerationMethod,
-                EvaluationMode, settings, options, web=web_server
-            )
-
-    # --LAUNCH BAYESIAN OPTIMIZATION;
-    elif options.bayesian_optimization:
-        exit("Bayesian method is deprecated.")
-
-    deltatime = datetime.datetime.now() - markzero_time
-    print("Run took %i seconds." % deltatime.seconds)
-    if options.spawn_web:
-        print('Statistics info server still runs...')
+        deltatime = datetime.datetime.now() - markzero_time
+        print("Run took %i seconds." % deltatime.seconds)
+        if options.spawn_web:
+            print('Statistics info server still runs...')
 
 

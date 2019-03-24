@@ -98,8 +98,11 @@ def grabDatasets(datasetconf, GekkoURL):
 
 
 def gekko_generations(
-        TargetParameters, GenerationMethod, EvaluationMode, settings,
-        options, web=None):
+        japonicusOptions,
+        EvaluationMode,
+        settings,
+        options,
+        web=None):
 
     # --LOAD SETTINGS;
     genconf = makeSettings(settings['generations'])

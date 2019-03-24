@@ -33,3 +33,25 @@ def parseDatasetInfo(purpose, candlestickDataset):
     return Text
 
 
+def showTitleDisclaimer(backtestsettings, VERSION):
+    TITLE = """\tGEKKO
+        ██╗ █████╗ ██████╗  ██████╗ ███╗   ██╗██╗ ██████╗██╗   ██╗███████╗
+        ██║██╔══██╗██╔══██╗██╔═══██╗████╗  ██║██║██╔════╝██║   ██║██╔════╝
+        ██║███████║██████╔╝██║   ██║██╔██╗ ██║██║██║     ██║   ██║███████╗
+   ██   ██║██╔══██║██╔═══╝ ██║   ██║██║╚██╗██║██║██║     ██║   ██║╚════██║
+   ╚█████╔╝██║  ██║██║     ╚██████╔╝██║ ╚████║██║╚██████╗╚██████╔╝███████║
+    ╚════╝ ╚═╝  ╚═╝╚═╝      ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═════╝ ╚══════╝"""
+    try:
+        print(TITLE)
+    except UnicodeEncodeError or SyntaxError:
+        print("\nJAPONICUS\n")
+    print('\t' * 8 + 'v%.2f' % VERSION)
+    print()
+
+    profitDisclaimer = "The profits reported here depends on backtest interpreter function;"
+    interpreterFuncName = backtestsettings['interpreteBacktestProfit']
+    interpreterInfo = evaluation.gekko.backtest.getInterpreterBacktestInfo(
+        interpreterFuncName)
+
+    print("%s \n\t%s" % (profitDisclaimer, interpreterInfo))
+
