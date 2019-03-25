@@ -5,7 +5,8 @@ import datetime
 
 import flask
 import dash
-from dash.dependencies import Input, Output, Event
+
+from dash.dependencies import Input, Output
 
 import dash_core_components as dcc
 import dash_html_components as html
@@ -55,7 +56,6 @@ def run_server(webpageTitle):
 
     # event triggers
     onRefreshClick = Input('refresh-button', 'n_clicks')
-    onInterval = Event('my-interval', 'interval')
 
     """
     # update graph methods
