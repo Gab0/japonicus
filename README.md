@@ -5,6 +5,7 @@ So you make a good strat, or get one from the internetz. Make sure its good, bec
 
 If you get good profit on strat standard settings or some random settings you made up, japonicus can find some setting set that improves the strategy, on some specific market/currency or overall.
 
+Discord Group: `https://discord.gg/TXDPEji`
 ## Instructions
 Japonicus works on `python>=3.6`!
 Check wiki for instructions on setup, workflow, methods, etc.
