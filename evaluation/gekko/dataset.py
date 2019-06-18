@@ -10,7 +10,10 @@ def getAllScanset(GekkoURL):
     return RESP['datasets']
 
 
-def selectCandlestickData(GekkoURL, exchange_source=None, avoidCurrency=None):
+def selectCandlestickData(GekkoURL,
+                          exchange_source=None,
+                          avoidCurrency=None,
+                          minDays=None):
     DataSetPack = getAllScanset(GekkoURL)
     specKeys = ['exchange', 'currency', 'asset']
     scanset = []
@@ -58,16 +61,25 @@ def selectCandlestickData(GekkoURL, exchange_source=None, avoidCurrency=None):
     # COMPILE MOST INTERESTING SCANSETS;
     availableScanset = [exchange for exchange in scanset
                         if 'max_span' in exchange.keys()]
+
     exchange_longest_spans = [x['max_span'] for x in availableScanset]
+
+    if minDays is not None:
+        exchange_longest_spans = [
+            span for span in exchange_longest_spans
+            if span > minDays * 24 * 3600
+        ]
 
     # Without scansets we cannot continue.
     if not exchange_longest_spans:
         print("FATAL: No scanset available.")
-        exit(1)
+        return None
 
     best_exchange = exchange_longest_spans.index(max(exchange_longest_spans))
-    best_exchange_span = availableScanset[best_exchange]['max_span_index']
-    chosenScansetRange = availableScanset[best_exchange]['ranges'][best_exchange_span]
+    best_exchange_span =\
+        availableScanset[best_exchange]['max_span_index']
+    chosenScansetRange =\
+        availableScanset[best_exchange]['ranges'][best_exchange_span]
 
     chosenScansetSpecifications = {
         K: availableScanset[best_exchange][K]
