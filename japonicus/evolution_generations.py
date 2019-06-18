@@ -204,6 +204,8 @@ def Generations(
     # --INITIALIZE WORLD WITH CANDLESTICK DATASET INFO; HERE THE GA KICKS IN;
     GlobalTools.register('Evaluate', Evaluate,
                          GlobalTools.constructPhenotype, conf.backtest)
+    GlobalTools.register("ApplyResult", EvaluationModule.ResultToIndividue)
+    GlobalTools.register("showIndividue", EvaluationModule.showIndividue)
 
     # --THIS LOADS A DATERANGE FOR A LOCALE;
     if options.benchmarkMode:
@@ -250,10 +252,10 @@ def Generations(
 
     # INITALIZE EVALUATION PROCESSING POOL
     World.parallel = promoterz.evaluationPool.EvaluationPool(
-            World.tools.Evaluate,
-            conf.Global.GekkoURLs,
-            conf.backtest.ParallelBacktests,
-            conf.generation.showIndividualEvaluationInfo,
+        World,
+        conf.Global.GekkoURLs,
+        conf.backtest.ParallelBacktests,
+        conf.generation.showIndividualEvaluationInfo,
         )
 
     # --GENERATE INITIAL LOCALES;
