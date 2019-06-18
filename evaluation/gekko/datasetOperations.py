@@ -43,11 +43,11 @@ def getRandomSectorOfDataset(sourceDataset, deltaDays):
 def getLocaleDataset(World, Type='evolution'):
 
     localeDataset = []
-    for DS in range(World.backtestconf.ParallelCandlestickDataset):
+    for DS in range(World.conf.backtest.ParallelCandlestickDataset):
         sourceDataset = random.choice(World.EnvironmentParameters['evolution'])
 
         newDataset = getRandomSectorOfDataset(sourceDataset,
-                                              World.backtestconf.deltaDays)
+                                              World.conf.backtest.deltaDays)
         localeDataset.append(newDataset)
 
     return localeDataset
