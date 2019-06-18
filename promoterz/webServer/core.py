@@ -23,7 +23,7 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 
-def run_server(webpageTitle):
+def build_server(webpageTitle):
     # Setup the app
     server = flask.Flask(__name__)
     app = dash.Dash(__name__, server=server, csrf_protect=False)
