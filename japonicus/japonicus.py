@@ -3,50 +3,42 @@
 from . import halt, Settings, interface
 
 from time import sleep
-from random import choice, randrange
-from subprocess import Popen, PIPE
+import random
 from threading import Thread
-from .evolution_generations import gekko_generations
+
+from .evolution_generations import Generations
+
 
 import datetime
 import os
 
+import waitress
 
 import promoterz
 from version import VERSION
-import evaluation
-
-
-def launchGekkoChildProcess(settings):
-    gekko_args = [
-        'node',
-        '--max-old-space-size=8192',
-        settings['global']['gekkoPath'] + '/web/server.js',
-    ]
-    gekko_server = Popen(gekko_args, stdin=PIPE, stdout=PIPE)
-    return gekko_server
 
 
 def launchWebEvolutionaryInfo():
     print("WEBSERVER MODE")
     webpageTitle = "japonicus evolutionary statistics - v%.2f" % VERSION
-    webServer = promoterz.webServer.core.run_server(webpageTitle)
+    webServer = promoterz.webServer.core.build_server(webpageTitle)
+
     webServerProcess = Thread(
-        target=webServer.server.run,
+        target=waitress.serve,
         kwargs={
-            'debug': False,
-            'host': '0.0.0.0'
+            "app": webServer,
+            "listen": "0.0.0.0:8182"
         }
     )
+
     webServerProcess.start()
     return webServer
 
 
-def buildJaponicusOptions(optionparser):
-    settings = Settings.getSettings()
+def buildSettingsOptions(optionparser, settingSubsets):
+    settings = Settings.getSettings(SettingsFiles=settingSubsets)
 
     # PARSE GENCONF & DATASET COMMANDLINE ARGUMENTS;
-    settingSubsets = ['generations', 'dataset', 'backtest', 'evalbreak']
     for settingSubset in settingSubsets:
         parser = promoterz.metaPromoterz.generateCommandLineArguments(
             optionparser,
@@ -63,29 +55,20 @@ def buildJaponicusOptions(optionparser):
     return settings, options
 
 
+def loadEvaluationModule():
+
+    req = [
+        "validateSettings",
+        "showStatistics"
+    ]
+    pass
+
+
 class JaponicusSession():
 
-    def filterIllegalOptions(self, settings, options):
-        # ABORT WHEN ILLEGAL OPTIONS ARE SET;
-        if not options.genetic_algorithm and not options.bayesian_optimization:
-            print("Aborted: No operation specified.")
-            exit(1)
-
-        if not os.path.isfile(settings['global']['gekkoPath'] + '/gekko.js'):
-            print("Aborted: gekko.js not found on path specified @Settings.py;")
-            exit(1)
-
-        # -- BAYESIAN IS DEPRECATED;
-        elif options.bayesian_optimization:
-            print("Bayesian method is deprecated.")
-            exit(1)
-
-    def __init__(self, settings, options):
-        self.filterIllegalOptions(settings, options)
+    def __init__(self, EvaluationModule, settings, options):
 
         # ADDITIONAL MODES;
-        self.gekko_server = launchGekkoChildProcess(settings)\
-            if options.spawn_gekko else None
         self.web_server = launchWebEvolutionaryInfo()\
             if options.spawn_web else None
         sleep(1)
@@ -95,34 +78,21 @@ class JaponicusSession():
 
         # show title;
         interface.showTitleDisclaimer(settings['backtest'], VERSION)
-        # LOCATE & VALIDATE RUNNING GEKKO INSTANCES FROM CONFIG URLs;
-        possibleInstances = settings['global']['GekkoURLs']
-        validatedInstances = []
-        for instance in possibleInstances:
-            Response = evaluation.gekko.API.checkInstance(instance)
-            if Response:
-                validatedInstances.append(instance)
-                print("found gekko @ %s" % instance)
-            else:
-                print("unable to locate %s" % instance)
 
-        if validatedInstances:
-            settings['global']['GekkoURLs'] = validatedInstances
-        else:
-            print("Aborted: No running gekko instances found.")
+        if not EvaluationModule.validateSettings(settings):
             exit(1)
 
         # --SELECT STRATEGY;
         if options.random_strategy:
             Strategy = ""
-            GekkoStrategyFolder = os.listdir(settings['global']['gekkoPath'] + '/strategies')
+            GekkoStrategyFolder = os.listdir(settings['Global']['gekkoPath'] + '/strategies')
             while Strategy + '.js' not in GekkoStrategyFolder:
                 if Strategy:
                     print(
                         "Strategy %s descripted on settings but not found on strat folder." %
                         Strategy
                     )
-                Strategy = choice(list(settings['strategies'].keys()))
+                Strategy = random.choice(list(settings['strategies'].keys()))
                 print("> %s" % Strategy)
         elif options.strategy:
             Strategy = options.strategy
@@ -159,7 +129,6 @@ class JaponicusSession():
                     exit(1)
             else:
                 EvaluationMode = Strategy
-
                 # READ STRATEGY PARAMETER RANGES FROM TOML;
                 try:
                     TOMLData = promoterz.TOMLutils.preprocessTOMLFile(
@@ -169,17 +138,21 @@ class JaponicusSession():
                     print("Failure to find strategy parameter rules for " +
                           "%s at ./strategy_parameters" % Strategy)
                     gekkoParameterPath = "%s/config/strategies/%s.toml" %\
-                                         (settings['global']['gekkoPath'], Strategy)
-                    print("Trying to locate gekko parameters at %s" %
+                                         (settings['Global']['gekkoPath'], Strategy)
+                    print("Trying to locate strategy parameters at %s" %
                           gekkoParameterPath)
-                    TOMLData = promoterz.TOMLutils.preprocessTOMLFile(gekkoParameterPath)
+
+                    TOMLData = promoterz.TOMLutils.preprocessTOMLFile(
+                        gekkoParameterPath)
 
                 japonicusOptions["TargetParameters"] =\
                     promoterz.TOMLutils.TOMLToParameters(TOMLData)
 
-            # RUN ONE EQUAL INSTANCE PER REPEATER NUMBER SETTINGS, SEQUENTIALLY;
+            # RUN ONE EQUAL INSTANCE PER REPEATER NUMBER SETTINGS,
+            # SEQUENTIALLY...
             for s in range(options.repeater):
-                gekko_generations(
+                Generations(
+                    EvaluationModule,
                     japonicusOptions,
                     EvaluationMode,
                     settings,
