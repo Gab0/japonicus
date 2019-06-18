@@ -24,6 +24,18 @@ SettingsFiles = [
 ]
 
 
+def ResultToIndividue(result, individue):
+    individue.fitness.values = (result['relativeProfit'], result['sharpe'])
+    individue.trades = result['trades']
+    individue.averageExposure = result['averageExposure'] / 3600000
+
+
+def showIndividue(evaldata):
+    return "~ bP: %.3f\tS: %.3f\tnbT:%.3f" % (
+        evaldata['relativeProfit'], evaldata['sharpe'], evaldata['trades']
+    )
+
+
 def validateSettings(settings):
     # LOCATE & VALIDATE RUNNING GEKKO INSTANCES FROM CONFIG URLs;
     possibleInstances = settings['Global']['GekkoURLs']
