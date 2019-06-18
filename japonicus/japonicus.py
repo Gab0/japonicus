@@ -21,7 +21,7 @@ from version import VERSION
 def launchWebEvolutionaryInfo():
     print("WEBSERVER MODE")
     webpageTitle = "japonicus evolutionary statistics - v%.2f" % VERSION
-    webServer = promoterz.webServer.core.build_server(webpageTitle)
+    webApp, webServer = promoterz.webServer.core.build_server(webpageTitle)
 
     webServerProcess = Thread(
         target=waitress.serve,
@@ -32,7 +32,7 @@ def launchWebEvolutionaryInfo():
     )
 
     webServerProcess.start()
-    return webServer
+    return webApp
 
 
 def buildSettingsOptions(optionparser, settingSubsets):
@@ -69,15 +69,16 @@ class JaponicusSession():
     def __init__(self, EvaluationModule, settings, options):
 
         # ADDITIONAL MODES;
-        self.web_server = launchWebEvolutionaryInfo()\
-            if options.spawn_web else None
-        sleep(1)
         markzero_time = datetime.datetime.now()
 
         print()
 
         # show title;
         interface.showTitleDisclaimer(settings['backtest'], VERSION)
+
+        self.web_server = launchWebEvolutionaryInfo()\
+            if options.spawn_web else None
+        sleep(1)
 
         if not EvaluationModule.validateSettings(settings):
             exit(1)
