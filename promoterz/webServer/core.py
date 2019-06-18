@@ -104,4 +104,4 @@ def build_server(webpageTitle):
         app.css.append_css({"external_url": css})
 
     # launch DASH APP
-    return app
+    return app, server
