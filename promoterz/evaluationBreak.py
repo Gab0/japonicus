@@ -23,8 +23,8 @@ def showResults(World):
     # LOAD EVALUATION DATASET;
     sourceDataset = random.choice(World.EnvironmentParameters[useSecondary])
     getter = evaluation.gekko.datasetOperations.getRandomSectorOfDataset
-    for NB in range(World.evalbreakconf.proofSize):
-        newDataset = getter(sourceDataset, World.backtestconf.deltaDays)
+    for NB in range(World.conf.evalbreak.proofSize):
+        newDataset = getter(sourceDataset, World.conf.backtest.deltaDays)
         validationDatasets.append(newDataset)
 
     for LOCALE in World.locales:
@@ -32,9 +32,9 @@ def showResults(World):
                              if ind.fitness.valid]
 
         # SELECT BEST INDIVIDUALS;
-        B = World.evalbreakconf.NBBESTINDS
+        B = World.conf.evalbreak.NBBESTINDS
         BestIndividues = tools.selBest(LOCALE.population, B)
-        Z = min(World.evalbreakconf.NBADDITIONALINDS,
+        Z = min(World.conf.evalbreak.NBADDITIONALINDS,
                 len(LOCALE.population) - B)
         Z = max(0, Z)
 
