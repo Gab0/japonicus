@@ -106,7 +106,7 @@ def getLocaleEvolutionToolbox(World, locale):
     toolbox.register(
         'populationAges',
         promoterz.supplement.age.populationAges,
-        World.genconf.ageBoundaries,
+        World.conf.generation.ageBoundaries,
     )
     toolbox.register(
         'populationPD',
