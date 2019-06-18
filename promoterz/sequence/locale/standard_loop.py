@@ -65,7 +65,7 @@ def execute(World, locale):
     assert (sum([x.fitness.valid for x in locale.population]) == len(locale.population))
 
     # --compile stats;
-    statistics.compileStats(locale)
+    World.EvaluationModule.compileStats(locale)
 
     # --population ages
     qpop = len(locale.population)
@@ -77,49 +77,49 @@ def execute(World, locale):
 
     # INDIVIDUE FITNESS ATTRIBUTES FILTERS;
     # --remove very inapt citizens
-    if World.genconf.minimumProfitFilter is not None:
-        locale.extratools.filterThreshold(World.genconf.minimumProfitFilter,
-                                          World.genconf._lambda)
+    if World.conf.generation.minimumProfitFilter is not None:
+        locale.extratools.filterThreshold(World.conf.generation.minimumProfitFilter,
+                                          World.conf.generation._lambda)
         checkPopulation(locale.population,
                         "Population dead after profit filter.")
 
     # --remove individuals below tradecount
-    if World.genconf.TradeNumberFilterRange is not None:
-        locale.extratools.filterTrades(World.genconf.TradeNumberFilterRange,
-                                       World.genconf._lambda)
+    if World.conf.generation.TradeNumberFilterRange is not None:
+        locale.extratools.filterTrades(World.conf.generation.TradeNumberFilterRange,
+                                       World.conf.generation._lambda)
         checkPopulation(locale.population,
                         "Population dead after trading number filter.")
 
     # --remove individues based on average roundtripe exposure time;
-    if World.genconf.averageExposureLengthFilterRange is not None:
+    if World.conf.generation.averageExposureLengthFilterRange is not None:
         locale.extratools.filterExposure(
-            World.genconf.averageExposureLengthFilterRange,
-            World.genconf._lambda
+            World.conf.generation.averageExposureLengthFilterRange,
+            World.conf.generation._lambda
         )
         checkPopulation(locale.population,
                         "Population dead after roundtrip exposure filter.")
 
     if not locale.population:
-        locale.population = World.tools.population(World.genconf.POP_SIZE)
+        locale.population = World.tools.population(World.conf.generation.POP_SIZE)
         print("Repopulating... Aborting epoch.")
 
     # --show stats;
-    statistics.showStatistics(locale)
+    World.EvaluationModule.showStatistics(locale)
 
     # --calculate new population size;
     if locale.EPOCH:
         PRoFIGA = supplement.PRoFIGA.calculatePRoFIGA(
-            World.genconf.PRoFIGA_beta,
+            World.conf.generation.PRoFIGA_beta,
             locale.EPOCH,
-            World.genconf.NBEPOCH,
+            World.conf.generation.NBEPOCH,
             locale.EvolutionStatistics[locale.EPOCH - 1],
             locale.EvolutionStatistics[locale.EPOCH],
         )
         locale.POP_SIZE += locale.POP_SIZE * PRoFIGA
 
         # put population size inside thresholds;
-        minps = World.genconf.POP_SIZE // 2
-        maxps = World.genconf.POP_SIZE * 3
+        minps = World.conf.generation.POP_SIZE // 2
+        maxps = World.conf.generation.POP_SIZE * 3
         try:
             _POP_SIZE = max(min(locale.POP_SIZE, maxps), minps)
             locale.POP_SIZE = int(round(_POP_SIZE))
@@ -136,7 +136,7 @@ def execute(World, locale):
     assert (None not in locale.population)
 
     # --select best individues to procreate
-    LAMBDA = max(World.genconf._lambda,
+    LAMBDA = max(World.conf.generation._lambda,
                  locale.POP_SIZE - len(locale.population))
 
     TournamentSize = max(2 * LAMBDA,
@@ -150,7 +150,7 @@ def execute(World, locale):
 
     # --modify and integrate offspring;
     offspring = algorithms.varAnd(
-        offspring, World.tools, World.genconf.cxpb, World.genconf.mutpb
+        offspring, World.tools, World.conf.generation.cxpb, World.conf.generation.mutpb
     )
 
     locale.extratools.ageZero(offspring)
