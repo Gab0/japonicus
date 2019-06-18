@@ -40,13 +40,15 @@ def showTitleDisclaimer(backtestsettings, VERSION):
    ██   ██║██╔══██║██╔═══╝ ██║   ██║██║╚██╗██║██║██║     ██║   ██║╚════██║
    ╚█████╔╝██║  ██║██║     ╚██████╔╝██║ ╚████║██║╚██████╗╚██████╔╝███████║
     ╚════╝ ╚═╝  ╚═╝╚═╝      ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
-    \tGENETIC ALGORITHMS
     """
+
+    TITLE += "\t EVOLUTIONARY GENETIC ALGORITHMS"
+
     try:
         print(TITLE, end="")
     except UnicodeEncodeError or SyntaxError:
         print("\nJAPONICUS\n")
-    print('\t' * 8 + 'v%.2f' % VERSION)
+    print('\t' * 4 + 'v%.2f' % VERSION)
     print()
 
     profitDisclaimer = "The profits reported here depends on backtest interpreter function;"
@@ -54,5 +56,5 @@ def showTitleDisclaimer(backtestsettings, VERSION):
     interpreterInfo = evaluation.gekko.backtest.getInterpreterBacktestInfo(
         interpreterFuncName)
 
-    print("%s \n\t%s" % (profitDisclaimer, interpreterInfo))
+    print("%s \n\t%s\n" % (profitDisclaimer, interpreterInfo))
 
