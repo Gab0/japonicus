@@ -7,22 +7,13 @@ from multiprocessing import Pool, TimeoutError
 from multiprocessing.pool import ThreadPool
 
 
-def showIndividue(evaldata):
-    return "~ bP: %.3f\tS: %.3f\tnbT:%.3f" % (
-        evaldata['relativeProfit'], evaldata['sharpe'], evaldata['trades']
-    )
-
-
-def applyEvaluationResultToIndividue(result, individue):
-    individue.fitness.values = (result['relativeProfit'], result['sharpe'])
-    individue.trades = result['trades']
-    individue.averageExposure = result['averageExposure'] / 3600000
-
-
 class EvaluationPool():
 
-    def __init__(self, EvaluationTool, Urls, poolsize, individual_info):
-        self.EvaluationTool = EvaluationTool
+    def __init__(self,
+                 World,
+                 Urls, poolsize, individual_info):
+        self.World = World
+
         self.Urls = Urls
         self.lasttimes = [0 for x in Urls]
         self.lasttimesperind = [0 for x in Urls]
@@ -44,7 +35,7 @@ class EvaluationPool():
             for dataset, Ind in dateInds
         ]
         P = Pool(self.poolsizes[I])
-        fitnesses = P.starmap(self.EvaluationTool, Q)
+        fitnesses = P.starmap(self.World.tools.Evaluate, Q)
         P.close()
         P.join()
         delta_time = time.time() - stime
@@ -86,8 +77,8 @@ class EvaluationPool():
         for PoolIndex in range(len(results)):
             for i, fit in enumerate(results[PoolIndex][0]):
                 if self.individual_info:
-                    print(showIndividue(fit))
-                applyEvaluationResultToIndividue(fit, props[PoolIndex][i])
+                    print(self.World.tools.showIndividue(fit))
+                self.World.tools.ApplyResult(fit, props[PoolIndex][i])
 
                 TotalNumberOfTrades += fit['trades']
             self.lasttimes[PoolIndex] = results[PoolIndex][1]
