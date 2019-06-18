@@ -1,20 +1,12 @@
 #!/bin/python
 import json
-import random
 import time
-import datetime
 import sys
 
 import promoterz
 import evaluation
 
-from copy import deepcopy
-
 from . import interface
-
-from deap import tools
-from deap import algorithms
-from deap import base
 
 from .Settings import getSettings, makeSettings
 import stratego
@@ -62,35 +54,42 @@ def benchmarkEvaluate(constructPhenotype, genconf, Datasets, Individual, gekkoUr
     return SCORE
 
 
-def grabDatasets(datasetconf, GekkoURL):
+def grabDatasets(conf):
     # CHECK HOW MANY EVOLUTION DATASETS ARE SPECIFIED AT SETTINGS;
     evolutionDatasetNames = ['dataset_source']
     evolutionDatasets = []
     for DS in range(1, 100):
         datasetConfigName = 'dataset_source%i' % DS
-        if datasetConfigName in datasetconf.__dict__.keys():
+        if datasetConfigName in conf.dataset.__dict__.keys():
             evolutionDatasetNames.append(datasetConfigName)
 
     # --GRAB PRIMARY (EVOLUTION) DATASETS
     for evolutionDatasetName in evolutionDatasetNames:
-        D = evaluation.gekko.dataset.selectCandlestickData(GekkoURL,
-            exchange_source=datasetconf.__dict__[evolutionDatasetName]
+        D = evaluation.gekko.dataset.selectCandlestickData(
+            conf.Global.GekkoURLs[0],
+            exchange_source=conf.dataset.__dict__[evolutionDatasetName],
+            minDays=conf.backtest.deltaDays
         )
         evolutionDatasets.append(datasetOperations.CandlestickDataset(*D))
         try:
-            evolutionDatasets[-1].restrain(datasetconf.dataset_span)
+            evolutionDatasets[-1].restrain(conf.dataset.dataset_span)
         except Exception:
             print('dataset_ span not configured for evolutionDatasetName. skipping...')
 
     # --GRAB SECONDARY (EVALUATION) DATASET
     try:
+        Avoid = evolutionDatasets[0].specifications['asset']
         D = evaluation.gekko.dataset.selectCandlestickData(
-            GekkoURL,
-            exchange_source=datasetconf.eval_dataset_source,
-            avoidCurrency=evolutionDatasets[0].specifications['asset'],
+            conf.Global.GekkoURLs[0],
+            exchange_source=conf.dataset.eval_dataset_source,
+            avoidCurrency=None,
+            minDays=conf.backtest.deltaDays
         )
-        evaluationDatasets = [datasetOperations.CandlestickDataset(*D)]
-        evaluationDatasets[0].restrain(datasetconf.eval_dataset_span)
+        if D is not None:
+            evaluationDatasets = [datasetOperations.CandlestickDataset(*D)]
+            evaluationDatasets[0].restrain(conf.dataset.eval_dataset_span)
+        else:
+            evaluationDatasets = []
     except RuntimeError:
         evaluationDatasets = []
         print("Evaluation dataset not found.")
@@ -98,7 +97,8 @@ def grabDatasets(datasetconf, GekkoURL):
     return evolutionDatasets, evaluationDatasets
 
 
-def gekko_generations(
+def Generations(
+        EvaluationModule,
         japonicusOptions,
         EvaluationMode,
         settings,
@@ -106,25 +106,23 @@ def gekko_generations(
         web=None):
 
     # --LOAD SETTINGS;
-    genconf = makeSettings(settings['generations'])
-    globalconf = makeSettings(settings['global'])
-    datasetconf = makeSettings(settings['dataset'])
-    indicatorconf = makeSettings(settings['indicators'])
-    backtestconf = makeSettings(settings['backtest'])
-    evalbreakconf = makeSettings(settings['evalbreak'])
+    conf = makeSettings(settings)
 
     # --APPLY COMMAND LINE GENCONF SETTINGS;
-    for parameter in genconf.__dict__.keys():
+    for parameter in conf.generation.__dict__.keys():
         if parameter in options.__dict__.keys():
             if options.__dict__[parameter] != None:
-                genconf.__dict__[parameter] = options.__dict__[parameter]
-    GenerationMethod = promoterz.functions.selectRepresentationMethod(japonicusOptions["GenerationMethod"])
+                conf.generation[parameter] = options.__dict__[parameter]
+
+    GenerationMethod = promoterz.functions.selectRepresentationMethod(
+        japonicusOptions["GenerationMethod"]
+    )
 
     # --MANAGE Evaluation Modes;
     if EvaluationMode == 'indicator':
         # global StrategyFileManager
         StrategyFileManager = stratego.gekko_strategy.StrategyFileManager(
-            globalconf.gekkoPath, indicatorconf
+            conf.Global.gekkoPath, conf.indicator
         )
         Evaluate = partial(indicatorEvaluate, StrategyFileManager)
         Strategy = options.skeleton
@@ -134,19 +132,24 @@ def gekko_generations(
         if options.benchmarkMode:
             Evaluate = benchmarkEvaluate
             evolutionDatasets, evaluationDatasets = [], []
-            genconf.minimumProfitFilter = None
+            conf.gen.minimumProfitFilter = None
         else:
             Evaluate = standardEvaluate
-            evolutionDatasets, evaluationDatasets = grabDatasets(datasetconf, globalconf.GekkoURLs[0])
+            evolutionDatasets, evaluationDatasets = grabDatasets(
+                conf
+            )
 
     # -- PARSE TARGET PARAMETERS
-    TargetParameters = promoterz.parameterOperations.flattenParameters(japonicusOptions["TargetParameters"])
+    TargetParameters = promoterz.parameterOperations.flattenParameters(
+        japonicusOptions["TargetParameters"])
     TargetParameters = promoterz.parameterOperations.parameterValuesToRangeOfValues(
-        TargetParameters, genconf.parameter_spread
+        TargetParameters, conf.generation.parameter_spread
     )
-    GlobalTools = GenerationMethod.getToolbox(Strategy, genconf, TargetParameters)
-    RemoteHosts = evaluation.gekko.API.loadHostsFile(globalconf.RemoteAWS)
-    globalconf.GekkoURLs += RemoteHosts
+    GlobalTools = GenerationMethod.getToolbox(Strategy,
+                                              conf.generation,
+                                              TargetParameters)
+    RemoteHosts = evaluation.gekko.API.loadHostsFile(conf.Global.RemoteAWS)
+    conf.Global.GekkoURLs += RemoteHosts
     if RemoteHosts:
         print("Connected Remote Hosts:\n%s" % ('\n').join(RemoteHosts))
         if EvaluationMode == 'indicator':
@@ -182,7 +185,7 @@ def gekko_generations(
         )
 
     # --LOG CONFIG INFO;
-    configInfo = json.dumps(genconf.__dict__, indent=4)
+    configInfo = json.dumps(conf.generation.__dict__, indent=4)
     Logger.log(configInfo, target="Header", show=False)
 
     # --SHOW DATASET INFO;
@@ -200,7 +203,7 @@ def gekko_generations(
 
     # --INITIALIZE WORLD WITH CANDLESTICK DATASET INFO; HERE THE GA KICKS IN;
     GlobalTools.register('Evaluate', Evaluate,
-                         GlobalTools.constructPhenotype, backtestconf)
+                         GlobalTools.constructPhenotype, conf.backtest)
 
     # --THIS LOADS A DATERANGE FOR A LOCALE;
     if options.benchmarkMode:
@@ -219,13 +222,16 @@ def gekko_generations(
             Dataset = datasetOperations.getLocaleDataset(World)
             return Dataset
 
+    # Select run loops;
     populationLoops = [promoterz.sequence.locale.standard_loop.execute]
     worldLoops = [promoterz.sequence.world.parallel_world.execute]
+
+    # Initalize World;
     World = promoterz.world.World(
         GlobalTools=GlobalTools,
         populationLoops=populationLoops,
         worldLoops=worldLoops,
-        genconf=genconf,
+        conf=conf,
         TargetParameters=TargetParameters,
         EnvironmentParameters={
             'evolution':  evolutionDatasets,
@@ -237,10 +243,7 @@ def gekko_generations(
     World.logger = Logger
     World.EvaluationStatistics = []
 
-    World.backtestconf = backtestconf
-    World.evalbreakconf = evalbreakconf
-    World.globalconf = globalconf
-
+    World.EvaluationModule = EvaluationModule
     World.seedEnvironment()
 
     World.logger.updateFile()
@@ -248,20 +251,20 @@ def gekko_generations(
     # INITALIZE EVALUATION PROCESSING POOL
     World.parallel = promoterz.evaluationPool.EvaluationPool(
             World.tools.Evaluate,
-            globalconf.GekkoURLs,
-            backtestconf.ParallelBacktests,
-            genconf.showIndividualEvaluationInfo,
+            conf.Global.GekkoURLs,
+            conf.backtest.ParallelBacktests,
+            conf.generation.showIndividualEvaluationInfo,
         )
 
     # --GENERATE INITIAL LOCALES;
-    for l in range(genconf.NBLOCALE):
+    for l in range(conf.generation.NBLOCALE):
         World.generateLocale()
 
     # --RUN EPOCHES;
-    while World.EPOCH < World.genconf.NBEPOCH:
+    while World.EPOCH < World.conf.generation.NBEPOCH:
         World.runEpoch()
-        if evalbreakconf.evaluateSettingsPeriodically and not options.benchmarkMode:
-            if not World.EPOCH % evalbreakconf.evaluateSettingsPeriodically:
+        if conf.evalbreak.evaluateSettingsPeriodically and not options.benchmarkMode:
+            if not World.EPOCH % conf.evalbreak.evaluateSettingsPeriodically:
                 promoterz.evaluationBreak.showResults(World)
         if not World.EPOCH % 10:
             print("Total Evaluations: %i" % World.totalEvaluations)
