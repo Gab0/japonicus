@@ -33,15 +33,17 @@ def parseDatasetInfo(purpose, candlestickDataset):
 
 
 def showTitleDisclaimer(backtestsettings, VERSION):
-    TITLE = """\tGEKKO
+    TITLE = """
         ██╗ █████╗ ██████╗  ██████╗ ███╗   ██╗██╗ ██████╗██╗   ██╗███████╗
         ██║██╔══██╗██╔══██╗██╔═══██╗████╗  ██║██║██╔════╝██║   ██║██╔════╝
         ██║███████║██████╔╝██║   ██║██╔██╗ ██║██║██║     ██║   ██║███████╗
    ██   ██║██╔══██║██╔═══╝ ██║   ██║██║╚██╗██║██║██║     ██║   ██║╚════██║
    ╚█████╔╝██║  ██║██║     ╚██████╔╝██║ ╚████║██║╚██████╗╚██████╔╝███████║
-    ╚════╝ ╚═╝  ╚═╝╚═╝      ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═════╝ ╚══════╝"""
+    ╚════╝ ╚═╝  ╚═╝╚═╝      ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
+    \tGENETIC ALGORITHMS
+    """
     try:
-        print(TITLE)
+        print(TITLE, end="")
     except UnicodeEncodeError or SyntaxError:
         print("\nJAPONICUS\n")
     print('\t' * 8 + 'v%.2f' % VERSION)
