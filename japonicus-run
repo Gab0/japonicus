@@ -2,9 +2,12 @@
 import os
 
 import japonicus
-
+import evaluation
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 
-settings, options = japonicus.buildJaponicusOptions(japonicus.options.parser)
-japonicus.JaponicusSession(settings, options)
+settings, options = japonicus.buildSettingsOptions(
+    japonicus.options.parser,
+    evaluation.gekko.SettingsFiles
+)
+japonicus.JaponicusSession(evaluation.gekko, settings, options)
