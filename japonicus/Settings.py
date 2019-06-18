@@ -18,8 +18,15 @@ class makeSettings(dict):
         self.update(entries)
 
 
-def getSettings(specific=None):
+def getSettings(SettingsFiles=[], specific=None):
     HOME = str(Path.home())
+
+    settings = {}
+
+    for SettingsFile in SettingsFiles:
+        settings[SettingsFile] = loadTomlSettings(SettingsFile)
+
+    return settings
 
     s = {
         # gekko global settings;
@@ -43,7 +50,6 @@ def getSettings(specific=None):
         }
     }
 
-    s['global']['gekkoPath'] = s['global']['gekkoPath'].replace("$HOME", HOME)
     if specific is not None:
         if not specific:
             return makeSettings(s)
