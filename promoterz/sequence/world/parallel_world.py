@@ -19,17 +19,17 @@ def execute(World):
                 World.migration(L[1], L[0], (1, 7))
 
     # --APPLY LOCALE CREATION;
-    if random.random() < World.genconf.localeCreationChance / 100:
+    if random.random() < World.conf.generation.localeCreationChance / 100:
         World.generateLocale()
 
     # --APPLY RANDOMIC LOCALE DESTRUCTION;
-    if random.random() < World.genconf.localeExplodeChance / 100:
+    if random.random() < World.conf.generation.localeExplodeChance / 100:
         chosenLocale = random.choice(World.locales)
         World.explodeLocale(chosenLocale)
 
     # --APPLY EXPECTED LOCALE DESTRUCTION;
     for L in range(len(World.locales)):
-        if World.locales[L].EPOCH > World.genconf.localeExpirationAge:
+        if World.locales[L].EPOCH > World.conf.generation.localeExpirationAge:
             if len(World.locales) > 2:
                 World.explodeLocale(World.locales[L])
                 #  if two locales are destroyed @ same time, post-locale migrations
@@ -38,5 +38,5 @@ def execute(World):
 
     # --APPLY LOCALE WALKS;
     for L in range(len(World.locales)):
-        if random.random() < World.genconf.localeWalkChance / 100:
+        if random.random() < World.conf.generation.localeWalkChance / 100:
             World.localeWalk(World.locales[L])
