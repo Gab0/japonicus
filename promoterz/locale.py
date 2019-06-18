@@ -25,15 +25,16 @@ class Locale():
         # function to convert parameters from individue to usable strategy Settings;
         # Check promoterz/representation;
         #genconf.Strategy = Strategy # ovrride strat defined on settings if needed;
+
         # --initial population
-        self.population = World.tools.population(World.genconf.POP_SIZE)
+        self.population = World.tools.population(World.conf.generation.POP_SIZE)
         self.lastEvaluation = None
         self.lastEvaluationOnSecondary = None
 
         # --INIT STATISTICS;
         self.stats = statistics.getStatisticsMeter()
         self.InitialBestScores, self.FinalBestScores = [], []
-        self.POP_SIZE = World.genconf.POP_SIZE
+        self.POP_SIZE = World.conf.generation.POP_SIZE
         self.loop = loop
 
     def run(self):
