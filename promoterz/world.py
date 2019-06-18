@@ -13,7 +13,7 @@ class World():
             GlobalTools=None,
             populationLoops=None,
             worldLoops=None,
-            genconf=None,
+            conf=None,
             TargetParameters=None,
             EnvironmentParameters=None,
             onInitLocale=None,
@@ -34,7 +34,9 @@ class World():
         self.size = [500, 500]
         self.maxdistance = self.calculateDistance([0, 0], self.size)
         self.TargetParameters = TargetParameters
-        self.genconf = genconf
+
+        self.conf = conf
+        # Temporary assignment of configs
 
         self.localeID = 1
         self.EnvironmentParameters = EnvironmentParameters
@@ -94,7 +96,7 @@ class World():
     def runEpoch(self):
         epochHeader = "EPOCH %i/%i" % (
             self.EPOCH,
-            self.genconf.NBEPOCH
+            self.conf.generation.NBEPOCH
         )
 
         print("\t====== %s ======" % epochHeader)
@@ -127,7 +129,7 @@ class World():
 
     def seedEnvironment(self):
         # round to nearest square number
-        self.sectorSeedRoot = round(math.sqrt(self.genconf.worldSeedSize))
+        self.sectorSeedRoot = round(math.sqrt(self.conf.generation.worldSeedSize))
 
         self.environmentSectors = []
         for i in range(self.sectorSeedRoot):
@@ -144,7 +146,7 @@ class World():
         return self.environmentSectors[pos[0]][pos[1]]
 
     def localeWalk(self, locale):
-        ammount = self.genconf.localeWalkDistance
+        ammount = self.conf.generation.localeWalkDistance
 
         variation = [random.randrange(-ammount, ammount)
                      for i in range(2)]
