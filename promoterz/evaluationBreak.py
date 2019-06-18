@@ -78,7 +78,7 @@ def showResults(World):
                 World.logger.log("Current parameters are viable.")
             else:
                 World.logger.log("Current parameters fails.")
-                if not World.globalconf.showFailedStrategies:
+                if not World.conf.Global.showFailedStrategies:
                     World.logger.log(
                         "Skipping further tests on current parameters.",
                         show=False)
