@@ -84,4 +84,4 @@ def getEvalbreak(app):
 
 
 def getResults(app):
-    return [html.P(str(r[0]) + '\n' + r) for r in app.resultParameters]
+    return [html.Textarea(str(r[0]) + '\n' + str(r[1]), style={'width': '525', 'height': '550'}) for r in app.resultParameters]
