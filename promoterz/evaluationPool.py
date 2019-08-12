@@ -20,12 +20,6 @@ class EvaluationPool():
         self.poolsizes = [poolsize for x in Urls]
         self.individual_info = individual_info
 
-    def ejectURL(self, Index):
-        self.Urls.pop(Index)
-        self.lasttimes.pop(Index)
-        self.lasttimesperind.pop(Index)
-        self.poolsizes.pop(Index)
-
     def evaluateBackend(self, datasets, I, inds):
         stime = time.time()
         dateInds = list(itertools.product(datasets, inds))
@@ -56,18 +50,22 @@ class EvaluationPool():
         ]
         pool = ThreadPool(len(self.Urls))
         results = []
-        for A in args:
-            results.append(pool.apply_async(self.evaluateBackend, A))
-        pool.close()
+        try:
+            for A in args:
+                results.append(pool.apply_async(self.evaluateBackend, A))
+            pool.close()
+        except (SystemExit, KeyboardInterrupt):
+            print("Aborted by user.")
+            exit(0)
         TimedOut = []
         for A in range(len(results)):
             try:
                 perindTime = 3 * self.lasttimesperind[A]\
                              if self.lasttimesperind[A] else 12
                 timeout = perindTime * len(props[A])\
-                          if A else None  # no timeout for local machine;
+                    if A else None  # no timeout for local machine;
                 results[A] = results[A].get(timeout=timeout)
-            except TimeoutError:  # Timeout: remote machine is dead, et al
+            except TimeoutError:  # Timeout: remote machine is dead;
                 print("Machine timeouts!")
                 args[A][1] = 0  # Set to evaluate @ local machine
                 results[A] = self.evaluateBackend(* args[A])
@@ -83,7 +81,8 @@ class EvaluationPool():
                 TotalNumberOfTrades += fit['trades']
             self.lasttimes[PoolIndex] = results[PoolIndex][1]
             L = len(props[PoolIndex])
-            self.lasttimesperind[PoolIndex] = self.lasttimes[PoolIndex] / L if L else 5
+            self.lasttimesperind[PoolIndex] =\
+                self.lasttimes[PoolIndex] / L if L else 5
         F = [x.fitness.valid for x in individues_to_simulate]
         assert (all(F))
         for T in TimedOut:
@@ -94,35 +93,3 @@ class EvaluationPool():
         # CALCULATE AVERAGE TRADE NUMBER;
         averageTrades = TotalNumberOfTrades / max(1, N)
         return N, averageTrades
-
-    def distributeIndividuals(self, tosimulation):
-        nb_simulate = len(tosimulation)
-        sumtimes = sum(self.lasttimes)
-        # stdtime = sum(self.lasttimes)/len(self.lasttimes)
-        std = nb_simulate / len(self.Urls)
-        # stdTPI = sum(self.lasttimesperind)/len(self.lasttimesperind)
-        #print(stdTPI)
-        if sumtimes:
-            vels = [1 / x for x in self.lasttimes]
-            constant = nb_simulate / sum(vels)
-            proportions = [max(1, x * constant) for x in vels]
-        else:
-            proportions = [std for x in self.Urls]
-        proportions = [int(round(x)) for x in proportions]
-        pC = lambda x: random.randrange(0, len(x))
-        pB = lambda x: x.index(min(x))
-        pM = lambda x: x.index(max(x))
-        while sum(proportions) < nb_simulate:
-            proportions[pB(proportions)] += 1
-            print('+')
-        while sum(proportions) > nb_simulate:
-            proportions[pM(proportions)] -= 1
-            print('-')
-        print(proportions)
-        assert (sum(proportions) == nb_simulate)
-        distribution = []
-        L = 0
-        for P in proportions:
-            distribution.append(tosimulation[L: L + P])
-            L = L + P
-        return distribution

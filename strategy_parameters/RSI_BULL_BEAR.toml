@@ -1,4 +1,4 @@
-SMA_long = 1000
+SMA_long = [800, 1000]
 SMA_short = 50
 
 BULL_RSI = 10

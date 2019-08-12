@@ -36,7 +36,8 @@ def indicatorEvaluate(
     return SCORE
 
 
-def standardEvaluate(constructPhenotype, genconf, Datasets, Individual, gekkoUrl):
+def standardEvaluate(constructPhenotype,
+                     genconf, Datasets, Individual, gekkoUrl):
     phenotype = constructPhenotype(Individual)
     phenotype = {Individual.Strategy: phenotype}
     SCORE = evaluation.gekko.backtest.Evaluate(
@@ -45,7 +46,8 @@ def standardEvaluate(constructPhenotype, genconf, Datasets, Individual, gekkoUrl
     return SCORE
 
 
-def benchmarkEvaluate(constructPhenotype, genconf, Datasets, Individual, gekkoUrl):
+def benchmarkEvaluate(constructPhenotype,
+                      genconf, Datasets, Individual, gekkoUrl):
     phenotype = constructPhenotype(Individual)
     phenotype = {Individual.Strategy: phenotype}
     SCORE = evaluation.benchmark.benchmark.Evaluate(
@@ -74,7 +76,8 @@ def grabDatasets(conf):
         try:
             evolutionDatasets[-1].restrain(conf.dataset.dataset_span)
         except Exception:
-            print('dataset_ span not configured for evolutionDatasetName. skipping...')
+            print(
+                'dataset_ span not configured for evolutionDatasetName. skipping...')
 
     # --GRAB SECONDARY (EVALUATION) DATASET
     try:
@@ -189,17 +192,9 @@ def Generations(
     Logger.log(configInfo, target="Header", show=False)
 
     # --SHOW DATASET INFO;
-    for evolutionDataset in evolutionDatasets:
-        Logger.log(
-            interface.parseDatasetInfo("evolution", evolutionDataset),
-            target="Header"
-        )
-    if evaluationDatasets:
-        for evaluationDataset in evaluationDatasets:
-            Logger.log(
-                interface.parseDatasetInfo("evaluation", evaluationDataset),
-                target="Header"
-            )
+    EvaluationModule.showPrimaryInfo(Logger,
+                                     evolutionDatasets,
+                                     evaluationDatasets)
 
     # --INITIALIZE WORLD WITH CANDLESTICK DATASET INFO; HERE THE GA KICKS IN;
     GlobalTools.register('Evaluate', Evaluate,
@@ -251,7 +246,7 @@ def Generations(
     World.logger.updateFile()
 
     # INITALIZE EVALUATION PROCESSING POOL
-    World.parallel = promoterz.evaluationPool.EvaluationPool(
+    World.parallel = World.EvaluationModule.EvaluationPool(
         World,
         conf.Global.GekkoURLs,
         conf.backtest.ParallelBacktests,

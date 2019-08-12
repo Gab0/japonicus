@@ -9,8 +9,6 @@ import promoterz
 import evaluation
 from . import TOMLutils
 
-from japonicus.interface import showBacktestResult
-
 
 def showResults(World):
     validationDatasets = []
@@ -68,7 +66,7 @@ def showResults(World):
 
             for R, Result in enumerate(Results):
                 World.logger.log(
-                    showBacktestResult(Result,
+                    evaluation.gekko.showBacktestResult(Result,
                                        validationDatasets[R]) + '\n')
 
             World.logger.log(
@@ -105,7 +103,7 @@ def showResults(World):
                 backtestResult = secondaryResults[0][0]
                 World.logger.log(
                     "Relative profit on evaluation dataset: \n\t%s" %
-                    showBacktestResult(backtestResult))
+                    evaluation.gekko.showBacktestResult(backtestResult))
                 LOCALE.lastEvaluationOnSecondary =\
                     backtestResult['relativeProfit']
                 GlobalLogEntry['secondary'] =\
