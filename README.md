@@ -13,21 +13,20 @@ Check wiki for instructions on setup, workflow, methods, etc.
 
 ## Disclaimer
 
-No matter how many years span your training candles or how convoluted or simple is your strategy,
-your strategies/parameters that were profitable on backtest runs probably won't translate well to live trading.
+No matter how many years your training candles span or how convoluted or simple is your strategy,
+your strategies/parameters that were profitable on backtest runs probably won't translate well to live trading.<br>
 Altough japonicus is a fairly competent GA and will find a capable set of parameters in a few epoches,
-We're yet to discover why the live trading runs seem an environment completely unrelated to backtests, where
-strategies/parameters that seemed good offline turn into daily losses or below market gains.
+we're yet to discover why the live trading runs seem an environment completely unrelated to backtest env, where
+strategies/parameters that seemed good offline turn into live daily losses or below market gains.
+
+You can send me a few coins to help me develop some ideas for binance trading bots,
+as this kind of research involves a steady negative profit so I cannot sustain it indefinitely...
+If something starts working I will share here or in our discord group. Those are my binance wallets:
 
 ```
 LTC	LVhThMzJMC6aKBcA1KX4q3yk2ryBjfPGfH
 ETH	0xceaa9bb655ed80ba36b55532fdd6e11e6e5b681b
 ```
-
-Those are my binance wallets, you can send few coins there to help me develop some ideas for binance trading bots,
-as this kind of research involves a steady negative profit so I cannot sustain it indefinitely...
-If something starts working I should share here or in our discord group.
-
 
 ## User Feedback
 
