@@ -4,7 +4,7 @@ numpy==1.16.2
 tulipy==0.2
 pandas==0.18.1
 deap==1.2.2
-scipy==0.19.0
+scipy==1.10.0
 pytoml==0.1.16
 Js2Py==0.59
 Flask_Caching==1.4.0
